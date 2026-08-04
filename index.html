@@ -186,8 +186,11 @@ body.da-phu .cuaso, body.da-phu .hero{
   /* Chú ý: với từ khoá 'circle', CSS chỉ nhận bán kính là ĐỘ DÀI (px), không
      nhận phần trăm. Viết % là cả khai báo bị bỏ và không vẽ gì cả.
      Bán kính px do JS tính từ cạnh thật của hiện vật.                      */
-  background:radial-gradient(circle var(--den-r,120px) at var(--den-x,50%) var(--den-y,50%),
-    rgba(255,252,240,.72) 0%, rgba(255,248,228,.34) 38%, rgba(255,255,255,0) 72%);
+  background:
+    radial-gradient(circle var(--den-loi,40px) at var(--den-x,50%) var(--den-y,50%),
+      rgba(255,253,246,.92) 0%, rgba(255,250,235,.42) 55%, rgba(255,255,255,0) 100%),
+    radial-gradient(circle var(--den-r,120px) at var(--den-x,50%) var(--den-y,50%),
+      rgba(255,246,224,.46) 0%, rgba(255,242,214,.16) 46%, rgba(255,255,255,0) 78%);
   -webkit-mask-size:contain; mask-size:contain;
   -webkit-mask-position:center; mask-position:center;
   -webkit-mask-repeat:no-repeat; mask-repeat:no-repeat;
@@ -337,6 +340,9 @@ body.da-phu .hero{ height:0; min-height:0; }
   position:fixed; top:0; left:0; right:0; z-index:18;
   background:var(--giay);
 }
+/* Thanh tiêu đề rời khỏi dòng chảy khi phóng kín → phải chừa lại đúng chiều
+   cao của nó, nếu không khung video đột ngột cao thêm và video giật lên. */
+.cuaso.phu-kin{ padding-top:var(--cao-thanh, 34px); }
 
 /* Khung chứa màn hình + lớp phủ làm tối */
 /* Video nền trong cửa sổ. object-fit:cover nên mọi tỉ lệ đều phủ kín khung,
@@ -349,17 +355,22 @@ body.da-phu .hero{ height:0; min-height:0; }
   pointer-events:none;
 }
 .cs-video.hien{ opacity:var(--vid-mo,1); }
-/* Dải mã "đang tải" chạy trước khi video hiện */
-.cs-tai{
-  position:absolute; left:0; right:0; top:50%; transform:translateY(-50%); z-index:3;
-  padding:0 6%;
-  font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace;
-  font-size:clamp(9px,1.1vw,13px); line-height:1.9;
-  color:var(--mint); opacity:0; transition:opacity .4s ease;
-  pointer-events:none; text-align:left;
+/* Thanh tiến trình tải video, nằm ngay dưới dòng "Loading... Idea" */
+.tai-thanh{
+  margin-top:1.1em; height:3px; width:min(62%, 320px);
+  background:rgba(140,199,196,.18); overflow:hidden;
 }
-.cs-tai.hien{ opacity:.85; }
-.cs-tai .dong.sang{ color:var(--giay); }
+.tai-thanh i{
+  display:block; height:100%; width:0%; background:var(--mint);
+  transition:width .18s linear;
+}
+.tai-so{
+  margin-top:.5em; font-size:9px; letter-spacing:.18em; color:var(--mint); opacity:.7;
+}
+/* Tải xong thì cả màn terminal biến mất hẳn, nhường chỗ cho video */
+.cs-than{ transition:opacity .55s ease; }
+.cs-than.xong{ opacity:0; pointer-events:none; }
+
 /* Nút bật tắt tiếng, nằm trên thanh tiêu đề */
 .cs-tieng{
   font:inherit; font-size:9px; letter-spacing:.14em; text-transform:uppercase;
@@ -487,7 +498,6 @@ body.khoa .cs-than{ cursor:pointer; }
       <div class="cs-than" id="csThan"></div>
       <video class="cs-video" id="csVideo" muted loop playsinline
              preload="auto" tabindex="-1" aria-hidden="true"></video>
-      <div class="cs-tai" id="csTai" aria-hidden="true"></div>
       <div class="cs-phu" id="csPhu" aria-hidden="true"></div>
     </div>
   </div>
@@ -709,13 +719,7 @@ const VIDEO = {
   hien:       900,    /* video mờ dần hiện lên trong bao lâu (ms)           */
   mo_hero:    0.55,   /* độ mờ của video khi còn ở Hero (0 → 1)             */
   mo_main:    1,      /* độ mờ khi đã thành nền của Main Section            */
-  nut_tieng:  true,   /* hiện nút bật/tắt tiếng                             */
-  dong_tai: [
-    "$ mount /media/idea",
-    "> decoding stream ......",
-    "> buffering 00:00 / 00:12",
-    "$ play --loop --muted"
-  ]
+  nut_tieng:  true    /* hiện nút bật/tắt tiếng                             */
 };
 
 const MAHOA = {
@@ -756,6 +760,8 @@ const MAIN = {
   muot:         0.18,     /* độ mượt khi nghiêng đuổi theo tay               */
   keo_tha:      true,
   le_keo:       10,       /* chừa lại bao nhiêu px ở mép, kể cả thanh tiêu đề */
+  keo_lac:      12,       /* vật lắc bao nhiêu độ theo hướng bị kéo (mặt phẳng) */
+  keo_nghieng:  10,       /* và ngả thêm bao nhiêu độ theo trục 3D             */
 
   /* Bóng đổ chạy theo góc nghiêng + vệt sáng lướt trên mặt */
   bong_lech:    22,       /* bóng dạt tối đa bao nhiêu px                     */
@@ -763,6 +769,8 @@ const MAIN = {
   bong_nhoe:    26,       /* độ nhoè của bóng                                 */
   den:          0.60,     /* độ sáng của quầng đèn pin (0 = tắt)              */
   den_ban_kinh: 45,       /* bán kính quầng, tính theo % cạnh hiện vật        */
+  den_loi:      0.34,     /* lõi sáng gắt chiếm bao nhiêu phần bán kính        */
+  den_toi:      0.14,     /* ảnh tối đi bao nhiêu khi bị rọi (tăng tương phản) */
   ma_duoi:      5,        /* đuôi ký tự rác chạy trước con trỏ gõ chữ         */
 
   /* Bấm vào hiện vật để phóng to xem chi tiết */
@@ -1078,47 +1086,48 @@ var cuaso = el('cuaso'), csThan = el('csThan'), csToado = el('csToado'), csPhu =
    Section thì video phóng theo và trở thành lớp nền phía sau lớp phủ mờ.
    ========================================================================= */
 function batVideo(){
-  var v = el('csVideo'), tai = el('csTai'), nut = el('csTieng');
+  var v = el('csVideo'), nut = el('csTieng'), than = el('csThan');
   if(!v) return;
   if(!VIDEO.bat){
     v.style.display = 'none';
-    if(tai) tai.style.display = 'none';
     if(nut) nut.style.display = 'none';
     return;
   }
-  /* nhiều nguồn → trình duyệt tự chọn định dạng nó đọc được */
   (VIDEO.nguon || []).forEach(function(n){
     var sc = document.createElement('source');
     sc.src = n.src; if(n.type) sc.type = n.type;
     v.appendChild(sc);
   });
-  v.muted = true;               /* bắt buộc, nếu không trình duyệt chặn tự chạy */
+  v.muted = true;                 /* bắt buộc, nếu không trình duyệt chặn tự chạy */
   v.setAttribute('playsinline', '');
   v.style.setProperty('--vid-mo', String(VIDEO.mo_hero));
 
-  /* dải mã đang tải */
-  if(tai && !itDong){
-    tai.innerHTML = '';
-    var ds = VIDEO.dong_tai || [], nhip = (VIDEO.cho || 1400) / Math.max(1, ds.length);
-    tai.classList.add('hien');
-    ds.forEach(function(d, i){
-      setTimeout(function(){
-        var e = document.createElement('div');
-        e.className = 'dong' + (/^\$/.test(d) ? ' sang' : '');
-        e.textContent = d;
-        tai.appendChild(e);
-        if(typeof maHoa === 'function') maHoa(e, 260);
-      }, i * nhip);
-    });
-  }
+  var san = false, hong = false, xongRoi = false;
+  v.addEventListener('canplaythrough', function(){ san = true; });
+  v.addEventListener('loadeddata',     function(){ san = true; });
+  v.addEventListener('error', function(){ hong = true; }, true);
 
-  function chay(){
-    if(tai) tai.classList.remove('hien');
+  var t0 = performance.now(), cho = itDong ? 1 : (VIDEO.cho || 1400);
+  (function nhip(){
+    var thanh = el('taiThanh'), so = el('taiSo');
+    if(hong){                      /* không có file video → giữ nguyên màn terminal */
+      if(thanh) thanh.parentNode.style.display = 'none';
+      if(so) so.style.display = 'none';
+      return;
+    }
+    /* Chạy tới 92% theo thời gian, chỉ nhảy nốt 100% khi video thật sự sẵn sàng */
+    var p = Math.min(0.92, (performance.now() - t0) / cho);
+    if(san) p = Math.min(1, Math.max(p, (performance.now() - t0) / cho));
+    if(san && p >= 0.92) p = 1;
+    if(thanh) thanh.style.width = (p * 100).toFixed(0) + '%';
+    if(so) so.textContent = (p * 100).toFixed(0) + '%';
+    if(p < 1){ requestAnimationFrame(nhip); return; }
+    if(xongRoi) return;
+    xongRoi = true;
+    if(than) than.classList.add('xong');   /* màn terminal biến mất hẳn */
     v.classList.add('hien');
-    var p = v.play();
-    if(p && p.catch) p.catch(function(){});
-  }
-  setTimeout(chay, itDong ? 0 : (VIDEO.cho || 1400));
+    var pr = v.play(); if(pr && pr.catch) pr.catch(function(){});
+  })();
 
   if(nut && VIDEO.nut_tieng){
     nut.addEventListener('click', function(e){
@@ -1258,8 +1267,9 @@ function datBi(ngay){
   if(lo){
     lo.style.setProperty('--den-x', (50 + biTT.mx * 50).toFixed(1) + '%');
     lo.style.setProperty('--den-y', (50 + biTT.my * 50).toFixed(1) + '%');
-    lo.style.setProperty('--den-r',
-      (Math.min(biTam.w, biTam.h) * (HEROBI.den_ban_kinh || 42) / 100).toFixed(1) + 'px');
+    var Rb = Math.min(biTam.w, biTam.h) * (HEROBI.den_ban_kinh || 42) / 100;
+    lo.style.setProperty('--den-r',   Rb.toFixed(1) + 'px');
+    lo.style.setProperty('--den-loi', (Rb * 0.34).toFixed(1) + 'px');
     lo.style.opacity = (biTT.manh * (HEROBI.den == null ? 0.6 : HEROBI.den)).toFixed(3);
   }
 }
@@ -1285,7 +1295,7 @@ function batHeroBi(){
     if(!HEROBI.nghieng) return; biTT.re = true; biDay();
   });
   e.addEventListener('pointerleave', function(){
-    biTT.re = false; biTT.ox = 0; biTT.oy = 0; biDay();
+    biTT.re = false; biDay();   /* quầng sáng đứng yên tại chỗ rồi mờ đi */
   });
   addEventListener('pointermove', function(ev){
     if(!biTT.re && !biTT.keo) return;
@@ -1335,6 +1345,8 @@ function veManHinh(){
       }).join('') +
       '<div class="chinh">' + thoat(C.dongChinh || '') +
         '<span class="con-tro"></span></div>' +
+      (VIDEO.bat ? '<div class="tai-thanh"><i id="taiThanh"></i></div>' +
+                   '<div class="tai-so" id="taiSo">0%</div>' : '') +
     '</div>';
 }
 
@@ -1500,6 +1512,8 @@ function ve(t){
   var duoi = Math.max(0, H - viTri.y - goc.h) * k;
 
   cuaso.classList.add('phongto');
+  var caoTh = Math.round(el('csThanh').getBoundingClientRect().height) || 34;
+  cuaso.style.setProperty('--cao-thanh', caoTh + 'px');
   cuaso.classList.toggle('phu-kin', t >= 0.999);
   cuaso.style.left   = trai + 'px';
   cuaso.style.top    = tren + 'px';
@@ -1740,6 +1754,7 @@ function batManHinh(){
       v.loe.style.webkitMaskImage = 'url(' + v.im.src + ')';
       v.loe.style.maskImage = 'url(' + v.im.src + ')';
       v.dx = 0; v.dy = 0; v.ox = 0; v.oy = 0; v.mx = 0; v.my = 0;
+      v.vx = 0; v.vy = 0; v._px = null; v._py = null;
       v.manh = 0; v.zoom = 0; v.dichZoom = 0;
       datVatTF(v);
     }
@@ -1935,7 +1950,14 @@ function batManHinh(){
     var ti = (1 + (MAIN.phong || 0) * (v.manh || 0) * (1 - z)) * (1 + (X.ti - 1) * z);
     var gB =  (v.mx || 0) * (MAIN.goc_3d || 0) * (v.manh || 0);
     var gA = -(v.my || 0) * (MAIN.goc_3d || 0) * (v.manh || 0);
-    var gc = v.def.goc * (1 - z);
+    /* NGHIÊNG THEO HƯỚNG KÉO: vật lắc trong mặt phẳng như tấm bìa bị lôi đi,
+       đồng thời ngả thêm theo trục 3D cùng chiều với tay.                 */
+    var gh = Math.max(-1, Math.min(1, (v.vx || 0) / 26));
+    var gv = Math.max(-1, Math.min(1, (v.vy || 0) / 26));
+    var lac = -gh * (MAIN.keo_lac || 12) * (1 - z);
+    gB +=  gh * (MAIN.keo_nghieng || 10) * (1 - z);
+    gA += -gv * (MAIN.keo_nghieng || 10) * (1 - z);
+    var gc = v.def.goc * (1 - z) + lac;
 
     /* CHỐNG VỠ ẢNH: khi đang đứng yên ở mức phóng to, đặt kích thước THẬT cho
        thẻ và bỏ scale đi, để trình duyệt vẽ lại tấm ảnh ở đúng cỡ đó. Nếu cứ
@@ -1967,15 +1989,18 @@ function batManHinh(){
     var bx = -(v.mx || 0) * (MAIN.bong_lech || 22);
     var by = (MAIN.bong_cao || 16) + (1 - (v.my || 0)) * (MAIN.bong_lech || 22) * 0.4 + nhac * 12;
     var nhoe = (MAIN.bong_nhoe || 26) + nhac * 16;
-    if(v.tam) v.tam.style.filter = 'drop-shadow(' + bx.toFixed(1) + 'px ' + by.toFixed(1) +
-      'px ' + nhoe.toFixed(0) + 'px rgba(0,0,0,' + (0.38 + nhac * 0.12).toFixed(2) + '))';
+    if(v.tam) v.tam.style.filter =
+      'drop-shadow(' + bx.toFixed(1) + 'px ' + by.toFixed(1) + 'px ' + nhoe.toFixed(0) +
+      'px rgba(0,0,0,' + (0.38 + nhac * 0.12).toFixed(2) + ')) ' +
+      'brightness(' + (1 - (MAIN.den_toi || 0.14) * (v.manh || 0)).toFixed(3) + ')';
 
     /* ĐÈN PIN bám theo con trỏ */
     if(v.loe){
       v.loe.style.setProperty('--den-x', (50 + (v.mx || 0) * 50).toFixed(1) + '%');
       v.loe.style.setProperty('--den-y', (50 + (v.my || 0) * 50).toFixed(1) + '%');
-      v.loe.style.setProperty('--den-r',
-        (Math.min(wq, hq) * (MAIN.den_ban_kinh || 45) / 100).toFixed(1) + 'px');
+      var Rq = Math.min(wq, hq) * (MAIN.den_ban_kinh || 45) / 100;
+      v.loe.style.setProperty('--den-r',   Rq.toFixed(1) + 'px');
+      v.loe.style.setProperty('--den-loi', (Rq * (MAIN.den_loi || 0.34)).toFixed(1) + 'px');
       v.loe.style.opacity = ((v.manh || 0) * (MAIN.den || 0.6)).toFixed(3);
     }
 
@@ -2010,6 +2035,10 @@ function batManHinh(){
       v.mx += (v.ox - v.mx) * k;
       v.my += (v.oy - v.my) * k;
       v.manh += (dRe - v.manh) * k;
+      if(keoVat !== i){ v.vx *= 0.86; v.vy *= 0.86;
+        if(Math.abs(v.vx) < 0.02) v.vx = 0;
+        if(Math.abs(v.vy) < 0.02) v.vy = 0; }
+      if(Math.abs(v.vx) > 0.02 || Math.abs(v.vy) > 0.02) yen = false;
       v.zoom += (dZ - v.zoom) * kz;
       datVatTF(v);
     }
@@ -2120,7 +2149,10 @@ function batManHinh(){
     oCum.addEventListener('pointerout', function(e){
       var i = chiSo(e);
       if(i >= 0 && i === reVat && keoVat < 0){
-        reVat = -1; vat[i].ox = 0; vat[i].oy = 0; day();
+        /* KHÔNG đặt lại ox/oy về 0 — nếu đặt thì quầng sáng trôi về tâm rồi
+           mới tắt, trông rất giả. Để nguyên chỗ cuối rồi mờ dần tại đó.
+           Độ nghiêng vẫn tự trở về phẳng vì nó được nhân với 'manh'.     */
+        reVat = -1; day();
       }
     });
     addEventListener('pointermove', function(e){
@@ -2137,6 +2169,10 @@ function batManHinh(){
       }
       if(keoVat >= 0){
         var h = vat[keoVat];
+        /* Tốc độ kéo → dùng để lắc và nghiêng vật theo hướng đang bị lôi đi */
+        h.vx += ((e.clientX - (h._px == null ? e.clientX : h._px)) - h.vx) * 0.35;
+        h.vy += ((e.clientY - (h._py == null ? e.clientY : h._py)) - h.vy) * 0.35;
+        h._px = e.clientX; h._py = e.clientY;
         h.dx = dx0 + e.clientX - x0;
         h.dy = dy0 + e.clientY - y0;
         chanTrongVung(h);
@@ -2160,6 +2196,7 @@ function batManHinh(){
       if(keoVat < 0) return;
       if(nutKeo && nutKeo.classList) nutKeo.classList.remove('keo');
       var i = keoVat; keoVat = -1; nutKeo = null;
+      vat[i]._px = null; vat[i]._py = null;
       if(!daDi) moXem(i);          /* bấm mà không kéo → phóng to */
       day();
     }
@@ -2290,6 +2327,7 @@ function batManHinh(){
       var v = vat[i];
       v.p = 0; v.dx = 0; v.dy = 0; v.ox = 0; v.oy = 0;
       v.mx = 0; v.my = 0; v.manh = 0; v.zoom = 0; v._net = null;
+      v.vx = 0; v.vy = 0; v._px = null; v._py = null;
       if(v.nut){
         v.nut.style.transform = ''; v.nut.style.opacity = '';
         v.nut.style.zIndex = ''; v.nut.style.pointerEvents = '';
