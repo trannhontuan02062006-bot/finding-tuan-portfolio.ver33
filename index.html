@@ -162,8 +162,30 @@ body.da-phu .cuaso, body.da-phu .hero{
 .mh-tren .cot{ overflow:hidden; flex:0 1 min(38ch, 42vw); min-width:0; }
 .mh-tren .dong{ white-space:nowrap; overflow:hidden; text-overflow:ellipsis; opacity:.78; }
 .mh-tren .dong.sang{ color:var(--giay); opacity:1; }
+/* Dòng trích dẫn tang vật — bấm được */
+.mh-tren .dong.co-vat{ cursor:pointer; opacity:.9; transition:color .18s ease, opacity .18s ease; }
+.mh-tren .dong.co-vat:hover{ color:var(--giay); opacity:1; }
+.mh-tren .dong.co-vat.khoa:hover{ color:var(--do); }
+.mh-tren .dong.loi{ color:var(--do); opacity:1; }
 
 /* --- Hai phần ba dưới: chữ ASCII rồi hoá thành hiện vật --- */
+/* Hạt nhiễu phim — nối các tấm ảnh chụp, chữ ASCII và nền đen vào một chất */
+.hat{
+  position:absolute; inset:0; z-index:6; pointer-events:none;
+  opacity:var(--hat-mo, .055); mix-blend-mode:overlay;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)' opacity='.9'/%3E%3C/svg%3E");
+  background-size:180px 180px;
+  animation:hatChay .7s steps(1) infinite;
+}
+@keyframes hatChay{
+  0%  { background-position:0 0; }
+  25% { background-position:-38px 22px; }
+  50% { background-position:26px -30px; }
+  75% { background-position:-18px -14px; }
+  100%{ background-position:32px 18px; }
+}
+@media (prefers-reduced-motion:reduce){ .hat{ animation:none; } }
+
 .mh-tren{ z-index:1; }
 .mh-duoi{ position:absolute; left:0; right:0; z-index:2; }
 .man-hinh.dangXem .mh-duoi{ z-index:4; }   /* hiện vật nổi lên trên nền tối */
@@ -171,6 +193,19 @@ body.da-phu .cuaso, body.da-phu .hero{
 .mh-ascii{ z-index:1; }
 .mh-nhieu{ z-index:2; }
 .mh-cum{ position:absolute; inset:0; z-index:3; }
+/* Thẻ tên: chỉ dịch chuyển, không bao giờ nghiêng hay phóng theo hiện vật */
+.vat-ten{
+  position:absolute; z-index:7; pointer-events:none;
+  transform:translate(-50%,-100%);
+  padding:5px 11px; white-space:nowrap;
+  background:rgba(10,14,14,.82); border:1px solid rgba(140,199,196,.42);
+  font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace;
+  font-size:clamp(9px,.92vw,12px); letter-spacing:.14em; text-transform:uppercase;
+  color:var(--giay);
+  opacity:0; transition:opacity .2s ease;
+}
+.vat-ten b{ color:var(--do); font-weight:700; margin-right:.7em; }
+.vat-ten.hien{ opacity:1; }
 
 .cum-vat{
   position:absolute; transform-origin:50% 50%;
@@ -355,21 +390,28 @@ body.da-phu .hero{ height:0; min-height:0; }
   pointer-events:none;
 }
 .cs-video.hien{ opacity:var(--vid-mo,1); }
-/* Thanh tiến trình tải video, nằm ngay dưới dòng "Loading... Idea" */
-.tai-thanh{
-  margin-top:1.1em; height:3px; width:min(62%, 320px);
-  background:rgba(140,199,196,.18); overflow:hidden;
+/* THANH TẢI kiểu terminal: một dãy ô vuông ASCII, căn giữa cửa sổ.
+   Chữ nhật ký vẫn căn trái ở trên, chỉ riêng thanh này nằm giữa.          */
+.tai-boc{
+  position:absolute; left:50%; bottom:12%;
+  transform:translateX(-50%);
+  width:max-content; max-width:86%;
+  text-align:center;
+  font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace;
 }
-.tai-thanh i{
-  display:block; height:100%; width:0%; background:var(--mint);
-  transition:width .18s linear;
+.tai-o{
+  font-size:clamp(13px,1.9vw,24px); line-height:1.2;
+  color:var(--mint); white-space:nowrap; letter-spacing:.04em;
 }
+.tai-o b{ color:var(--giay); font-weight:400; }
 .tai-so{
-  margin-top:.5em; font-size:9px; letter-spacing:.18em; color:var(--mint); opacity:.7;
+  margin-top:.7em; font-size:clamp(9px,1vw,12px);
+  letter-spacing:.24em; color:rgba(140,199,196,.6); text-transform:uppercase;
 }
 /* Tải xong thì cả màn terminal biến mất hẳn, nhường chỗ cho video */
 .cs-than{ transition:opacity .55s ease; }
 .cs-than.xong{ opacity:0; pointer-events:none; }
+.tai-boc{ transition:opacity .5s ease; }
 
 /* Nút bật tắt tiếng, nằm trên thanh tiêu đề */
 .cs-tieng{
@@ -386,6 +428,10 @@ body.da-phu .hero{ height:0; min-height:0; }
   position:absolute; inset:0; background:var(--den); z-index:4;
   opacity:0; pointer-events:none;
 }
+/* Vùng bắt thao tác bấm — trong suốt, luôn nằm trên cùng trong khung cửa sổ */
+.cs-bam{ position:absolute; inset:0; z-index:5; }
+body.khoa .cs-bam{ cursor:pointer; }
+.cuaso.phu-kin .cs-bam{ pointer-events:none; }
 
 .cs-thanh{
   display:flex; align-items:center; gap:10px;
@@ -398,7 +444,7 @@ body.da-phu .hero{ height:0; min-height:0; }
 /* Đang chờ thao tác cuộn → chấm thở nhẹ. Xoá 3 dòng dưới nếu không muốn. */
 body.khoa .cs-cham{ animation:tho 2.1s ease-in-out infinite; }
 /* Bấm vào màn hình cửa sổ cũng mở được — lối thoát dự phòng nếu chuột không lăn */
-body.khoa .cs-than{ cursor:pointer; }
+
 @keyframes tho{ 0%,100%{ opacity:1 } 50%{ opacity:.28 } }
 .cs-ten{ font-size:10px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; white-space:nowrap; }
 .cs-toado{ font-size:10px; color:var(--muc-nhat); margin-left:auto; white-space:nowrap; }
@@ -413,9 +459,10 @@ body.khoa .cs-than{ cursor:pointer; }
 .terminal{
   position:absolute; inset:0; background:var(--den);
   display:flex; flex-direction:column; justify-content:flex-start;  /* căn từ trên xuống */
-  padding:clamp(14px,3vw,26px); gap:6px;
+  padding:clamp(20px,4vw,44px); gap:.15em;
   font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace;
-  font-size:clamp(10px,1.15vw,13px); line-height:1.7; color:var(--mint);
+  font-size:clamp(13px,1.75vw,22px); line-height:1.8; color:var(--mint);
+  letter-spacing:.01em;
 }
 .terminal .mo{ color:rgba(140,199,196,.42); }
 .terminal .chinh{ color:var(--giay); }
@@ -436,12 +483,6 @@ body.khoa .cs-than{ cursor:pointer; }
   pointer-events:none;             /* vùng trống không chắn thanh tiêu đề cửa sổ */
 }
 
-.chan{
-  position:relative; z-index:17;
-  display:flex; flex-wrap:wrap; gap:14px; justify-content:space-between;
-  padding:clamp(40px,7vh,80px) var(--le) 34px;
-  font-size:9px; letter-spacing:.14em; text-transform:uppercase; color:var(--mint);
-}
 
 /* =========================================================================
    RESPONSIVE
@@ -496,9 +537,12 @@ body.khoa .cs-than{ cursor:pointer; }
       <!-- Video và dải mã tải phải nằm NGOÀI #csThan, vì veManHinh() ghi đè
            toàn bộ innerHTML của #csThan mỗi lần dựng lại màn hình terminal -->
       <div class="cs-than" id="csThan"></div>
+      <!-- Vùng bắt thao tác bấm: nằm trên cùng nhưng trong suốt, nên dù màn
+           terminal đã ẩn hay video đang chạy thì vẫn bấm mở được -->
       <video class="cs-video" id="csVideo" muted loop playsinline
              preload="auto" tabindex="-1" aria-hidden="true"></video>
       <div class="cs-phu" id="csPhu" aria-hidden="true"></div>
+      <div class="cs-bam" id="csBam" aria-hidden="true"></div>
     </div>
   </div>
 
@@ -510,6 +554,9 @@ body.khoa .cs-than{ cursor:pointer; }
      Khối này phủ kín màn hình khi cửa sổ phóng to, và được bật bằng
      class "hien". Nội dung mới cứ đặt vào bên trong. -->
 <div class="man-hinh" id="manHinh" aria-hidden="true">
+  <!-- Hạt nhiễu phim. Nằm trong .man-hinh nên tự động KHÔNG phủ lên thanh
+       IDEA.EXE, vì khối này vốn đã bắt đầu từ dưới thanh đó. -->
+  <div class="hat" id="mhHat" aria-hidden="true"></div>
   <!-- 1/3 trên: hai cột nhật ký chạy chữ -->
   <div class="mh-tren" id="mhTren">
     <div class="cot" id="cotTrai"></div>
@@ -520,6 +567,9 @@ body.khoa .cs-than{ cursor:pointer; }
     <canvas class="mh-ascii" id="mhAscii"></canvas>
     <canvas class="mh-nhieu" id="mhNhieu"></canvas>
     <div class="mh-cum" id="mhCum"></div>
+    <!-- Thẻ tên bám theo hiện vật. Nằm NGOÀI .cum-vat nên không dính bất kỳ
+         phép nghiêng, lắc hay phóng nào của hiện vật. -->
+    <div class="vat-ten" id="vatTen" aria-hidden="true"></div>
   </div>
   <!-- Lớp xem chi tiết: nền tối + cột chữ bên cạnh hiện vật đang phóng -->
   <div class="xem-nen" id="xemNen"></div>
@@ -530,7 +580,6 @@ body.khoa .cs-than{ cursor:pointer; }
 <section class="main" id="main"></section>
 </main>
 
-<footer class="chan" id="chan"></footer>
 
 
 
@@ -581,36 +630,35 @@ const DATA = {
      Dòng nào bắt đầu bằng $ sẽ được tô sáng. Thêm bớt thoải mái.
      --------------------------------------------------------------------- */
   nhatKy: {
+    /* Dòng nào là chuỗi thì chỉ hiển thị.
+       Dòng "@tangvat" tự nở ra thành danh sách tang vật lấy từ CUMVAT,
+       mỗi dòng bấm được để phóng to hiện vật tương ứng.                  */
     trai: [
       "$ finding-tuan --open case/004",
-      "> subject: Tran Nhon Tuan",
-      "> alias: Tom · sinh 02-06-2006",
-      "> noi o: Thua Thien Hue",
-      "> nghe: Content Creator",
-      "> huong: Creative Strategist",
+      "> subject   : Tran Nhon Tuan",
+      "> alias     : Tom",
+      "> born      : 02-06-2006",
+      "> location  : Thua Thien Hue",
+      "> role      : Content Creator",
+      "> target    : Creative Strategist",
       "",
-      "$ list --skills",
-      "> viet noi dung · kich ban",
-      "> nhiep anh · quay dung video",
-      "> quan ly van hanh · dieu phoi",
-      "> tu duy chien luoc thuong hieu"
+      "$ scan --skills --verbose",
+      "> writing ........... ok",
+      "> photography ....... ok",
+      "> video ............. ok",
+      "> operations ........ ok",
+      "> brand strategy .... ok"
     ],
     phai: [
-      "$ list --evidence",
-      "> 001 portfolio a4 ......... ok",
-      "> 002 evidence bag ........ ok",
-      "> 003 keychain ............ ok",
-      "> 004 archival sleeve ..... ok",
-      "> 005 sounds .............. ok",
+      "$ ls /evidence --detail",
+      "@tangvat",
       "",
-      "$ timeline --range 2024:2026",
-      "> 2024 content creator",
-      "> 2025 photographer · Hue",
-      "> 2025 quan ly Toum Gaming",
-      "> 2026 videographer",
-      "$ render --items 5 · sang ASCII"
+      "$ hint",
+      "> bấm vào một dòng để mở tang vật"
     ]
   },
+
+
 
 
   /* ---------------------------------------------------------------------
@@ -719,6 +767,7 @@ const VIDEO = {
   hien:       900,    /* video mờ dần hiện lên trong bao lâu (ms)           */
   mo_hero:    0.55,   /* độ mờ của video khi còn ở Hero (0 → 1)             */
   mo_main:    1,      /* độ mờ khi đã thành nền của Main Section            */
+  so_o:       24,     /* số ô vuông của thanh tải kiểu ASCII                 */
   nut_tieng:  true    /* hiện nút bật/tắt tiếng                             */
 };
 
@@ -795,7 +844,7 @@ const MAIN = {
 const CUMTILE = 1.2149;   /* rộng / cao của khung cụm */
 
 const CUMVAT = [
-  { ma:"moBi", ma_ho_so:"EV-004", ten:"Hồ sơ lưu trữ",
+  { ma:"moBi", ma_ho_so:"EV-004", tep:"archival-open", ten:"Hồ sơ lưu trữ",
     x:49.27, y:51.04, cao:80.63, goc:5.74,
     lop:1,                    /* thứ tự trước–sau: số lớn nằm TRƯỚC        */
     xem:false,                 /* true = bấm vào phóng to xem chi tiết       */
@@ -813,7 +862,7 @@ const CUMVAT = [
         { ten:"KẾT QUẢ", dong:["Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla."] }
       ]
     } },
-  { ma:"a4", ma_ho_so:"EV-001", ten:"Portfolio A4",
+  { ma:"a4", ma_ho_so:"EV-001", tep:"a4-portfolio", ten:"Portfolio A4",
     x:67.14, y:39.93, cao:65.2, goc:14.18,
     lop:2,                    /* thứ tự trước–sau: số lớn nằm TRƯỚC        */
     xem:true ,                 /* true = bấm vào phóng to xem chi tiết       */
@@ -831,7 +880,7 @@ const CUMVAT = [
         { ten:"KẾT QUẢ", dong:["Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla."] }
       ]
     } },
-  { ma:"bag", ma_ho_so:"EV-002", ten:"Máy ảnh",
+  { ma:"bag", ma_ho_so:"EV-002", tep:"evidence-bag", ten:"Máy ảnh",
     x:22.5, y:35.15, cao:46.21, goc:-16.28,
     lop:3,                    /* thứ tự trước–sau: số lớn nằm TRƯỚC        */
     xem:true ,                 /* true = bấm vào phóng to xem chi tiết       */
@@ -849,7 +898,7 @@ const CUMVAT = [
         { ten:"KẾT QUẢ", dong:["Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla."] }
       ]
     } },
-  { ma:"key", ma_ho_so:"EV-003", ten:"Móc khoá",
+  { ma:"key", ma_ho_so:"EV-003", tep:"keychain", ten:"Móc khoá",
     x:32.9, y:73.74, cao:27.36, goc:3.49,
     lop:5,                    /* thứ tự trước–sau: số lớn nằm TRƯỚC        */
     xem:false,                 /* true = bấm vào phóng to xem chi tiết       */
@@ -867,7 +916,7 @@ const CUMVAT = [
         { ten:"KẾT QUẢ", dong:["Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla."] }
       ]
     } },
-  { ma:"sound", ma_ho_so:"EV-005", ten:"Âm thanh",
+  { ma:"sound", ma_ho_so:"EV-005", tep:"sounds", ten:"Âm thanh",
     x:67.22, y:78.84, cao:21.94, goc:-8.33,
     lop:4,                    /* thứ tự trước–sau: số lớn nằm TRƯỚC        */
     xem:false,                 /* true = bấm vào phóng to xem chi tiết       */
@@ -913,7 +962,9 @@ const HEROBI = {
   bong_cao:   24,   /* bóng nằm thấp hơn vật bao nhiêu px             */
   bong_nhoe:  40,   /* độ nhoè của bóng                               */
   den:        0.6,  /* độ sáng quầng đèn pin (0 = tắt)                */
-  den_ban_kinh: 42  /* bán kính quầng, % cạnh tấm bì                   */
+  den_ban_kinh: 42, /* bán kính quầng, % cạnh tấm bì                   */
+  keo_lac:    10,   /* lắc bao nhiêu độ theo hướng bị kéo               */
+  keo_nghieng: 9    /* và ngả thêm bao nhiêu độ theo trục 3D            */
 };
 
 /* Kho ảnh — ĐỂ NGOÀI dưới dạng file rời, không nhúng base64 nữa.
@@ -1108,23 +1159,28 @@ function batVideo(){
   v.addEventListener('error', function(){ hong = true; }, true);
 
   var t0 = performance.now(), cho = itDong ? 1 : (VIDEO.cho || 1400);
+  var SO_O = VIDEO.so_o || 24;
   (function nhip(){
-    var thanh = el('taiThanh'), so = el('taiSo');
+    var oo = el('taiO'), so = el('taiSo'), boc = el('taiBoc');
     if(hong){                      /* không có file video → giữ nguyên màn terminal */
-      if(thanh) thanh.parentNode.style.display = 'none';
-      if(so) so.style.display = 'none';
+      if(boc) boc.style.display = 'none';
       return;
     }
     /* Chạy tới 92% theo thời gian, chỉ nhảy nốt 100% khi video thật sự sẵn sàng */
     var p = Math.min(0.92, (performance.now() - t0) / cho);
     if(san) p = Math.min(1, Math.max(p, (performance.now() - t0) / cho));
     if(san && p >= 0.92) p = 1;
-    if(thanh) thanh.style.width = (p * 100).toFixed(0) + '%';
-    if(so) so.textContent = (p * 100).toFixed(0) + '%';
+    if(oo){
+      var day = Math.round(p * SO_O), t = '';
+      for(var q = 0; q < SO_O; q++) t += (q < day ? '\u2588' : '\u2591');
+      oo.innerHTML = '[<b>' + t + '</b>]';
+    }
+    if(so) so.textContent = 'nạp luồng · ' + (p * 100).toFixed(0) + '%';
     if(p < 1){ requestAnimationFrame(nhip); return; }
     if(xongRoi) return;
     xongRoi = true;
     if(than) than.classList.add('xong');   /* màn terminal biến mất hẳn */
+    var bocT = el('taiBoc'); if(bocT) bocT.style.opacity = '0';
     v.classList.add('hien');
     var pr = v.play(); if(pr && pr.catch) pr.catch(function(){});
   })();
@@ -1212,7 +1268,8 @@ function maHoa(goc, thoiGian){
    đúng chỗ con trỏ đang đứng; kéo được đi khắp khung rồi thả.
    ========================================================================= */
 var biTam = { x:0, y:0, w:0, h:0 };
-var biTT  = { dx:0, dy:0, ox:0, oy:0, mx:0, my:0, manh:0, re:false, keo:false };
+var biTT  = { dx:0, dy:0, ox:0, oy:0, mx:0, my:0, manh:0, re:false, keo:false,
+              vx:0, vy:0, _px:null, _py:null };
 var dangKeoBi = false;          /* để thao tác vuốt không mở nhầm Main Section */
 var biQuay = null;
 
@@ -1247,11 +1304,17 @@ function datBi(ngay){
   var ti  = 1 + (HEROBI.phong || 0) * biTT.manh;   /* chỉ mờ dần, không trôi vào */
   var gB  =  biTT.mx * (HEROBI.goc_3d || 0) * biTT.manh;
   var gA  = -biTT.my * (HEROBI.goc_3d || 0) * biTT.manh;
+  /* nghiêng theo hướng kéo */
+  var gh2 = Math.max(-1, Math.min(1, (biTT.vx || 0) / 26));
+  var gv2 = Math.max(-1, Math.min(1, (biTT.vy || 0) / 26));
+  var lac2 = -gh2 * (HEROBI.keo_lac || 10);
+  gB +=  gh2 * (HEROBI.keo_nghieng || 9);
+  gA += -gv2 * (HEROBI.keo_nghieng || 9);
   e.style.transform =
     'translate(-50%,-50%) translate(' + biTT.dx.toFixed(1) + 'px,' + biTT.dy.toFixed(1) + 'px) ' +
     'perspective(' + (HEROBI.chieu_sau || 1100) + 'px) ' +
     'rotateX(' + gA.toFixed(2) + 'deg) rotateY(' + gB.toFixed(2) + 'deg) ' +
-    'rotate(' + (HEROBI.goc || 0) + 'deg) scale(' + ti.toFixed(4) + ')';
+    'rotate(' + ((HEROBI.goc || 0) + lac2).toFixed(2) + 'deg) scale(' + ti.toFixed(4) + ')';
 
   /* BÓNG ĐỔ chạy ngược chiều nghiêng — nghiêng phải thì bóng dạt sang trái */
   var nhac = biTT.keo ? 1 : biTT.manh;
@@ -1276,8 +1339,12 @@ function datBi(ngay){
 
 function biChay(){
   var xong = Math.abs(biTT.mx - biTT.ox) < 0.002 && Math.abs(biTT.my - biTT.oy) < 0.002
-             && Math.abs(biTT.manh - (biTT.re ? 1 : 0)) < 0.002;
+             && Math.abs(biTT.manh - (biTT.re ? 1 : 0)) < 0.002
+             && Math.abs(biTT.vx) < 0.03 && Math.abs(biTT.vy) < 0.03;
   var k = HEROBI.muot || 0.18;
+  if(!biTT.keo){ biTT.vx *= 0.86; biTT.vy *= 0.86;
+    if(Math.abs(biTT.vx) < 0.02) biTT.vx = 0;
+    if(Math.abs(biTT.vy) < 0.02) biTT.vy = 0; }
   biTT.mx += (biTT.ox - biTT.mx) * k;
   biTT.my += (biTT.oy - biTT.my) * k;
   biTT.manh += ((biTT.re ? 1 : 0) - biTT.manh) * k;
@@ -1318,6 +1385,10 @@ function batHeroBi(){
   });
   e.addEventListener('pointermove', function(ev){
     if(!biTT.keo) return;
+    /* tốc độ kéo → lắc và ngả vật theo hướng đang bị lôi đi */
+    biTT.vx += ((ev.clientX - (biTT._px == null ? ev.clientX : biTT._px)) - biTT.vx) * 0.35;
+    biTT.vy += ((ev.clientY - (biTT._py == null ? ev.clientY : biTT._py)) - biTT.vy) * 0.35;
+    biTT._px = ev.clientX; biTT._py = ev.clientY;
     var gh = HEROBI.gioi_han || 0.4;
     var mx = window.innerWidth * gh, my = window.innerHeight * gh;
     biTT.dx = Math.max(-mx, Math.min(mx, dx0 + ev.clientX - x0));
@@ -1327,7 +1398,7 @@ function batHeroBi(){
   });
   function nha(){
     if(!biTT.keo) return;
-    biTT.keo = false; e.classList.remove('keo');
+    biTT.keo = false; biTT._px = null; biTT._py = null; e.classList.remove('keo');
     setTimeout(function(){ dangKeoBi = false; }, 60);
     biDay();
   }
@@ -1345,9 +1416,11 @@ function veManHinh(){
       }).join('') +
       '<div class="chinh">' + thoat(C.dongChinh || '') +
         '<span class="con-tro"></span></div>' +
-      (VIDEO.bat ? '<div class="tai-thanh"><i id="taiThanh"></i></div>' +
-                   '<div class="tai-so" id="taiSo">0%</div>' : '') +
-    '</div>';
+    '</div>' +
+    (VIDEO.bat ? '<div class="tai-boc" id="taiBoc">' +
+                   '<div class="tai-o" id="taiO"></div>' +
+                   '<div class="tai-so" id="taiSo">nạp luồng · 0%</div>' +
+                 '</div>' : '');
 }
 
 /* ---------- Đặt vị trí & kéo thả ---------- */
@@ -1455,7 +1528,7 @@ function veGiua(){
    cửa sổ thu nhỏ lại đúng theo tiến trình cuộn. */
 /* Bấm vào màn hình cửa sổ khi còn ở Hero → mở ra. Lối thoát dự phòng
    phòng khi chuột không có bánh lăn hoặc thao tác cuộn không nhận. */
-csThan.addEventListener('click', function(){
+el('csBam').addEventListener('click', function(){
   if(trangThai === 'hero') noRa();
 });
 
@@ -1622,14 +1695,6 @@ function batChuyenCanh(){
 /* =========================================================================
    4. DỰNG NỘI DUNG MAIN SECTION + CHÂN TRANG
    ========================================================================= */
-function dungNoiDung(){
-  var C = DATA.caNhan;
-
-  el('chan').innerHTML =
-    '<span>© ' + new Date().getFullYear() + ' ' + thoat(C.hoTen) + '</span>' +
-    '<span>Finding Tuan · Archival Portfolio</span>' +
-    '<span>Hồ sơ 02-06-2006 · Huế, Việt Nam</span>';
-}
 
 /* =========================================================================
    5. TƯƠNG TÁC: menu, cuộn mượt, hiện dần
@@ -2023,6 +2088,21 @@ function batManHinh(){
     v.dy = yMax >= yMin ? Math.max(yMin, Math.min(yMax, v.dy)) : 0;
   }
 
+  /* Thẻ tên bám đỉnh hiện vật đang được rê. Chỉ đặt left/top, không transform
+     gì khác, nên nó hoàn toàn miễn nhiễm với nghiêng 3D và lắc khi kéo.  */
+  function datThe(){
+    var e = el('vatTen'); if(!e) return;
+    if(reVat < 0 || phongVat >= 0 || pha !== 'xong'){ e.classList.remove('hien'); return; }
+    var v = vat[reVat];
+    if(e._i !== reVat){
+      e._i = reVat;
+      e.innerHTML = '<b>' + thoat(v.def.ma_ho_so) + '</b>' + thoat(v.def.ten);
+    }
+    e.style.left = (v.cx + (v.dx || 0)) + 'px';
+    e.style.top  = (v.cy + (v.dy || 0) - v.h / 2 - 12) + 'px';
+    e.classList.add('hien');
+  }
+
   function chay(){
     var yen = true, k = MAIN.muot || 0.18, i;
     for(i = 0; i < vat.length; i++){
@@ -2042,6 +2122,7 @@ function batManHinh(){
       v.zoom += (dZ - v.zoom) * kz;
       datVatTF(v);
     }
+    datThe();
     if(yen){ quay = null; return; }
     quay = requestAnimationFrame(chay);
   }
@@ -2203,6 +2284,27 @@ function batManHinh(){
     oCum.addEventListener('pointerup', nha);
     oCum.addEventListener('pointercancel', nha);
 
+    /* Bấm vào một dòng trích dẫn tang vật */
+    oTren.addEventListener('click', function(e){
+      if(pha !== 'xong') return;
+      var t = e.target;
+      while(t && t !== oTren && !(t.classList && t.classList.contains('co-vat'))) t = t.parentNode;
+      if(!t || t === oTren) return;
+      var i = parseInt(t.getAttribute('data-vat'), 10);
+      if(isNaN(i) || i < 0 || i >= vat.length) return;
+      if(vat[i].def.xem === false){
+        if(t.nextSibling && t.nextSibling.className &&
+           t.nextSibling.className.indexOf('loi') >= 0) return;
+        var l = document.createElement('div');
+        l.className = 'dong loi';
+        t.parentNode.insertBefore(l, t.nextSibling);
+        giaiDongMa(l, '! ERROR 403 · ' + vat[i].def.ma_ho_so + ' chưa được giải mật',
+                   itDong ? 0 : (MAIN.xem_giai || 260));
+        return;
+      }
+      moXem(i);
+    });
+
     oNen.addEventListener('click', dongXem);
     addEventListener('keydown', function(e){ if(e.key === 'Escape') dongXem(); });
   }
@@ -2263,6 +2365,23 @@ function batManHinh(){
     })(performance.now());
   }
 
+  /* Nở "@tangvat" thành danh sách lấy thẳng từ CUMVAT, nên thêm bớt hiện vật
+     là danh sách tự cập nhật theo.                                        */
+  function noDanhSach(ds){
+    var ra = [], i, k;
+    for(i = 0; i < ds.length; i++){
+      if(ds[i] !== '@tangvat'){ ra.push(ds[i]); continue; }
+      for(k = 0; k < CUMVAT.length; k++){
+        var c = CUMVAT[k];
+        var ten = (c.ma_ho_so + '  ' + (c.tep || c.ma) + ' ');
+        while(ten.length < 30) ten += '.';
+        ra.push({ chu: '> ' + ten + ' [' + (c.xem === false ? 'lock' : 'open') + ']',
+                  vat: k, mo: c.xem !== false });
+      }
+    }
+    return ra;
+  }
+
   function goCot(o, ds, tongMs, xong, noiThem){
     /* tongMs = null → dùng nhịp cố định MAIN.xem_go (bảng chi tiết).
        Ngược lại tự chia nhịp để cột gõ xong ĐÚNG lúc chữ ASCII in xong.   */
@@ -2273,6 +2392,7 @@ function batManHinh(){
       for(z = 0; z < ds.length; z++) soKT += ds[z].length;
       buoc = tongMs > 0 ? tongMs / Math.max(1, soKT + ds.length * 6) : 0;
     }
+    ds = noDanhSach(ds);
     if(!noiThem) o.innerHTML = '';
 
     /* Bảng chi tiết dùng chế độ nhanh: đổ hết dòng ra, mỗi dòng lệch nhau
@@ -2281,10 +2401,11 @@ function batManHinh(){
       for(var k = 0; k < ds.length; k++){
         (function(k){
           hen.push(setTimeout(function(){
+            var m = ds[k], chu = (m && m.chu != null) ? m.chu : m;
             var d = document.createElement('div');
-            d.className = 'dong' + (/^\$/.test(ds[k]) ? ' sang' : '');
+            d.className = 'dong' + (/^\$/.test(chu) ? ' sang' : '');
             o.appendChild(d);
-            giaiDongMa(d, ds[k], itDong ? 0 : (MAIN.xem_giai || 260));
+            giaiDongMa(d, chu, itDong ? 0 : (MAIN.xem_giai || 260));
             if(k === ds.length - 1 && xong) xong();
           }, k * (itDong ? 0 : (MAIN.xem_le_dong || 46))));
         })(k);
@@ -2295,10 +2416,15 @@ function batManHinh(){
     var i = 0;
     (function dong(){
       if(i >= ds.length){ if(xong) xong(); return; }
+      var m = ds[i], chu = (m && m.chu != null) ? m.chu : m;
       var d = document.createElement('div');
-      d.className = 'dong' + (/^\$/.test(ds[i]) ? ' sang' : '');
+      d.className = 'dong' + (/^\$/.test(chu) ? ' sang' : '');
+      if(m && m.vat != null){
+        d.className += ' co-vat' + (m.mo ? '' : ' khoa');
+        d.setAttribute('data-vat', m.vat);
+      }
       o.appendChild(d);
-      var chu = ds[i]; i++;
+      i++;
       goDongMa(d, chu, buoc, function(){
         o.scrollTop = o.scrollHeight;
         hen.push(setTimeout(dong, buoc * 6));
@@ -2328,6 +2454,7 @@ function batManHinh(){
       v.p = 0; v.dx = 0; v.dy = 0; v.ox = 0; v.oy = 0;
       v.mx = 0; v.my = 0; v.manh = 0; v.zoom = 0; v._net = null;
       v.vx = 0; v.vy = 0; v._px = null; v._py = null;
+      var eT = el('vatTen'); if(eT){ eT.classList.remove('hien'); eT._i = null; }
       if(v.nut){
         v.nut.style.transform = ''; v.nut.style.opacity = '';
         v.nut.style.zIndex = ''; v.nut.style.pointerEvents = '';
@@ -2526,7 +2653,6 @@ function veLai(){
 
 document.fonts && document.fonts.ready.then(dongBoCum);
 
-dungNoiDung();
 dungCumChu();
 veLuoi();
 dongBoCum();
