@@ -183,7 +183,10 @@ body.da-phu .cuaso, body.da-phu .hero{
 .loe{
   position:absolute; inset:0; pointer-events:none; opacity:0;
   mix-blend-mode:screen;
-  background:radial-gradient(circle var(--den-r,45%) at var(--den-x,50%) var(--den-y,50%),
+  /* Chú ý: với từ khoá 'circle', CSS chỉ nhận bán kính là ĐỘ DÀI (px), không
+     nhận phần trăm. Viết % là cả khai báo bị bỏ và không vẽ gì cả.
+     Bán kính px do JS tính từ cạnh thật của hiện vật.                      */
+  background:radial-gradient(circle var(--den-r,120px) at var(--den-x,50%) var(--den-y,50%),
     rgba(255,252,240,.72) 0%, rgba(255,248,228,.34) 38%, rgba(255,255,255,0) 72%);
   -webkit-mask-size:contain; mask-size:contain;
   -webkit-mask-position:center; mask-position:center;
@@ -338,8 +341,9 @@ body.da-phu .hero{ height:0; min-height:0; }
 /* Khung chứa màn hình + lớp phủ làm tối */
 /* Video nền trong cửa sổ. object-fit:cover nên mọi tỉ lệ đều phủ kín khung,
    không bao giờ để lộ viền đen.                                          */
+.cs-than{ z-index:1; }
 .cs-video{
-  position:absolute; inset:0; width:100%; height:100%;
+  position:absolute; inset:0; width:100%; height:100%; z-index:2;
   object-fit:cover; display:block;
   opacity:0; transition:opacity .9s ease;
   pointer-events:none;
@@ -347,7 +351,7 @@ body.da-phu .hero{ height:0; min-height:0; }
 .cs-video.hien{ opacity:var(--vid-mo,1); }
 /* Dải mã "đang tải" chạy trước khi video hiện */
 .cs-tai{
-  position:absolute; left:0; right:0; top:50%; transform:translateY(-50%);
+  position:absolute; left:0; right:0; top:50%; transform:translateY(-50%); z-index:3;
   padding:0 6%;
   font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace;
   font-size:clamp(9px,1.1vw,13px); line-height:1.9;
@@ -368,7 +372,7 @@ body.da-phu .hero{ height:0; min-height:0; }
 
 .cs-khung{ position:relative; flex:1 1 auto; overflow:hidden; background:var(--den); }
 .cs-phu{
-  position:absolute; inset:0; background:var(--den);
+  position:absolute; inset:0; background:var(--den); z-index:4;
   opacity:0; pointer-events:none;
 }
 
@@ -478,11 +482,12 @@ body.khoa .cs-than{ cursor:pointer; }
     <button class="cs-thu" id="csThu" title="Thu nhỏ cửa sổ" aria-label="Thu nhỏ cửa sổ">&minus;</button>
     </div>
     <div class="cs-khung">
-      <div class="cs-than" id="csThan">
-        <video class="cs-video" id="csVideo" muted loop playsinline
-               preload="auto" tabindex="-1" aria-hidden="true"></video>
-        <div class="cs-tai" id="csTai" aria-hidden="true"></div>
-      </div>
+      <!-- Video và dải mã tải phải nằm NGOÀI #csThan, vì veManHinh() ghi đè
+           toàn bộ innerHTML của #csThan mỗi lần dựng lại màn hình terminal -->
+      <div class="cs-than" id="csThan"></div>
+      <video class="cs-video" id="csVideo" muted loop playsinline
+             preload="auto" tabindex="-1" aria-hidden="true"></video>
+      <div class="cs-tai" id="csTai" aria-hidden="true"></div>
       <div class="cs-phu" id="csPhu" aria-hidden="true"></div>
     </div>
   </div>
@@ -1253,7 +1258,8 @@ function datBi(ngay){
   if(lo){
     lo.style.setProperty('--den-x', (50 + biTT.mx * 50).toFixed(1) + '%');
     lo.style.setProperty('--den-y', (50 + biTT.my * 50).toFixed(1) + '%');
-    lo.style.setProperty('--den-r', (HEROBI.den_ban_kinh || 42) + '%');
+    lo.style.setProperty('--den-r',
+      (Math.min(biTam.w, biTam.h) * (HEROBI.den_ban_kinh || 42) / 100).toFixed(1) + 'px');
     lo.style.opacity = (biTT.manh * (HEROBI.den == null ? 0.6 : HEROBI.den)).toFixed(3);
   }
 }
@@ -1968,7 +1974,8 @@ function batManHinh(){
     if(v.loe){
       v.loe.style.setProperty('--den-x', (50 + (v.mx || 0) * 50).toFixed(1) + '%');
       v.loe.style.setProperty('--den-y', (50 + (v.my || 0) * 50).toFixed(1) + '%');
-      v.loe.style.setProperty('--den-r', (MAIN.den_ban_kinh || 45) + '%');
+      v.loe.style.setProperty('--den-r',
+        (Math.min(wq, hq) * (MAIN.den_ban_kinh || 45) / 100).toFixed(1) + 'px');
       v.loe.style.opacity = ((v.manh || 0) * (MAIN.den || 0.6)).toFixed(3);
     }
 
