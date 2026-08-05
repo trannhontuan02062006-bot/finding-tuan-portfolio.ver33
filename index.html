@@ -128,7 +128,7 @@ body.da-phu .hero-bi{ opacity:0; transition-delay:0s; pointer-events:none; }
 body.da-phu .cuaso, body.da-phu .hero{
   user-select:none; -webkit-user-select:none;
 }
-.mh-tren, .hud-cot{
+.mh-tren, .hud.hien .hud-cot{
   pointer-events:auto; cursor:text;
   user-select:text; -webkit-user-select:text;
 }
@@ -310,19 +310,30 @@ body.da-phu .cuaso, body.da-phu .hero{
 .hud{
   position:absolute; inset:0; z-index:6; pointer-events:none;
   font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace;
-  opacity:0; transition:opacity .28s ease;
+  /* visibility:hidden là mấu chốt — chỉ hạ opacity thôi thì khối chữ vẫn
+     nằm nguyên đó, vẫn bôi đen copy được và vẫn chặn thao tác kéo hiện
+     vật đi ngang qua vùng của nó.                                        */
+  opacity:0; visibility:hidden;
+  transition:opacity .28s ease, visibility 0s linear .28s;
 }
-.hud.hien{ opacity:1; }
+.hud.hien{ opacity:1; visibility:visible;
+  transition:opacity .28s ease, visibility 0s linear 0s; }
+
+/* Lớp mã lan ra từ hiện vật */
+.hud-lan{ position:absolute; left:0; top:0; display:block; pointer-events:none; }
 
 /* --- Đường nối từ hiện vật sang các khối --- */
 .hud-day{ position:absolute; inset:0; width:100%; height:100%; overflow:visible; }
 .hud-day path{
   fill:none; stroke:var(--mint); stroke-width:1; opacity:.5;
+  /* --dai do JS đặt bằng ĐỘ DÀI THẬT của đường (getTotalLength). Trước đây
+     đặt đại một số rất lớn nên nét chỉ hiện ra ở đoạn chót, trông như bật
+     lên chứ không phải được vẽ dần từ phía hiện vật ra.                  */
   stroke-dasharray:var(--dai,400); stroke-dashoffset:var(--dai,400);
-  transition:stroke-dashoffset .55s cubic-bezier(.2,.85,.25,1);
+  transition:stroke-dashoffset var(--ve,.68s) cubic-bezier(.25,.7,.3,1);
 }
 .hud.ra .hud-day path{ stroke-dashoffset:0; }
-.hud-day circle{ fill:var(--do); opacity:0; transition:opacity .3s ease .35s; }
+.hud-day circle{ fill:var(--do); opacity:0; transition:opacity .3s ease .45s; }
 .hud.ra .hud-day circle{ opacity:.9; }
 
 /* --- Khung ngắm bốn góc ôm lấy hiện vật --- */
@@ -340,21 +351,22 @@ body.da-phu .cuaso, body.da-phu .hero{
   transform:translate(-16px,16px); }
 .hud-khung i:nth-child(4){ right:0; bottom:0; border-left:0;  border-top:0;
   transform:translate(16px,16px); }
-.hud.ra .hud-khung i{ opacity:.85; transform:none; }
+.hud.ra-khung .hud-khung i{ opacity:.85; transform:none; }
 .hud-khung b{
   position:absolute; left:50%; top:-1.9em; transform:translateX(-50%);
   font-size:clamp(7px,.7vw,9px); letter-spacing:.24em; font-weight:400;
   color:var(--do); white-space:nowrap; opacity:0; transition:opacity .3s ease .2s;
 }
-.hud.ra .hud-khung b{ opacity:.9; }
+.hud.ra-khung .hud-khung b{ opacity:.9; }
 
 /* --- Hai cột dữ liệu --- */
 .hud-cot{
   position:absolute; top:50%; transform:translateY(-50%);
   width:min(25vw, 330px); max-height:86%;
   display:flex; flex-direction:column; gap:9px;
-  overflow-y:auto; scrollbar-width:none; pointer-events:auto;
+  overflow-y:auto; scrollbar-width:none; pointer-events:none;
 }
+.hud.hien .hud-cot{ pointer-events:auto; }
 .hud-cot::-webkit-scrollbar{ display:none; }
 .hud-trai{ left:var(--le); }
 .hud-phai{ right:var(--le); width:min(31vw, 430px); }
@@ -369,13 +381,16 @@ body.da-phu .cuaso, body.da-phu .hero{
   transition:opacity .3s ease, transform .44s cubic-bezier(.2,.85,.25,1),
              clip-path .48s cubic-bezier(.2,.85,.25,1);
 }
-.hud-trai .hud-o, .hud-o.le-trai{
+/* HƯỚNG MỌC: khối bắt đầu ở MÉP TRONG — mép quay về phía hiện vật — rồi nở
+   dần ra phía ngoài. Cột trái mở từ phải sang trái, cột phải thì ngược lại.
+   Nhờ vậy mọi thứ đều toả ra từ giữa màn hình chứ không trượt từ rìa vào. */
+.hud-trai .hud-o{
   border-left:2px solid var(--do);
-  transform:translateX(-26px); clip-path:inset(0 100% 0 0);
+  transform:translateX(26px); clip-path:inset(0 0 0 100%);
 }
 .hud-phai .hud-o{
   border-right:2px solid var(--do);
-  transform:translateX(26px); clip-path:inset(0 0 0 100%);
+  transform:translateX(-26px); clip-path:inset(0 100% 0 0);
 }
 .hud-o.ra{ opacity:1; transform:none; clip-path:inset(0 0 0 0); }
 
@@ -432,6 +447,13 @@ body.da-phu .cuaso, body.da-phu .hero{
     left:var(--le); right:var(--le); width:auto;
     top:auto; bottom:2.5%; transform:none; max-height:44svh;
   }
+  /* Điện thoại: hiện vật nằm PHÍA TRÊN, nên khối nở từ mép trên xuống */
+  .hud-phai .hud-o{
+    border-right:0; border-left:2px solid var(--do);
+    transform:translateY(-18px); clip-path:inset(0 0 100% 0);
+  }
+  .hud-phai .hud-o.le-phai{ border-left:0; border-right:2px solid var(--do); }
+  .hud-phai .hud-o.ra{ transform:none; clip-path:inset(0 0 0 0); }
   .hud-ten{ font-size:clamp(17px,5.4vw,26px); }
   .hud-khung i{ width:11px; height:11px; }
 }
@@ -711,6 +733,7 @@ body.khoa .cs-logo{ animation:tho 2.1s ease-in-out infinite; }
   <div class="xem-nen" id="xemNen"></div>
   <!-- Lớp HUD: khung ngắm quanh hiện vật + hai cột dữ liệu bung ra hai bên -->
   <div class="hud" id="hud" aria-hidden="true">
+    <canvas class="hud-lan" id="hudLan" aria-hidden="true"></canvas>
     <svg class="hud-day" id="hudDay" aria-hidden="true"></svg>
     <div class="hud-khung" id="hudKhung" aria-hidden="true"></div>
     <div class="hud-cot hud-trai" id="hudTrai"></div>
@@ -1046,14 +1069,20 @@ const MAIN = {
   xem_y_m:      26,       /* tâm theo % chiều cao — mobile                   */
   xem_nhip:     420,      /* thời gian phóng ra / thu về (ms)                */
 
-  quet_ms:      1500,     /* dòng code quét trên mặt vật trong bao lâu (ms)  */
+  quet_ms:      1000,     /* dòng code quét trên mặt vật trong bao lâu (ms)  */
   quet_lan:     2,        /* quét mấy lượt lên–xuống                         */
   quet_day:     0.13,     /* bề dày dải quét, theo phần chiều cao của vật    */
   quet_toi_da:  700,      /* vẽ tối đa bao nhiêu ký tự mỗi khung (giữ mượt)  */
 
-  hud_tre:      340,      /* bao lâu sau khi mở thì khung ngắm hiện ra (ms)  */
-  bang_tre:     700,      /* bao lâu sau khi mở thì khối đầu tiên bung (ms)  */
-  bang_le:      95,       /* các khối bung lệch nhau bao nhiêu ms            */
+  hud_tre:      320,      /* bao lâu sau khi mở thì khung ngắm hiện ra (ms)  */
+
+  /* Quét xong thì MÃ LAN RA từ tâm hiện vật. Sóng mã chạm tới chỗ nào thì
+     khối dữ liệu ở chỗ đó hiện ra — khối không tự trượt vào nữa.          */
+  lan_tre:      940,      /* bao lâu sau khi mở thì mã bắt đầu lan (ms)      */
+  lan_ms:       900,      /* sóng mã lan hết màn hình trong bao lâu (ms)     */
+  lan_day:      130,      /* bề dày dải mã đang lan (px)                     */
+  lan_so:       460,      /* số ký tự vẽ mỗi khung — giảm nếu máy yếu        */
+  bang_le:      95,       /* dự phòng khi không đo được vị trí khối (ms)     */
 
   xem_go:       14,       /* tốc độ gõ chữ (ms mỗi ký tự)                    */
   xem_nhanh:    true,     /* true = mỗi dòng hiện NGAY dạng mã rồi giải dần,  */
@@ -2131,6 +2160,8 @@ function batManHinh(){
   var oNen  = el('xemNen');
   var oHud  = el('hud'),   oTrai  = el('hudTrai'), oPhai = el('hudPhai');
   var oKhung= el('hudKhung'), oDay = el('hudDay');
+  var cvL   = el('hudLan');
+  var ctxL  = cvL ? cvL.getContext('2d') : null;
   var cv    = el('mhAscii'), ctx  = cv.getContext('2d');
   var cvN   = el('mhNhieu'), ctxN = cvN.getContext('2d');
   var dpr   = Math.min(window.devicePixelRatio || 1, 2);
@@ -2564,17 +2595,96 @@ function batManHinh(){
     oHud.classList.add('hien');
     day();
 
-    /* Khung ngắm bật ra khi hiện vật đã về gần giữa màn hình */
+    /* NHỊP 1 — khung ngắm bốn góc bật ra khi hiện vật đã về giữa màn hình */
     hen.push(setTimeout(function(){
-      datKhung(v); veDay(v);
-      /* Buộc trình duyệt tính lại bố cục TRƯỚC khi bật class, nếu không thì
-         đường nối và khung ngắm nhảy thẳng tới đích, mất hẳn hoạt ảnh.  */
+      if(phongVat < 0) return;
+      datKhung(v);
+      void boc.offsetHeight;
+      oHud.classList.add('ra-khung');
+    }, itDong ? 0 : (MAIN.hud_tre || 320)));
+
+    /* NHỊP 2 — dòng code quét lên xuống trên bề mặt hiện vật */
+    batQuet(v);
+
+    /* NHỊP 3 — quét xong thì mã LAN RA từ tâm vật. Đường nối được vẽ dần từ
+       mép vật ra ngoài, và sóng mã chạm tới khối nào thì khối đó hiện ra. */
+    hen.push(setTimeout(function(){
+      if(phongVat < 0) return;
+      veDay(v);
       void boc.offsetHeight;
       oHud.classList.add('ra');
-    }, itDong ? 0 : (MAIN.hud_tre || 340)));
+      batLan(v);
+      bungKhoi(v);
+    }, itDong ? 0 : (MAIN.lan_tre || 940)));
+  }
 
-    batQuet(v);                          /* dòng code quét mặt vật */
-    hen.push(setTimeout(bungKhoi, itDong ? 0 : (MAIN.bang_tre || 700)));
+  /* Tâm hiện vật khi đang phóng, tính theo hệ toạ độ của .man-hinh */
+  function tamVat(v){
+    var X = hopXem(v);
+    return { x:X.x, y:CH * MAIN.phan_tren + X.y };
+  }
+
+  /* =====================================================================
+     SÓNG MÃ LAN RA
+     Một vòng ký tự nở ra từ tâm hiện vật. Chạm tới đâu, khối dữ liệu ở đó
+     hoá hình tới đó — nên chữ trông như được chính hiện vật đẩy ra.
+     ===================================================================== */
+  var lanTT = null;
+  function batLan(v){
+    if(itDong || !ctxL) return;
+    cvL.width  = Math.round(W * dpr);
+    cvL.height = Math.round(CH * dpr);
+    cvL.style.width  = W + 'px';
+    cvL.style.height = CH + 'px';
+    var t = tamVat(v), R = 0;
+    R = Math.max(R, Math.sqrt(t.x * t.x + t.y * t.y));
+    R = Math.max(R, Math.sqrt((W - t.x) * (W - t.x) + t.y * t.y));
+    R = Math.max(R, Math.sqrt(t.x * t.x + (CH - t.y) * (CH - t.y)));
+    R = Math.max(R, Math.sqrt((W - t.x) * (W - t.x) + (CH - t.y) * (CH - t.y)));
+    lanTT = { cx:t.x, cy:t.y, R:R, bd:0 };
+    requestAnimationFrame(chayLan);
+  }
+  function ngungLan(){
+    lanTT = null;
+    if(ctxL){
+      ctxL.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctxL.clearRect(0, 0, cvL.width / dpr, cvL.height / dpr);
+    }
+  }
+  function chayLan(luc){
+    if(!lanTT || !ctxL) return;
+    if(!lanTT.bd) lanTT.bd = luc;
+    var tong = MAIN.lan_ms || 900;
+    var p = (luc - lanTT.bd) / tong;
+    if(p >= 1.3){ ngungLan(); return; }
+
+    var g = ctxL;
+    g.setTransform(dpr, 0, 0, dpr, 0, 0);
+    g.clearRect(0, 0, W, CH);
+    var R   = Math.min(1, p) * lanTT.R;
+    var day = MAIN.lan_day || 130;
+    var S   = (W < 768 ? MAIN.co_o_mobile : MAIN.co_o) * 1.6;
+    var gx  = S * 0.62, gy = S * 1.05;
+    var K   = kho || String(MAIN.kho || '#');
+    g.font = '700 ' + S.toFixed(1) + 'px ui-monospace, Menlo, Consolas, monospace';
+    g.textAlign = 'center'; g.textBaseline = 'middle';
+    var tat = p > 1 ? Math.max(0, 1 - (p - 1) / 0.3) : 1;
+    var n = MAIN.lan_so || 460;
+    for(var i = 0; i < n; i++){
+      var a  = (i / n) * Math.PI * 2 + Math.random() * 0.09;
+      var rr = R - Math.random() * day;
+      if(rr < 12) continue;
+      var x = lanTT.cx + Math.cos(a) * rr;
+      var y = lanTT.cy + Math.sin(a) * rr;
+      if(x < -20 || x > W + 20 || y < -20 || y > CH + 20) continue;
+      var f = 1 - (R - rr) / day;
+      g.globalAlpha = (0.12 + f * 0.88) * tat;
+      g.fillStyle = f > 0.72 ? '#FFF6F6' : (f > 0.34 ? MAIN.mau_code : MAIN.mau_nhieu);
+      g.fillText(K.charAt((Math.random() * K.length) | 0),
+                 Math.round(x / gx) * gx, Math.round(y / gy) * gy);
+    }
+    g.globalAlpha = 1;
+    requestAnimationFrame(chayLan);
   }
 
   /* =====================================================================
@@ -2621,6 +2731,17 @@ function batManHinh(){
       }
     }
     oDay.innerHTML = svg;
+
+    /* Đặt --dai bằng ĐỘ DÀI THẬT của từng đường, để nét được vẽ dần đều từ
+       phía hiện vật ra ngoài thay vì loé ra ở đoạn cuối.                  */
+    var ps = oDay.querySelectorAll('path');
+    for(var j = 0; j < ps.length; j++){
+      var L = 0;
+      try { L = ps[j].getTotalLength(); } catch(err) { L = 0; }
+      if(!L || !isFinite(L)) L = 600;
+      ps[j].style.setProperty('--dai', Math.round(L));
+      ps[j].style.setProperty('--ve', ((MAIN.lan_ms || 900) * 0.8).toFixed(0) + 'ms');
+    }
   }
 
   /* =====================================================================
@@ -2719,7 +2840,9 @@ function batManHinh(){
       ds.push({ ben:1, html:
         '<div class="nhan"><span data-ma>' + thoat(kh[k].ten) + '</span></div>' +
         '<div class="the-khoi"><div class="than">' +
-        (kh[k].dong || []).map(function(d){ return thoat(d); }).join('<br>') +
+        (kh[k].dong || []).map(function(d){
+          return '<div class="d">' + thoat(d) + '</div>';
+        }).join('') +
         '</div></div>' });
 
     for(k = 0; k < ds.length; k++){
@@ -2738,16 +2861,38 @@ function batManHinh(){
     oTrai.scrollTop = 0; oPhai.scrollTop = 0;
   }
 
-  function bungKhoi(){
-    for(var k = 0; k < khoiHUD.length; k++)
-      (function(o, n){
+  /* Mỗi khối chờ đúng lúc SÓNG MÃ chạm tới mép trong của nó rồi mới hoá hình.
+     Nhờ vậy khối gần hiện vật hiện trước, khối xa hiện sau — đúng nhịp lan. */
+  function bungKhoi(v){
+    var r   = boc.getBoundingClientRect();
+    var t   = v ? tamVat(v) : { x:W / 2, y:CH / 2 };
+    var R   = lanTT ? lanTT.R : Math.sqrt(W * W + CH * CH);
+    var tong= itDong ? 0 : (MAIN.lan_ms || 900);
+    var nho = nhoMH();
+    for(var k = 0; k < khoiHUD.length; k++){
+      var o = khoiHUD[k], b = o.getBoundingClientRect(), tre;
+      if(b.width){
+        var tr = b.left - r.left, ph = b.right - r.left;
+        /* mép TRONG = mép quay về phía hiện vật */
+        var ex = nho ? (tr + b.width / 2) : (ph < t.x ? ph : tr);
+        var ey = nho ? (b.top - r.top) : (b.top - r.top + b.height / 2);
+        var kc = Math.sqrt((ex - t.x) * (ex - t.x) + (ey - t.y) * (ey - t.y));
+        tre = Math.min(1, kc / R) * tong;
+      } else tre = k * (itDong ? 0 : (MAIN.bang_le || 95));
+      (function(o2, ms){
         hen.push(setTimeout(function(){
-          o.classList.add('ra');
-          var ma = o.querySelectorAll('[data-ma]');
-          for(var j = 0; j < ma.length; j++)
+          o2.classList.add('ra');
+          var j, ma = o2.querySelectorAll('[data-ma]');
+          for(j = 0; j < ma.length; j++)
             giaiChu(ma[j], itDong ? 0 : (MAIN.xem_giai || 260));
-        }, n * (itDong ? 0 : (MAIN.bang_le || 95))));
-      })(khoiHUD[k], k);
+          /* Chữ trong khối cũng hiện ra dạng mã rồi giải dần, cho khớp với
+             cảm giác vừa được trích xuất ra từ hiện vật.                  */
+          var th = o2.querySelectorAll('.than .d, .the-truong span');
+          for(j = 0; j < th.length; j++)
+            giaiChu(th[j], itDong ? 0 : Math.round((MAIN.xem_giai || 260) * 1.5));
+        }, ms));
+      })(o, tre);
+    }
   }
 
   /* Giải mã tại chỗ nội dung chữ của một phần tử */
@@ -2780,11 +2925,20 @@ function batManHinh(){
   function dongXem(){
     if(phongVat < 0) return;
     phongVat = -1;
-    ngungQuet();
+    ngungQuet(); ngungLan();
     boc.classList.remove('dangXem');
     oNen.classList.remove('hien');
-    oHud.classList.remove('hien', 'ra');
+    oHud.classList.remove('hien', 'ra', 'ra-khung');
     for(var k = 0; k < khoiHUD.length; k++) khoiHUD[k].classList.remove('ra');
+    /* Dọn sạch nội dung sau khi mờ hẳn. Nếu để lại, khối chữ vẫn nằm nguyên
+       đó: vẫn bôi đen copy được, và kéo hiện vật ngang qua vùng đó thì mất
+       tương tác vì thao tác chuột bị khối chữ nuốt mất.                   */
+    hen.push(setTimeout(function(){
+      if(phongVat >= 0) return;
+      oTrai.innerHTML = ''; oPhai.innerHTML = ''; khoiHUD = [];
+      if(oDay)   oDay.innerHTML = '';
+      if(oKhung) oKhung.innerHTML = '';
+    }, itDong ? 0 : 340));
     day();
   }
 
@@ -3152,12 +3306,13 @@ function batManHinh(){
     if(henDon){ clearTimeout(henDon); henDon = null; }
     phongVat = -1; reVat = -1; keoVat = -1;
     if(quay){ cancelAnimationFrame(quay); quay = null; }
-    ngungQuet();
+    ngungQuet(); ngungLan();
     boc.classList.remove('dangXem');
     oNen.classList.remove('hien');
-    oHud.classList.remove('hien', 'ra');
+    oHud.classList.remove('hien', 'ra', 'ra-khung');
     oTrai.innerHTML = ''; oPhai.innerHTML = ''; khoiHUD = [];
-    if(oDay) oDay.innerHTML = '';
+    if(oDay)   oDay.innerHTML = '';
+    if(oKhung) oKhung.innerHTML = '';
     oCum.classList.remove('song');
     oCum.style.maskImage = oCum.style.webkitMaskImage = '';
     if(cv) cv.style.maskImage = cv.style.webkitMaskImage = '';
