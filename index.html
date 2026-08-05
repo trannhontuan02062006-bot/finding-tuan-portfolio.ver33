@@ -152,9 +152,11 @@ body.da-phu .cuaso, body.da-phu .hero{
 /* --- Một phần ba trên: hai cột nhật ký --- */
 .mh-tren{
   position:absolute; left:0; right:0;
-  display:grid; align-items:start;
-  grid-template-columns:repeat(auto-fit, minmax(240px, 1fr));
-  gap:8px clamp(12px,1.6vw,28px);
+  display:grid; align-items:start; justify-content:start;
+  /* Bề ngang cột và khoảng cách do JS đặt theo MAIN.cot_rong / MAIN.cot_cach,
+     nên các cột nằm sát nhau bên trái thay vì dàn đều hết bề ngang.        */
+  grid-template-columns:repeat(3, minmax(0, 30ch));
+  gap:0 26px;
   padding:14px var(--le) 8px;
   font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace;
   font-size:clamp(11px,1.1vw,16px); line-height:1.85; letter-spacing:.01em;
@@ -171,24 +173,11 @@ body.da-phu .cuaso, body.da-phu .hero{
 .mh-tren .dong.co-link:hover{ color:var(--giay); opacity:1; text-decoration:underline; }
 .mh-tren .dong.co-vat.khoa:hover{ color:var(--do); text-decoration:none; }
 .mh-tren .dong.loi{ color:var(--do); opacity:1; }
+/* Đuôi con trỏ "|" nhấp nháy, luôn đứng cuối dòng đang gõ */
+.mh-tren .go-tro{ color:var(--giay); font-weight:700;
+  animation:nhay 1.05s steps(1) infinite; }
 
 /* --- Hai phần ba dưới: chữ ASCII rồi hoá thành hiện vật --- */
-/* Hạt nhiễu phim — nối các tấm ảnh chụp, chữ ASCII và nền đen vào một chất */
-.hat{
-  position:absolute; inset:0; z-index:6; pointer-events:none;
-  opacity:var(--hat-mo, .055); mix-blend-mode:overlay;
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)' opacity='.9'/%3E%3C/svg%3E");
-  background-size:180px 180px;
-  animation:hatChay .7s steps(1) infinite;
-}
-@keyframes hatChay{
-  0%  { background-position:0 0; }
-  25% { background-position:-38px 22px; }
-  50% { background-position:26px -30px; }
-  75% { background-position:-18px -14px; }
-  100%{ background-position:32px 18px; }
-}
-@media (prefers-reduced-motion:reduce){ .hat{ animation:none; } }
 
 .mh-tren{ z-index:1; }
 .mh-duoi{ position:absolute; left:0; right:0; z-index:2; }
@@ -197,19 +186,6 @@ body.da-phu .cuaso, body.da-phu .hero{
 .mh-ascii{ z-index:1; }
 .mh-nhieu{ z-index:2; }
 .mh-cum{ position:absolute; inset:0; z-index:3; }
-/* Thẻ tên: chỉ dịch chuyển, không bao giờ nghiêng hay phóng theo hiện vật */
-.vat-ten{
-  position:absolute; z-index:7; pointer-events:none;
-  transform-origin:50% 100%;
-  padding:5px 11px; white-space:nowrap;
-  background:rgba(10,14,14,.82); border:1px solid rgba(140,199,196,.42);
-  font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace;
-  font-size:clamp(9px,.92vw,12px); letter-spacing:.14em; text-transform:uppercase;
-  color:var(--giay);
-  opacity:0; transition:opacity .2s ease;
-}
-.vat-ten b{ color:var(--do); font-weight:700; margin-right:.7em; }
-.vat-ten.hien{ opacity:1; }
 
 .cum-vat{
   position:absolute; transform-origin:50% 50%;
@@ -221,7 +197,51 @@ body.da-phu .cuaso, body.da-phu .hero{
   -webkit-user-drag:none; user-select:none; -webkit-user-select:none;
   /* bóng đổ do JS đặt từng khung theo góc nghiêng */
 }
-.mh-cum.song .cum-vat{ pointer-events:auto; cursor:grab; }
+/* Trên cảm ứng: chặn trình duyệt hiểu nhầm thao tác kéo vật là cuộn trang */
+.mh-cum.song .cum-vat{ pointer-events:auto; cursor:grab; touch-action:none; }
+
+/* --- VÙNG CHẠM VÔ HÌNH quanh mỗi hiện vật (chỉ trên thiết bị cảm ứng) ---
+   Nới rộng vùng bắt ngón tay cho đủ 44px mà không đụng gì tới hình ảnh.
+   Độ nới do JS tính theo MAIN.cham_toi_thieu rồi đặt vào biến --cham.    */
+@media (pointer:coarse){
+  .mh-cum.song .cum-vat::before{
+    content:''; position:absolute; display:block;
+    inset:calc(var(--cham, 0px) * -1);
+  }
+}
+
+/* --- LOÉ SÁNG KIỂU TRINH THÁM ---
+   Hai lớp phủ nằm trong lòng hiện vật, được CẮT ĐÚNG THEO HÌNH của ảnh bằng
+   mask, nên ánh sáng chỉ liếm trên bề mặt vật chứ không tràn ra ô vuông.
+   .vat-loe  = quầng đèn pin bám theo con trỏ
+   .vat-quet = vệt loé chéo quét qua một lần lúc vừa rê vào               */
+.cum-vat > i{
+  position:absolute; inset:0; display:block; pointer-events:none;
+  -webkit-mask-size:100% 100%; mask-size:100% 100%;
+  -webkit-mask-repeat:no-repeat; mask-repeat:no-repeat;
+  -webkit-mask-position:center; mask-position:center;
+  mix-blend-mode:screen; opacity:0;
+}
+.vat-loe{
+  background:radial-gradient(circle at var(--sx,50%) var(--sy,50%),
+    rgba(var(--loe-mau,255,246,246),.95) 0%,
+    rgba(var(--loe-mau,255,246,246),.35) calc(var(--loe-bk,58%) * .45),
+    rgba(var(--loe-mau,255,246,246),0)   var(--loe-bk,58%));
+}
+.vat-quet{
+  background:linear-gradient(102deg,
+    rgba(255,255,255,0) 40%, rgba(255,255,255,.9) 50%, rgba(255,255,255,0) 60%);
+  background-size:280% 100%;
+}
+.cum-vat.loe-quet .vat-quet{
+  animation:vatQuet var(--quet-ms,620ms) cubic-bezier(.25,.6,.3,1) 1;
+}
+@keyframes vatQuet{
+  0%  { opacity:0;  background-position:140% 0; }
+  16% { opacity:1; }
+  100%{ opacity:0; background-position:-40% 0; }
+}
+@media (prefers-reduced-motion:reduce){ .cum-vat > i{ display:none; } }
 .mh-cum.song .cum-vat.xem-duoc{ cursor:zoom-in; }
 .mh-cum.song .cum-vat.keo{ cursor:grabbing; }
 
@@ -404,13 +424,18 @@ body.da-phu .hero{ height:0; min-height:0; }
   text-align:center;
   font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace;
 }
+/* Dòng "Loading... Idea" — CĂN GIỮA, nằm ngay trên thanh tiến trình */
+.tai-chinh{
+  color:var(--giay); letter-spacing:.02em; margin-bottom:.75em;
+  font-size:clamp(10px,1.15vw,15px); line-height:1.3; white-space:nowrap;
+}
 .tai-o{
-  font-size:clamp(13px,1.9vw,24px); line-height:1.2;
+  font-size:clamp(9px,1.25vw,15px); line-height:1.2;
   color:var(--mint); white-space:nowrap; letter-spacing:.04em;
 }
 .tai-o b{ color:var(--giay); font-weight:400; }
 .tai-so{
-  margin-top:.7em; font-size:clamp(9px,1vw,12px);
+  margin-top:.7em; font-size:clamp(8px,.85vw,11px);
   letter-spacing:.24em; color:rgba(140,199,196,.6); text-transform:uppercase;
 }
 /* Tải xong thì cả màn terminal biến mất hẳn, nhường chỗ cho video */
@@ -418,15 +443,17 @@ body.da-phu .hero{ height:0; min-height:0; }
 .cs-than.xong{ opacity:0; pointer-events:none; }
 .tai-boc{ transition:opacity .5s ease; }
 
-/* Nút bật tắt tiếng, nằm trên thanh tiêu đề */
-.cs-tieng{
-  font:inherit; font-size:9px; letter-spacing:.14em; text-transform:uppercase;
-  padding:2px 8px; margin-left:10px; cursor:pointer;
-  background:transparent; color:var(--muc-nhat);
-  border:1px solid rgba(18,48,57,.35); border-radius:2px;
-  transition:color .2s ease, border-color .2s ease;
+/* --- NÚT ICON trên thanh tiêu đề (tiếng · phóng to/thu nhỏ) ---
+   Cả hai nút đều nằm phía BÊN PHẢI, đẩy sang bởi .cs-toado{margin-left:auto} */
+.cs-nut{
+  display:inline-flex; align-items:center; justify-content:center;
+  width:20px; height:18px; padding:0; flex:0 0 auto; line-height:0;
+  background:transparent; color:var(--muc-nhat); cursor:pointer;
+  border:1px solid rgba(18,48,57,.28); border-radius:2px;
+  transition:color .18s ease, border-color .18s ease, background .18s ease;
 }
-.cs-tieng:hover{ color:var(--do); border-color:var(--do); }
+.cs-nut:hover{ color:var(--do); border-color:var(--do); background:rgba(219,26,26,.06); }
+.cs-nut svg{ display:block; width:12px; height:12px; }
 
 .cs-khung{ position:relative; flex:1 1 auto; overflow:hidden; background:var(--den); }
 .cs-phu{
@@ -439,39 +466,39 @@ body.khoa .cs-bam{ cursor:pointer; }
 .cuaso.phu-kin .cs-bam{ pointer-events:none; }
 
 .cs-thanh{
-  display:flex; align-items:center; gap:10px;
+  display:flex; align-items:center; gap:8px;
   padding:8px 10px; border-bottom:1px solid var(--muc);
   cursor:grab; user-select:none; flex:0 0 auto;
 }
 .cuaso.dangkeo .cs-thanh{ cursor:grabbing; }
 
-.cs-cham{ width:8px; height:8px; border-radius:50%; background:var(--do); flex:0 0 auto; }
-/* Đang chờ thao tác cuộn → chấm thở nhẹ. Xoá 3 dòng dưới nếu không muốn. */
-body.khoa .cs-cham{ animation:tho 2.1s ease-in-out infinite; }
+/* LOGO trên thanh tiêu đề — thay ảnh ở LOGO.nguon trong khu vực chỉnh sửa */
+.cs-logo{
+  height:14px; width:auto; flex:0 0 auto; display:block;
+  object-fit:contain; -webkit-user-drag:none; user-select:none;
+}
+/* Đang chờ thao tác mở → logo thở nhẹ. Xoá dòng dưới nếu không muốn. */
+body.khoa .cs-logo{ animation:tho 2.1s ease-in-out infinite; }
 /* Bấm vào màn hình cửa sổ cũng mở được — lối thoát dự phòng nếu chuột không lăn */
 
 @keyframes tho{ 0%,100%{ opacity:1 } 50%{ opacity:.28 } }
 .cs-ten{ font-size:10px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; white-space:nowrap; }
 .cs-toado{ font-size:10px; color:var(--muc-nhat); margin-left:auto; white-space:nowrap; }
-/* Nút thu nhỏ chỉ có nghĩa khi cửa sổ đã phóng to → cuộn ngược lên Hero */
-.cs-thu{
-  background:none; border:0; padding:2px 6px; cursor:pointer;
-  font:inherit; font-size:13px; line-height:1; color:var(--muc); flex:0 0 auto;
-  opacity:0; pointer-events:none; transition:opacity .3s ease;
-}
+/* Nút phóng to / thu nhỏ — LUÔN hiện, icon tự đổi theo trạng thái cửa sổ */
 .cs-than{ position:absolute; inset:0; background:var(--den); }
 /* Màn hình dự phòng kiểu terminal */
 .terminal{
   position:absolute; inset:0; background:var(--den);
   display:flex; flex-direction:column; justify-content:flex-start;  /* căn từ trên xuống */
-  padding:clamp(20px,4vw,44px); gap:.15em;
+  padding:clamp(12px,2.4vw,26px); gap:0;
   font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace;
-  font-size:clamp(13px,1.75vw,22px); line-height:1.8; color:var(--mint);
+  /* CỠ CHỮ TERMINAL — nhỏ lại cho ra dáng cửa sổ dòng lệnh thật */
+  font-size:clamp(9px,1vw,13px); line-height:1.7; color:var(--mint);
   letter-spacing:.01em;
 }
 .terminal .mo{ color:rgba(140,199,196,.42); }
 .terminal .chinh{ color:var(--giay); }
-.terminal .con-tro{
+.terminal .con-tro, .tai-chinh .con-tro{
   display:inline-block; width:.6em; height:1em; background:var(--mint);
   vertical-align:-.15em; margin-left:.25em; animation:nhay 1.05s steps(1) infinite;
 }
@@ -493,6 +520,8 @@ body.khoa .cs-cham{ animation:tho 2.1s ease-in-out infinite; }
    RESPONSIVE
    ========================================================================= */
 @media (max-width:760px){
+  /* Cửa sổ còn nhỏ trên điện thoại thì bỏ toạ độ đi cho thanh tiêu đề đủ chỗ */
+  .cuaso:not(.phu-kin) .cs-toado{ display:none; }
   .cum{ max-width:none; }
   .cum-chu{ font-size:12px; }
   .cuaso{ width:min(80vw, 340px); }
@@ -530,12 +559,13 @@ body.khoa .cs-cham{ animation:tho 2.1s ease-in-out infinite; }
 
   <div class="cuaso" id="cuaso" role="group" aria-label="Cửa sổ phần mềm">
     <div class="cs-thanh" id="csThanh">
-      <span class="cs-cham" aria-hidden="true"></span>
+      <img class="cs-logo" id="csLogo" alt="" draggable="false">
       <span class="cs-ten" id="csTen"></span>
       <span class="cs-toado may" id="csToado">X:0000 Y:0000</span>
-      <button class="cs-tieng" id="csTieng" type="button"
-            aria-label="Bật hoặc tắt tiếng video">TIẾNG: TẮT</button>
-    <button class="cs-thu" id="csThu" title="Thu nhỏ cửa sổ" aria-label="Thu nhỏ cửa sổ">&minus;</button>
+      <button class="cs-nut cs-tieng" id="csTieng" type="button"
+              aria-label="Bật hoặc tắt tiếng video"></button>
+      <button class="cs-nut cs-thu" id="csThu" type="button"
+              aria-label="Phóng to cửa sổ"></button>
     </div>
     <div class="cs-khung">
       <!-- Video và dải mã tải phải nằm NGOÀI #csThan, vì veManHinh() ghi đè
@@ -558,9 +588,6 @@ body.khoa .cs-cham{ animation:tho 2.1s ease-in-out infinite; }
      Khối này phủ kín màn hình khi cửa sổ phóng to, và được bật bằng
      class "hien". Nội dung mới cứ đặt vào bên trong. -->
 <div class="man-hinh" id="manHinh" aria-hidden="true">
-  <!-- Hạt nhiễu phim. Nằm trong .man-hinh nên tự động KHÔNG phủ lên thanh
-       IDEA.EXE, vì khối này vốn đã bắt đầu từ dưới thanh đó. -->
-  <div class="hat" id="mhHat" aria-hidden="true"></div>
   <!-- 1/3 trên: hai cột nhật ký chạy chữ -->
   <div class="mh-tren" id="mhTren">
     <!-- các cột do JS dựng theo DATA.cot -->
@@ -570,9 +597,6 @@ body.khoa .cs-cham{ animation:tho 2.1s ease-in-out infinite; }
     <canvas class="mh-ascii" id="mhAscii"></canvas>
     <canvas class="mh-nhieu" id="mhNhieu"></canvas>
     <div class="mh-cum" id="mhCum"></div>
-    <!-- Thẻ tên bám theo hiện vật. Nằm NGOÀI .cum-vat nên không dính bất kỳ
-         phép nghiêng, lắc hay phóng nào của hiện vật. -->
-    <div class="vat-ten" id="vatTen" aria-hidden="true"></div>
   </div>
   <!-- Lớp xem chi tiết: nền tối + cột chữ bên cạnh hiện vật đang phóng -->
   <div class="xem-nen" id="xemNen"></div>
@@ -615,12 +639,12 @@ const DATA = {
      Cửa sổ chỉ hiển thị màn hình terminal. Sửa chữ ở đây là đổi ngay.
      --------------------------------------------------------------------- */
   cuaSo: {
-    ten: "IDEA.EXE",              /* tên hiện trên thanh tiêu đề cửa sổ */
+    ten: "FINDING TUAN.EXE",      /* tên hiện trên thanh tiêu đề cửa sổ */
 
     /* Các dòng mờ phía trên — thêm bớt tuỳ ý */
     manHinh: [
       "> mount /finding-tuan",
-      "> run IDEA.EXE",
+      "> run FINDING-TUAN.EXE",
       "[ OK ] hồ sơ 02-06-2006"
     ],
 
@@ -643,9 +667,9 @@ const DATA = {
      --------------------------------------------------------------------- */
   cot: [
     { dong: [
-      "$ whoami",
+      "$ who -am -i",
       "> Trần Nhơn Tuân",
-      "> alias ..... Tom",
+      "> biệt danh ..... Tom",
       "> giới tính . Nam",
       "> tuổi ...... 20",
       "> nghề ...... Content Creator",
@@ -654,13 +678,13 @@ const DATA = {
       "> khoá ...... 2024 - 2028"
     ]},
     { dong: [
-      "$ ls /evidence --detail",
+      "$ ls /folder -detail",
       "@tangvat",
       "",
       "> bấm một dòng để mở tang vật"
     ]},
     { dong: [
-      "$ contact --open",
+      "$ contact -open",
       { chu:"> email ......... [→]",
         url:"mailto:trannhontuan.02.06.2006@gmail.com" },
       { chu:"> facebook ...... [→]",
@@ -669,9 +693,7 @@ const DATA = {
         url:"https://instagram.com/finding_tuan" },
       { chu:"> tiktok ........ [→]",
         url:"https://tiktok.com/@finding.tuan" },
-      "",
-      "> trannhontuan.02.06.2006",
-      "  @gmail.com"
+      ""
     ]}
   ],
 
@@ -784,10 +806,48 @@ const VIDEO = {
   ],
   cho:        1400,   /* chạy dải mã "đang tải" bao lâu trước khi hiện (ms) */
   hien:       900,    /* video mờ dần hiện lên trong bao lâu (ms)           */
-  mo_hero:    0.55,   /* độ mờ của video khi còn ở Hero (0 → 1)             */
+  mo_hero:    1,      /* độ RÕ của video khi còn ở Hero (1 = không làm mờ)   */
   mo_main:    1,      /* độ mờ khi đã thành nền của Main Section            */
   so_o:       24,     /* số ô vuông của thanh tải kiểu ASCII                 */
   nut_tieng:  true    /* hiện nút bật/tắt tiếng                             */
+};
+
+/* ---- LOGO trên thanh tiêu đề cửa sổ ----
+   Thay chấm đỏ nhấp nháy cũ. Đặt file ảnh (png/svg/webp nền trong suốt) vào
+   thư mục 'anh' cạnh file HTML rồi khai báo đường dẫn ở đây.
+   Nếu không tìm thấy ảnh, logo tự ẩn đi chứ không làm vỡ thanh tiêu đề.   */
+const LOGO = {
+  bat:    true,
+  nguon:  "./anh/logo.png",   /* ← THAY ẢNH CỦA CẬU VÀO ĐÂY */
+  cao:    14                  /* chiều cao logo (px)         */
+};
+
+/* ---- LOÉ SÁNG KIỂU TRINH THÁM khi rê / chạm vào hiện vật ----
+   Ánh sáng được cắt đúng theo hình dáng của hiện vật, nên nó nằm TRÊN bề mặt
+   vật chứ không phải một ô vuông sáng. Chồng lên hiệu ứng nghiêng 3D, kéo thả
+   và bóng đổ đang có, không thay thế cái nào cả.                          */
+const LOE = {
+  bat:        true,
+  mau:        "255, 246, 246", /* màu ánh sáng dạng "R, G, B"              */
+  do_sang:    0.5,    /* độ sáng tối đa của quầng đèn pin (0 → 1)          */
+  ban_kinh:   62,     /* bán kính quầng sáng, % bề ngang hiện vật          */
+  vien:       true,   /* viền sáng mảnh chạy quanh mép hiện vật            */
+  vien_nhoe:  14,     /* độ nhoè của viền sáng (px)                        */
+  vien_dam:   0.45,   /* độ đậm của viền sáng (0 → 1)                      */
+  quet:       true,   /* vệt loé chéo quét qua MỘT LẦN lúc vừa rê vào      */
+  quet_ms:    560     /* vệt loé chạy hết trong bao lâu (ms)               */
+};
+
+/* ---- NGHIÊNG 3D THEO CẢM BIẾN ĐIỆN THOẠI ----
+   Trên điện thoại không có con trỏ, nên độ nghiêng 3D lấy từ chính độ nghiêng
+   của máy: nghiêng máy sang trái thì hiện vật và tấm bì ngả theo.
+   iOS 13+ đòi hỏi người xem chạm vào màn hình một lần để cấp quyền.       */
+const NGHIENGMAY = {
+  bat:      true,
+  muc:      0.6,   /* nghiêng máy hết cỡ thì vật ngả bao nhiêu phần goc_3d */
+  goc_day:  30,    /* nghiêng máy bao nhiêu độ thì tính là hết cỡ          */
+  moc_beta: 50,    /* độ ngả trước–sau coi như "đang cầm thẳng" (độ)       */
+  muot:     0.14   /* độ mượt khi bám theo cảm biến (0 → 1)                */
 };
 
 const MAHOA = {
@@ -801,6 +861,18 @@ const MAIN = {
   bat:          true,
   phan_tren:    0.34,     /* một phần ba trên dành cho hai cột nhật ký       */
   le_cum:       0.03,     /* cụm hiện vật chừa lề bao nhiêu trong vùng dưới  */
+
+  /* Cột nhật ký — bố cục và nhịp gõ kiểu terminal */
+  cot_rong:     30,       /* bề ngang mỗi cột, tính bằng SỐ KÝ TỰ           */
+  cot_cach:     26,       /* khoảng cách giữa hai cột (px). Nhỏ = sát nhau  */
+  go_cot:       10,       /* ms mỗi ký tự — DÙNG CHUNG cho mọi cột, nên các */
+                          /* cột gõ đều một nhịp y như dòng lệnh thật       */
+  go_nghi:      70,       /* nghỉ giữa hai dòng (ms)                        */
+
+  /* Thao tác cảm ứng trên điện thoại */
+  cham_giu:     250,      /* giữ bao lâu (ms) thì mới vào chế độ KÉO        */
+  cham_di:      12,       /* ngón tay xê dịch quá bao nhiêu px thì huỷ chạm */
+  cham_toi_thieu: 44,     /* vùng chạm tối thiểu quanh mỗi hiện vật (px)    */
 
   /* Nhịp (mili-giây) */
   in_ascii:     2600,     /* đường quét in hết chữ ASCII của cụm hiện vật    */
@@ -916,7 +988,7 @@ const CUMVAT = [
         ] }
       ]
     } },
-  { ma:"bag", ma_ho_so:"EV-002", tep:"evidence-bag", ten:"Máy ảnh",
+  { ma:"bag", ma_ho_so:"EV-002", tep:"evidence-bag", ten:"Túi vật chứng",
     x:22.5, y:35.15, cao:46.21, goc:-16.28,
     lop:3,                    /* thứ tự trước–sau: số lớn nằm TRƯỚC        */
     xem:true ,                 /* true = bấm vào phóng to xem chi tiết       */
@@ -963,7 +1035,7 @@ const CUMVAT = [
         ] }
       ]
     } },
-  { ma:"sound", ma_ho_so:"EV-005", tep:"sounds", ten:"Âm thanh",
+  { ma:"sound", ma_ho_so:"EV-005", tep:"sounds", ten:"Băng Cassette",
     x:67.22, y:78.84, cao:21.94, goc:-8.33,
     lop:4,                    /* thứ tự trước–sau: số lớn nằm TRƯỚC        */
     xem:false,                 /* true = bấm vào phóng to xem chi tiết       */
@@ -1044,6 +1116,24 @@ var $  = function(s, g){ return (g||document).querySelector(s); };
 var el = function(id){ return document.getElementById(id); };
 var itDong = matchMedia('(prefers-reduced-motion: reduce)').matches;
 var tatVetChuot = false;   /* bật lên khi đang ở Main Section */
+var mayCham = matchMedia('(pointer: coarse)').matches;   /* thiết bị cảm ứng */
+
+/* Bộ icon vẽ bằng SVG cho các nút trên thanh tiêu đề cửa sổ */
+var SVG0 = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" ' +
+           'stroke-width="1.35" stroke-linecap="round" stroke-linejoin="round">';
+var ICON = {
+  tiengTat: SVG0 + '<path d="M2.6 6h2.1L7.9 3.3v9.4L4.7 10H2.6z"/>' +
+                   '<path d="M10.7 6.3l3.1 3.4M13.8 6.3l-3.1 3.4"/></svg>',
+  tiengBat: SVG0 + '<path d="M2.6 6h2.1L7.9 3.3v9.4L4.7 10H2.6z"/>' +
+                   '<path d="M10.6 6.2a2.6 2.6 0 0 1 0 3.6"/>' +
+                   '<path d="M12.6 4.4a5.2 5.2 0 0 1 0 7.2"/></svg>',
+  phongTo:  SVG0 + '<rect x="2.9" y="2.9" width="10.2" height="10.2"/></svg>',
+  thuNho:   SVG0 + '<path d="M3.2 8h9.6"/></svg>'
+};
+
+/* ĐỘ NGHIÊNG CỦA MÁY (điện thoại) — dùng chung cho tấm bì Hero và hiện vật.
+   x, y nằm trong khoảng -1 → 1, đã được làm mượt sẵn.                     */
+var MAY = { x:0, y:0, co:false };
 
 /* ---------- Tiện ích chữ ---------- */
 function thoat(s){
@@ -1131,7 +1221,7 @@ function dungCumChu(){
   el('tuyenngon').innerHTML = dong.map(function(d){
     return '<span class="tn-dong">' + danh(d) + '</span>';
   }).join('');
-  el('csTen').textContent   = DATA.cuaSo.ten || 'IDEA.EXE';
+  el('csTen').textContent   = DATA.cuaSo.ten || 'FINDING TUAN.EXE';
 }
 
 function dongBoCum(){
@@ -1206,8 +1296,10 @@ function batVideo(){
   var SO_O = VIDEO.so_o || 24;
   (function nhip(){
     var oo = el('taiO'), so = el('taiSo'), boc = el('taiBoc');
-    if(hong){                      /* không có file video → giữ nguyên màn terminal */
-      if(boc) boc.style.display = 'none';
+    if(hong){        /* không có file video → giữ nguyên màn terminal */
+      /* Chỉ giấu thanh tiến trình, VẪN giữ dòng "Loading... Idea" ở giữa */
+      if(oo) oo.style.display = 'none';
+      if(so) so.style.display = 'none';
       return;
     }
     /* Chạy tới 92% theo thời gian, chỉ nhảy nốt 100% khi video thật sự sẵn sàng */
@@ -1230,11 +1322,14 @@ function batVideo(){
   })();
 
   if(nut && VIDEO.nut_tieng){
+    nut.innerHTML = ICON.tiengTat;
     nut.addEventListener('click', function(e){
       e.stopPropagation();
       v.muted = !v.muted;
       if(!v.muted && v.volume === 0) v.volume = 1;
-      nut.textContent = 'TIẾNG: ' + (v.muted ? 'TẮT' : 'BẬT');
+      nut.innerHTML = v.muted ? ICON.tiengTat : ICON.tiengBat;
+      nut.setAttribute('aria-label', v.muted ? 'Bật tiếng' : 'Tắt tiếng');
+      nut.setAttribute('title',      v.muted ? 'Bật tiếng' : 'Tắt tiếng');
     });
     nut.addEventListener('pointerdown', function(e){ e.stopPropagation(); });
   } else if(nut) nut.style.display = 'none';
@@ -1350,8 +1445,9 @@ function datBi(ngay){
   var e = el('heroBi'); if(!e) return;
   var vao = e.classList.contains('hien');
   var ti  = 1 + (HEROBI.phong || 0) * biTT.manh;   /* chỉ mờ dần, không trôi vào */
-  var gB  =  biTT.mx * (HEROBI.goc_3d || 0) * biTT.manh;
-  var gA  = -biTT.my * (HEROBI.goc_3d || 0) * biTT.manh;
+  /* Nghiêng theo con trỏ (máy tính) CỘNG nghiêng theo cảm biến (điện thoại) */
+  var gB  =  (biTT.mx * biTT.manh + MAY.x) * (HEROBI.goc_3d || 0);
+  var gA  = -(biTT.my * biTT.manh + MAY.y) * (HEROBI.goc_3d || 0);
   /* nghiêng theo hướng kéo */
   var gh2 = Math.max(-1, Math.min(1, (biTT.vx || 0) / 26));
   var gv2 = Math.max(-1, Math.min(1, (biTT.vy || 0) / 26));
@@ -1376,10 +1472,14 @@ function datBi(ngay){
 
 }
 
+var biMayCu = { x:0, y:0 };
 function biChay(){
   var xong = Math.abs(biTT.mx - biTT.ox) < 0.002 && Math.abs(biTT.my - biTT.oy) < 0.002
              && Math.abs(biTT.manh - (biTT.re ? 1 : 0)) < 0.002
              && Math.abs(biTT.vx) < 0.03 && Math.abs(biTT.vy) < 0.03;
+  /* Máy vừa nghiêng thì phải vẽ tiếp, dù mọi thứ khác đã đứng yên */
+  if(Math.abs(MAY.x - biMayCu.x) > 0.0015 || Math.abs(MAY.y - biMayCu.y) > 0.0015) xong = false;
+  biMayCu.x = MAY.x; biMayCu.y = MAY.y;
   var k = HEROBI.muot || 0.18;
   if(!biTT.keo){ biTT.vx *= 0.86; biTT.vy *= 0.86;
     if(Math.abs(biTT.vx) < 0.02) biTT.vx = 0;
@@ -1448,18 +1548,40 @@ function batHeroBi(){
 /* Màn hình terminal — nội dung lấy từ DATA.cuaSo *//* Màn hình terminal — nội dung lấy từ DATA.cuaSo */
 function veManHinh(){
   var C = DATA.cuaSo;
+  /* Các dòng nhật ký nhỏ căn TRÁI ở trên; riêng dòng chính "Loading... Idea"
+     được đưa xuống khối giữa, nằm ngay trên thanh tiến trình.             */
   csThan.innerHTML =
     '<div class="terminal">' +
       [].concat(C.manHinh || []).map(function(d){
         return '<div class="mo">' + thoat(d) + '</div>';
       }).join('') +
-      '<div class="chinh">' + thoat(C.dongChinh || '') +
-        '<span class="con-tro"></span></div>' +
     '</div>' +
-    (VIDEO.bat ? '<div class="tai-boc" id="taiBoc">' +
-                   '<div class="tai-o" id="taiO"></div>' +
-                   '<div class="tai-so" id="taiSo">nạp luồng · 0%</div>' +
-                 '</div>' : '');
+    '<div class="tai-boc" id="taiBoc">' +
+      '<div class="tai-chinh">' + thoat(C.dongChinh || '') +
+        '<span class="con-tro"></span></div>' +
+      (VIDEO.bat ? '<div class="tai-o" id="taiO"></div>' +
+                   '<div class="tai-so" id="taiSo">nạp luồng · 0%</div>' : '') +
+    '</div>';
+}
+
+/* Logo trên thanh tiêu đề — không có ảnh thì tự ẩn, thanh vẫn gọn gàng */
+function veLogo(){
+  var g = el('csLogo'); if(!g) return;
+  if(!LOGO.bat || !LOGO.nguon){ g.style.display = 'none'; return; }
+  g.style.height = (LOGO.cao || 14) + 'px';
+  g.onerror = function(){ g.style.display = 'none'; };
+  g.src = LOGO.nguon;
+}
+
+/* Nút phóng to / thu nhỏ: cùng MỘT nút, icon đổi theo trạng thái cửa sổ */
+var nutPhong = null;
+function datNutCuaSo(phong){
+  if(nutPhong === phong) return;
+  nutPhong = phong;
+  var n = el('csThu'); if(!n) return;
+  n.innerHTML = phong ? ICON.thuNho : ICON.phongTo;
+  n.setAttribute('aria-label', phong ? 'Thu nhỏ cửa sổ' : 'Phóng to cửa sổ');
+  n.setAttribute('title',      phong ? 'Thu nhỏ' : 'Phóng to');
 }
 
 /* ---------- Đặt vị trí & kéo thả ---------- */
@@ -1528,7 +1650,7 @@ function veGiua(){
   var thanh = el('csThanh'), dangKeo = false, lechX = 0, lechY = 0, idCham = null;
 
   thanh.addEventListener('pointerdown', function(e){
-    if(e.target.closest('.cs-thu')) return;
+    if(e.target.closest('.cs-nut')) return;   /* để dành cho các nút icon */
     if(trangThai !== 'hero') return;                 /* chỉ kéo được khi còn ở Hero */
     dangKeo = true; dangKeoCS = true; idCham = e.pointerId; daKeo = true;
     var r = cuaso.getBoundingClientRect();
@@ -1572,7 +1694,13 @@ el('csBam').addEventListener('click', function(){
   if(trangThai === 'hero') noRa();
 });
 
-el('csThu').addEventListener('click', function(){
+/* Một nút lo cả hai chiều:
+   · đang ở Hero  → bấm để PHÓNG TO thành Main Section
+   · đang phủ kín → bấm để THU NHỎ về Hero (đây là lối thoát DUY NHẤT)   */
+el('csThu').addEventListener('click', function(e){
+  e.stopPropagation();
+  if(trangThai === 'hero'){ noRa(); return; }
+  if(trangThai !== 'phu-kin') return;
   if(window.scrollY > 0){
     window.scrollTo({ top:0, behavior: itDong ? 'auto' : 'smooth' });
     setTimeout(thuLai, itDong ? 0 : 520);
@@ -1609,8 +1737,7 @@ function ve(t){
     cuaso.style.width = ''; cuaso.style.height = ''; cuaso.style.borderColor = '';
     csThan.style.filter = '';
     csPhu.style.opacity = 0;
-    el('csThu').style.opacity = 0;
-    el('csThu').style.pointerEvents = 'none';
+    datNutCuaSo(false);            /* về Hero → icon quay lại "phóng to" */
     doKichThuocGoc();
     ganViTri(viTri.x, viTri.y);
     return;
@@ -1641,9 +1768,7 @@ function ve(t){
     ? 'W:' + so4(W - trai - phai) + ' H:' + so4(H - tren - duoi)
     : 'X:' + so4(trai) + ' Y:' + so4(tren);
 
-  var hienNut = t > 0.5;
-  el('csThu').style.opacity = hienNut ? 1 : 0;
-  el('csThu').style.pointerEvents = hienNut ? 'auto' : 'none';
+  datNutCuaSo(t > 0.5);            /* qua nửa đường thì icon đổi sang "thu nhỏ" */
 }
 
 /* Chạy hoạt ảnh từ tiến trình hiện tại tới đích (0 hoặc 1) */
@@ -1709,29 +1834,28 @@ function batChuyenCanh(){
     if(trangThai === 'hero' && window.scrollY > CHUYEN.nguong) noRa();
   }, { passive:true });
 
+  /* CHÚ Ý: từ v39, thao tác vuốt / lăn chuột CHỈ dùng để MỞ cửa sổ ra.
+     Muốn thoát khỏi Main Section thì bấm nút "−" ở góc phải thanh tiêu đề. */
   addEventListener('wheel', function(e){
-    if(e.deltaY < 0 && window.scrollY <= 2) thuLai();
-    else if(khoaVuot()) return;
-    else if(e.deltaY > 0 && trangThai === 'hero') noRa();
+    if(khoaVuot()) return;
+    if(e.deltaY > 0 && trangThai === 'hero') noRa();
   }, { passive:true });
 
   var chamY = 0;
   addEventListener('touchstart', function(e){ chamY = e.touches[0].clientY; }, { passive:true });
   addEventListener('touchmove', function(e){
     if(khoaVuot()) return;      /* đang kéo, hoặc đang xem chi tiết → bỏ qua */
+    if(trangThai !== 'hero') return;
     if(e.target && e.target.closest &&
        (e.target.closest('.xem-chu') || e.target.closest('.mh-tren'))) return;
     var dy = chamY - e.touches[0].clientY;          /* dương = vuốt lên = cuộn xuống */
-    if(dy < -10 && window.scrollY <= 2) thuLai();
-    else if(dy > 10 && trangThai === 'hero') noRa();
+    if(dy > 10) noRa();
   }, { passive:true });
 
   addEventListener('keydown', function(e){
     if(e.target.closest && e.target.closest('#csThanh')) return;   /* để dành cho kéo cửa sổ */
     if(['ArrowDown','PageDown','End',' ','Spacebar'].indexOf(e.key) >= 0){
       if(trangThai === 'hero') noRa();
-    } else if(['ArrowUp','PageUp','Home'].indexOf(e.key) >= 0){
-      if(window.scrollY <= 2) thuLai();
     }
   });
 }
@@ -1849,7 +1973,8 @@ function batManHinh(){
       n.className = 'cum-vat';
       n.setAttribute('data-i', i);
       if(v.def.xem !== false) n.className += ' xem-duoc';
-      n.innerHTML = '<img draggable="false" alt="' + thoat(v.def.ten) + '" src="' + v.im.src + '">';
+      n.innerHTML = '<img draggable="false" alt="' + thoat(v.def.ten) + '" src="' + v.im.src + '">' +
+        (LOE.bat ? '<i class="vat-loe"></i>' + (LOE.quet ? '<i class="vat-quet"></i>' : '') : '');
       n.style.left   = (v.cx - v.w / 2) + 'px';
       n.style.top    = (v.cy - v.h / 2) + 'px';
       n.style.width  = v.w + 'px';
@@ -1857,6 +1982,29 @@ function batManHinh(){
       n.style.zIndex = String(v.def.lop || 1);
       oCum.appendChild(n);
       v.nut = n; v.tam = n.querySelector('img'); v.i = i;
+
+      /* Hai lớp loé sáng lấy CHÍNH TẤM ẢNH làm mặt nạ, nên ánh sáng bám đúng
+         theo hình dáng hiện vật thay vì loang ra một ô vuông.             */
+      v.loe  = n.querySelector('.vat-loe');
+      v.quet = n.querySelector('.vat-quet');
+      var naAnh = 'url("' + String(v.im.src).replace(/"/g, '%22') + '")';
+      if(v.loe){
+        v.loe.style.webkitMaskImage = v.loe.style.maskImage = naAnh;
+        v.loe.style.setProperty('--loe-mau', LOE.mau || '255, 246, 246');
+        v.loe.style.setProperty('--loe-bk', (LOE.ban_kinh || 62) + '%');
+      }
+      if(v.quet){
+        v.quet.style.webkitMaskImage = v.quet.style.maskImage = naAnh;
+        v.quet.style.setProperty('--quet-ms', (LOE.quet_ms || 560) + 'ms');
+      }
+
+      /* VÙNG CHẠM: hiện vật nhỏ hơn 44px thì nới thêm một viền vô hình quanh
+         nó cho vừa đầu ngón tay. Chỉ làm trên thiết bị cảm ứng.           */
+      if(mayCham){
+        var can = MAIN.cham_toi_thieu || 44;
+        var noi = Math.max(0, (can - Math.min(v.w, v.h)) / 2);
+        n.style.setProperty('--cham', noi.toFixed(1) + 'px');
+      }
       v.dx = 0; v.dy = 0; v.ox = 0; v.oy = 0; v.mx = 0; v.my = 0;
       v.vx = 0; v.vy = 0; v._px = null; v._py = null;
       v.manh = 0; v.zoom = 0; v.dichZoom = 0;
@@ -2052,8 +2200,9 @@ function batManHinh(){
     var cx = v.cx + (v.dx || 0) * (1 - z) + (X.x - v.cx) * z;
     var cy = v.cy + (v.dy || 0) * (1 - z) + (X.y - v.cy) * z;
     var ti = (1 + (MAIN.phong || 0) * (v.manh || 0) * (1 - z)) * (1 + (X.ti - 1) * z);
-    var gB =  (v.mx || 0) * (MAIN.goc_3d || 0) * (v.manh || 0);
-    var gA = -(v.my || 0) * (MAIN.goc_3d || 0) * (v.manh || 0);
+    /* Nghiêng theo con trỏ (máy tính) CỘNG nghiêng theo cảm biến (điện thoại) */
+    var gB =  ((v.mx || 0) * (v.manh || 0) + MAY.x) * (MAIN.goc_3d || 0);
+    var gA = -((v.my || 0) * (v.manh || 0) + MAY.y) * (MAIN.goc_3d || 0);
     /* NGHIÊNG THEO HƯỚNG KÉO: vật lắc trong mặt phẳng như tấm bìa bị lôi đi,
        đồng thời ngả thêm theo trục 3D cùng chiều với tay.                 */
     var gh = Math.max(-1, Math.min(1, (v.vx || 0) / 26));
@@ -2093,12 +2242,25 @@ function batManHinh(){
     var bx = -(v.mx || 0) * (MAIN.bong_lech || 22);
     var by = (MAIN.bong_cao || 16) + (1 - (v.my || 0)) * (MAIN.bong_lech || 22) * 0.4 + nhac * 12;
     var nhoe = (MAIN.bong_nhoe || 26) + nhac * 16;
+
+    /* VIỀN SÁNG kiểu trinh thám: một quầng sáng mảnh ôm đúng theo mép hiện
+       vật, đậm dần khi con trỏ đang ở trên. Ghép NỐI TIẾP vào bóng đổ nên
+       hai hiệu ứng chồng lên nhau chứ không cái nào đè cái nào.           */
+    var mLoe = v.manh || 0;
+    var vien = (LOE.bat && LOE.vien)
+      ? ' drop-shadow(0 0 ' + ((LOE.vien_nhoe || 14) * mLoe).toFixed(1) + 'px rgba(' +
+        (LOE.mau || '255, 246, 246') + ',' + ((LOE.vien_dam || 0.45) * mLoe).toFixed(3) + '))'
+      : '';
     if(v.tam) v.tam.style.filter =
       'drop-shadow(' + bx.toFixed(1) + 'px ' + by.toFixed(1) + 'px ' + nhoe.toFixed(0) +
-      'px rgba(0,0,0,' + (0.38 + nhac * 0.12).toFixed(2) + '))';
+      'px rgba(0,0,0,' + (0.38 + nhac * 0.12).toFixed(2) + '))' + vien;
 
-    /* ĐÈN PIN bám theo con trỏ */
-
+    /* QUẦNG ĐÈN PIN bám theo con trỏ, cắt theo hình dáng hiện vật */
+    if(v.loe){
+      v.loe.style.opacity = (mLoe * (LOE.do_sang == null ? 0.5 : LOE.do_sang)).toFixed(3);
+      v.loe.style.setProperty('--sx', (50 + (v.mx || 0) * 45).toFixed(1) + '%');
+      v.loe.style.setProperty('--sy', (50 + (v.my || 0) * 45).toFixed(1) + '%');
+    }
 
     var khac = phongVat >= 0 && phongVat !== v.i;
     n.style.opacity = khac ? '0.10' : '1';
@@ -2119,24 +2281,6 @@ function batManHinh(){
     v.dy = yMax >= yMin ? Math.max(yMin, Math.min(yMax, v.dy)) : 0;
   }
 
-  /* Thẻ tên bám đỉnh hiện vật đang được rê. Chỉ đặt left/top, không transform
-     gì khác, nên nó hoàn toàn miễn nhiễm với nghiêng 3D và lắc khi kéo.  */
-  function datThe(){
-    var e = el('vatTen'); if(!e) return;
-    if(reVat < 0 || phongVat >= 0 || pha !== 'xong'){ e.classList.remove('hien'); return; }
-    var v = vat[reVat];
-    if(e._i !== reVat){
-      e._i = reVat;
-      e.innerHTML = '<b>' + thoat(v.def.ma_ho_so) + '</b>' + thoat(v.def.ten);
-    }
-    /* Chỉ nhận độ nghiêng CỐ ĐỊNH của hiện vật trong bản vẽ. Nghiêng 3D và
-       lắc khi kéo đều không chạm tới đây.                                */
-    e.style.left = (v.cx + (v.dx || 0)) + 'px';
-    e.style.top  = (v.cy + (v.dy || 0) - v.h / 2 - 12) + 'px';
-    e.style.transform = 'translate(-50%,-100%) rotate(' + (v.def.goc || 0).toFixed(2) + 'deg)';
-    e.classList.add('hien');
-  }
-
   /* Chạm: đặt luôn toạ độ nghiêng theo điểm chạm, khỏi chờ rê chuột */
   function vaoVatCham(i, px, py){
     var v = vat[i];
@@ -2145,8 +2289,12 @@ function batManHinh(){
     v.oy = Math.max(-1, Math.min(1, (my - v.cy - (v.dy || 0)) / (v.h / 2)));
   }
 
+  var mayCu = { x:0, y:0 };
   function chay(){
     var yen = true, k = MAIN.muot || 0.18, i;
+    /* Máy vừa nghiêng thì phải vẽ tiếp dù mọi thứ khác đã đứng yên */
+    if(Math.abs(MAY.x - mayCu.x) > 0.0015 || Math.abs(MAY.y - mayCu.y) > 0.0015) yen = false;
+    mayCu.x = MAY.x; mayCu.y = MAY.y;
     for(i = 0; i < vat.length; i++){
       var v = vat[i];
       var dRe = (reVat === i) ? 1 : 0;   /* rê được cả khi đang phóng to */
@@ -2164,7 +2312,6 @@ function batManHinh(){
       v.zoom += (dZ - v.zoom) * kz;
       datVatTF(v);
     }
-    datThe();
     if(yen){ quay = null; return; }
     quay = requestAnimationFrame(chay);
   }
@@ -2252,6 +2399,17 @@ function batManHinh(){
   function batTuongTacVat(){
     if(batTuongTacVat.roi) return; batTuongTacVat.roi = true;
     var x0 = 0, y0 = 0, dx0 = 0, dy0 = 0, daDi = false, nutKeo = null;
+    /* Trạng thái riêng cho thao tác cảm ứng */
+    var vatDang = -1, henGiu = null, laCham = false;
+    function huyGiu(){ if(henGiu){ clearTimeout(henGiu); henGiu = null; } }
+
+    /* Bắn một vệt loé chéo qua mặt hiện vật — chạy đúng một lần */
+    function loeQuet(i){
+      var v = vat[i]; if(!v || !v.quet || !v.nut) return;
+      v.nut.classList.remove('loe-quet');
+      void v.nut.offsetWidth;                 /* buộc trình duyệt chạy lại */
+      v.nut.classList.add('loe-quet');
+    }
 
     function chiSo(e){
       var t = e.target;
@@ -2265,9 +2423,10 @@ function batManHinh(){
 
     oCum.addEventListener('pointerover', function(e){
       if(pha !== 'xong' || keoVat >= 0) return;
+      if(e.pointerType === 'touch') return;      /* cảm ứng lo ở pointerdown */
       var i = chiSo(e); if(i < 0 || !MAIN.nghieng) return;
       if(phongVat >= 0 && i !== phongVat) return;
-      reVat = i; day();
+      reVat = i; loeQuet(i); day();
     });
     oCum.addEventListener('pointerout', function(e){
       var i = chiSo(e);
@@ -2290,6 +2449,12 @@ function batManHinh(){
         v.oy = Math.max(-1, Math.min(1, (my - ty0) / (v.h * ti / 2)));
         day();
       }
+      /* Đang trong 250ms chờ giữ: ngón tay xê dịch quá ngưỡng thì huỷ, để
+         không nhầm một cú vuốt thành cú chạm mở chi tiết.                 */
+      if(keoVat < 0 && henGiu && laCham &&
+         Math.abs(e.clientX - x0) + Math.abs(e.clientY - y0) > (MAIN.cham_di || 12)){
+        huyGiu(); daDi = true;
+      }
       if(keoVat >= 0){
         var h = vat[keoVat];
         /* Tốc độ kéo → dùng để lắc và nghiêng vật theo hướng đang bị lôi đi */
@@ -2308,19 +2473,50 @@ function batManHinh(){
       if(pha !== 'xong') return;      /* code còn đang hoá thành tệp */
       var i = chiSo(e); if(i < 0) return;
       if(phongVat >= 0){ if(i !== phongVat) moXem(i); return; }
-      keoVat = i; daDi = false;
+      laCham = (e.pointerType === 'touch');
+      vatDang = i; daDi = false;
       x0 = e.clientX; y0 = e.clientY; dx0 = vat[i].dx; dy0 = vat[i].dy;
       nutKeo = vat[i].nut;
-      if(MAIN.keo_tha && nutKeo.classList) nutKeo.classList.add('keo');
       try{ nutKeo.setPointerCapture(e.pointerId); }catch(err){}
-      e.preventDefault();
+
+      if(laCham){
+        /* ĐIỆN THOẠI — chạm nhanh thì MỞ CHI TIẾT, giữ lâu mới vào chế độ KÉO.
+           Không dùng ngưỡng vài px nữa vì ngón tay luôn xê dịch đôi chút.  */
+        reVat = i; vaoVatCham(i, e.clientX, e.clientY); loeQuet(i); day();
+        huyGiu();
+        henGiu = setTimeout(function(){
+          henGiu = null;
+          if(vatDang < 0) return;
+          keoVat = vatDang;
+          daDi = true;                         /* đã vào kéo → nhả ra không mở */
+          if(MAIN.keo_tha && nutKeo && nutKeo.classList) nutKeo.classList.add('keo');
+          if(navigator.vibrate){ try{ navigator.vibrate(12); }catch(err){} }
+          day();
+        }, MAIN.cham_giu == null ? 250 : MAIN.cham_giu);
+      } else {
+        /* MÁY TÍNH — giữ nguyên nếp cũ: bấm giữ là kéo, bấm nhả là mở */
+        keoVat = i;
+        if(MAIN.keo_tha && nutKeo.classList) nutKeo.classList.add('keo');
+        e.preventDefault();
+      }
     });
     function nha(){
-      if(keoVat < 0) return;
+      huyGiu();
+      if(keoVat < 0){
+        /* Chưa kịp vào chế độ kéo → đây là một cú CHẠM NHANH */
+        var j = vatDang; vatDang = -1;
+        if(laCham){
+          reVat = -1;
+          if(j >= 0 && !daDi) moXem(j);
+          day();
+        }
+        return;
+      }
       if(nutKeo && nutKeo.classList) nutKeo.classList.remove('keo');
-      var i = keoVat; keoVat = -1; nutKeo = null;
+      var i = keoVat; keoVat = -1; nutKeo = null; vatDang = -1;
       vat[i]._px = null; vat[i]._py = null;
       if(!daDi) moXem(i);          /* bấm mà không kéo → phóng to */
+      if(laCham) reVat = -1;
       day();
     }
     oCum.addEventListener('pointerup', nha);
@@ -2346,7 +2542,7 @@ function batManHinh(){
         var l = document.createElement('div');
         l.className = 'dong loi';
         t.parentNode.insertBefore(l, t.nextSibling);
-        giaiDongMa(l, '! ERROR 403 · ' + vat[i].def.ma_ho_so + ' chưa được giải mật',
+        giaiDongMa(l, '! ERROR 403 · ' + (vat[i].def.tep || vat[i].def.ma) + ' chưa được giải mật',
                    itDong ? 0 : (MAIN.xem_giai || 260));
         return;
       }
@@ -2366,13 +2562,6 @@ function batManHinh(){
       }, { passive:true });
       oXem.addEventListener('touchend', function(){ y0 = null; }, { passive:true });
     })();
-
-    /* Chạm vào một hiện vật thì chọn nó luôn (điện thoại không có rê chuột) */
-    oCum.addEventListener('touchstart', function(e){
-      if(pha !== 'xong' || !e.touches[0]) return;
-      var i = chiSo(e); if(i < 0) return;
-      reVat = i; vaoVatCham(i, e.touches[0].clientX, e.touches[0].clientY); day();
-    }, { passive:true });
 
     oNen.addEventListener('click', dongXem);
     addEventListener('keydown', function(e){ if(e.key === 'Escape') dongXem(); });
@@ -2449,8 +2638,9 @@ function batManHinh(){
           var c = CUMVAT[k], khoa = (c.xem === false);
           if(m === '@khoa' && !khoa) continue;
           if(m === '@mo'   &&  khoa) continue;
-          var ten = (c.ma_ho_so + ' ' + (c.tep || c.ma) + ' ');
-          while(ten.length < 26) ten += '.';
+          /* Chỉ hiện TÊN TỆP, không kèm mã hồ sơ EV-00x nữa */
+          var ten = ((c.tep || c.ma) + ' ');
+          while(ten.length < 20) ten += '.';
           ra.push({ chu:'> ' + ten + ' [' + (khoa ? 'lock' : 'open') + ']',
                     vat:k, mo:!khoa });
         }
@@ -2470,6 +2660,16 @@ function batManHinh(){
   /* Dựng đúng số cột theo DATA.cot */
   function dungCot(){
     oTren.innerHTML = ''; oCot = [];
+    /* Máy tính: các cột rộng cố định theo số ký tự và NẰM SÁT NHAU bên trái.
+       Điện thoại: giữ nguyên kiểu vuốt ngang từng cột (do CSS lo).        */
+    if(!nhoMH()){
+      oTren.style.gridTemplateColumns =
+        'repeat(' + DATA.cot.length + ', minmax(0, ' + (MAIN.cot_rong || 30) + 'ch))';
+      oTren.style.columnGap = (MAIN.cot_cach || 26) + 'px';
+    } else {
+      oTren.style.gridTemplateColumns = '';
+      oTren.style.columnGap = '';
+    }
     for(var i = 0; i < DATA.cot.length; i++){
       var d = document.createElement('div');
       d.className = 'cot';
@@ -2481,14 +2681,25 @@ function batManHinh(){
   function goCot(o, ds, tongMs, xong, noiThem){
     /* tongMs = null → dùng nhịp cố định MAIN.xem_go (bảng chi tiết).
        Ngược lại tự chia nhịp để cột gõ xong ĐÚNG lúc chữ ASCII in xong.   */
-    var buoc;
-    if(tongMs == null){ buoc = itDong ? 0 : (MAIN.xem_go || 14); }
-    else {
-      var soKT = 0, z;
-      for(z = 0; z < ds.length; z++) soKT += ds[z].length;
-      buoc = tongMs > 0 ? tongMs / Math.max(1, soKT + ds.length * 6) : 0;
+    var buoc, nghi;
+    if(tongMs == null){
+      buoc = itDong ? 0 : (MAIN.xem_go || 14); nghi = buoc * 6;
+    } else {
+      /* MỘT NHỊP CHUNG cho mọi cột — không chia theo độ dài từng cột nữa,
+         nhờ vậy ba cột gõ đều tăm tắp y như một cửa sổ dòng lệnh thật.   */
+      buoc = itDong ? 0 : (MAIN.go_cot == null ? 10 : MAIN.go_cot);
+      nghi = itDong ? 0 : (MAIN.go_nghi == null ? 70 : MAIN.go_nghi);
     }
     ds = noDanhSach(ds);
+
+    /* Đuôi con trỏ "|" nhấp nháy — luôn được dời xuống dòng đang gõ, gõ xong
+       cả cột thì nằm lại ở cuối dòng cuối cùng.                           */
+    var tro = null;
+    if(tongMs != null && !itDong){
+      tro = document.createElement('span');
+      tro.className = 'go-tro';
+      tro.textContent = '|';
+    }
     if(!noiThem) o.innerHTML = '';
 
     /* Bảng chi tiết dùng chế độ nhanh: đổ hết dòng ra, mỗi dòng lệch nhau
@@ -2526,8 +2737,9 @@ function batManHinh(){
       i++;
       goDongMa(d, chu, buoc, function(){
         o.scrollTop = o.scrollHeight;
-        hen.push(setTimeout(dong, buoc * 6));
+        hen.push(setTimeout(dong, nghi));
       });
+      if(tro) d.appendChild(tro);
     })();
   }
 
@@ -2553,8 +2765,9 @@ function batManHinh(){
       v.p = 0; v.dx = 0; v.dy = 0; v.ox = 0; v.oy = 0;
       v.mx = 0; v.my = 0; v.manh = 0; v.zoom = 0; v._net = null;
       v.vx = 0; v.vy = 0; v._px = null; v._py = null;
-      var eT = el('vatTen'); if(eT){ eT.classList.remove('hien'); eT._i = null; }
+      if(v.loe) v.loe.style.opacity = '0';
       if(v.nut){
+        v.nut.classList.remove('loe-quet', 'keo');
         v.nut.style.transform = ''; v.nut.style.opacity = '';
         v.nut.style.zIndex = ''; v.nut.style.pointerEvents = '';
         v.nut.style.width = v.w + 'px'; v.nut.style.height = v.h + 'px';
@@ -2651,6 +2864,8 @@ function batManHinh(){
     /* Báo cho phần chuyển cảnh biết lúc nào KHÔNG được hiểu cú vuốt là
        lệnh thoát: đang xem chi tiết, đang kéo hiện vật, hoặc đang cuộn thẻ. */
     khoa: function(){ return phongVat >= 0 || keoVat >= 0; },
+    /* Cho phần cảm biến nghiêng gọi vào để vẽ lại khi máy đổi hướng */
+    day: function(){ if(pha === 'xong') day(); },
     dong: function(){
       pha = 'nghi';
       hen.forEach(clearTimeout); hen = [];
@@ -2663,6 +2878,48 @@ function batManHinh(){
       henDon = setTimeout(donDep, 620);
     }
   };
+}
+
+/* =========================================================================
+   NGHIÊNG THEO CẢM BIẾN CỦA ĐIỆN THOẠI
+   Máy tính dùng con trỏ để quyết định hướng nghiêng 3D; điện thoại không có
+   con trỏ nên lấy luôn độ nghiêng thật của thiết bị. Giá trị được làm mượt
+   rồi ghi vào MAY.x / MAY.y, và mọi nơi đang nghiêng 3D đều cộng thêm nó.
+   ========================================================================= */
+function batNghiengMay(){
+  if(!NGHIENGMAY.bat || itDong) return;
+  if(!mayCham) return;                     /* chỉ chạy trên thiết bị cảm ứng */
+  if(typeof DeviceOrientationEvent === 'undefined') return;
+
+  var day = NGHIENGMAY.goc_day || 30;
+  var moc = NGHIENGMAY.moc_beta == null ? 50 : NGHIENGMAY.moc_beta;
+  var muc = NGHIENGMAY.muc == null ? 0.6 : NGHIENGMAY.muc;
+  var k   = NGHIENGMAY.muot || 0.14;
+
+  function nhan(e){
+    if(e.gamma == null && e.beta == null) return;
+    MAY.co = true;
+    /* gamma = nghiêng trái–phải · beta = ngả trước–sau */
+    var gx = Math.max(-1, Math.min(1, (e.gamma || 0) / day)) * muc;
+    var gy = Math.max(-1, Math.min(1, ((e.beta || 0) - moc) / day)) * muc;
+    MAY.x += (gx - MAY.x) * k;
+    MAY.y += (gy - MAY.y) * k;
+    biDay();
+    if(manHinh && manHinh.day) manHinh.day();
+  }
+  addEventListener('deviceorientation', nhan, { passive:true });
+
+  /* iOS 13+ chỉ cấp quyền cảm biến sau một thao tác chạm của người xem */
+  if(typeof DeviceOrientationEvent.requestPermission === 'function'){
+    var xin = function(){
+      removeEventListener('touchend', xin);
+      try{
+        DeviceOrientationEvent.requestPermission()
+          .then(function(){}).catch(function(){});
+      }catch(err){}
+    };
+    addEventListener('touchend', xin, { passive:true });
+  }
 }
 
 /* =========================================================================
@@ -2761,6 +3018,8 @@ dungCumChu();
 veLuoi();
 dongBoCum();
 veManHinh();
+veLogo();
+datNutCuaSo(false);
 veHeroBi();
 veGiua();
 doKichThuocGoc();
@@ -2775,6 +3034,8 @@ batVideo();
 var manHinh = null;
 try { manHinh = batManHinh(); }
 catch(e){ console.error('Main Section không khởi động được:', e); }
+
+batNghiengMay();   /* phải gọi SAU khi manHinh đã dựng xong */
 
 /* Hiện dần các phần tử hero sau khi đã đo đạc xong */
 requestAnimationFrame(function(){
