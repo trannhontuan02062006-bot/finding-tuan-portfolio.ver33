@@ -152,20 +152,24 @@ body.da-phu .cuaso, body.da-phu .hero{
 /* --- Một phần ba trên: hai cột nhật ký --- */
 .mh-tren{
   position:absolute; left:0; right:0;
-  display:flex; justify-content:flex-start; align-items:flex-start;
-  gap:clamp(10px,1.6vw,26px);
+  display:grid; align-items:start;
+  grid-template-columns:repeat(auto-fit, minmax(190px, 1fr));
+  gap:8px clamp(12px,1.6vw,28px);
   padding:14px var(--le) 8px;
   font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace;
-  font-size:clamp(12px,1.45vw,19px); line-height:1.7; letter-spacing:.01em;
+  font-size:clamp(10px,.95vw,13px); line-height:1.8; letter-spacing:.01em;
   color:var(--mint); overflow:hidden;
 }
-.mh-tren .cot{ overflow:hidden; flex:0 1 min(38ch, 42vw); min-width:0; }
+.mh-tren .cot{ overflow:hidden; min-width:0; }
 .mh-tren .dong{ white-space:nowrap; overflow:hidden; text-overflow:ellipsis; opacity:.78; }
 .mh-tren .dong.sang{ color:var(--giay); opacity:1; }
 /* Dòng trích dẫn tang vật — bấm được */
-.mh-tren .dong.co-vat{ cursor:pointer; opacity:.9; transition:color .18s ease, opacity .18s ease; }
-.mh-tren .dong.co-vat:hover{ color:var(--giay); opacity:1; }
-.mh-tren .dong.co-vat.khoa:hover{ color:var(--do); }
+.mh-tren .dong.co-vat,
+.mh-tren .dong.co-link{ cursor:pointer; opacity:.9;
+  transition:color .18s ease, opacity .18s ease; }
+.mh-tren .dong.co-vat:hover,
+.mh-tren .dong.co-link:hover{ color:var(--giay); opacity:1; text-decoration:underline; }
+.mh-tren .dong.co-vat.khoa:hover{ color:var(--do); text-decoration:none; }
 .mh-tren .dong.loi{ color:var(--do); opacity:1; }
 
 /* --- Hai phần ba dưới: chữ ASCII rồi hoá thành hiện vật --- */
@@ -190,13 +194,13 @@ body.da-phu .cuaso, body.da-phu .hero{
 .mh-duoi{ position:absolute; left:0; right:0; z-index:2; }
 .man-hinh.dangXem .mh-duoi{ z-index:4; }   /* hiện vật nổi lên trên nền tối */
 .mh-ascii, .mh-nhieu{ position:absolute; left:0; top:0; display:block; }
-.mh-ascii{ z-index:1; }
+.mh-ascii{ z-index:1; transition:opacity .22s ease; }
 .mh-nhieu{ z-index:2; }
 .mh-cum{ position:absolute; inset:0; z-index:3; }
 /* Thẻ tên: chỉ dịch chuyển, không bao giờ nghiêng hay phóng theo hiện vật */
 .vat-ten{
   position:absolute; z-index:7; pointer-events:none;
-  transform:translate(-50%,-100%);
+  transform-origin:50% 100%;
   padding:5px 11px; white-space:nowrap;
   background:rgba(10,14,14,.82); border:1px solid rgba(140,199,196,.42);
   font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace;
@@ -210,26 +214,6 @@ body.da-phu .cuaso, body.da-phu .hero{
 .cum-vat{
   position:absolute; transform-origin:50% 50%;
   transition:opacity .34s ease;      /* transform do JS lo từng khung */
-}
-/* ĐÈN PIN: một quầng sáng tròn bám theo con trỏ, rọi lên mặt hiện vật.
-   Mặt nạ chính là tấm ảnh nên quầng chỉ nằm trong đúng hình, không tràn ra
-   vùng trong suốt. Vị trí quầng lấy thẳng từ toạ độ con trỏ nên không có
-   phép tính góc nào để sai.                                              */
-.loe{
-  position:absolute; inset:0; pointer-events:none; opacity:0;
-  mix-blend-mode:screen;
-  /* Chú ý: với từ khoá 'circle', CSS chỉ nhận bán kính là ĐỘ DÀI (px), không
-     nhận phần trăm. Viết % là cả khai báo bị bỏ và không vẽ gì cả.
-     Bán kính px do JS tính từ cạnh thật của hiện vật.                      */
-  background:
-    radial-gradient(circle var(--den-loi,40px) at var(--den-x,50%) var(--den-y,50%),
-      rgba(255,253,246,.92) 0%, rgba(255,250,235,.42) 55%, rgba(255,255,255,0) 100%),
-    radial-gradient(circle var(--den-r,120px) at var(--den-x,50%) var(--den-y,50%),
-      rgba(255,246,224,.46) 0%, rgba(255,242,214,.16) 46%, rgba(255,255,255,0) 78%);
-  -webkit-mask-size:contain; mask-size:contain;
-  -webkit-mask-position:center; mask-position:center;
-  -webkit-mask-repeat:no-repeat; mask-repeat:no-repeat;
-  transition:opacity .18s ease;
 }
 .cum-vat img{
   width:100%; height:100%; object-fit:contain; display:block;
@@ -249,12 +233,14 @@ body.da-phu .cuaso, body.da-phu .hero{
 }
 .xem-nen.hien{ opacity:1; pointer-events:auto; cursor:zoom-out; }
 .xem-chu{
-  position:absolute; z-index:5; pointer-events:none;
+  position:absolute; z-index:5; pointer-events:auto;
   right:var(--le); top:50%; transform:translateY(-50%);
-  width:min(44vw, 560px); max-height:80svh; overflow:hidden;
+  width:min(44vw, 560px); max-height:82svh; overflow-y:auto;
+  scrollbar-width:none;
   opacity:0; transition:opacity .32s ease;
 }
 .xem-chu.hien{ opacity:1; }
+.xem-chu::-webkit-scrollbar{ display:none; }
 
 /* --- THẺ TANG VẬT --- */
 .the{
@@ -521,7 +507,6 @@ body.khoa .cs-cham{ animation:tho 2.1s ease-in-out infinite; }
   <!-- Tấm bì hồ sơ: nằm SAU cửa sổ, lệch sang phải, nghiêng nhẹ -->
   <div class="hero-bi" id="heroBi" aria-hidden="true">
     <img id="heroBiAnh" draggable="false" alt="">
-    <span class="loe" id="heroBiLoe"></span>
   </div>
 
   <div class="cuaso" id="cuaso" role="group" aria-label="Cửa sổ phần mềm">
@@ -559,8 +544,7 @@ body.khoa .cs-cham{ animation:tho 2.1s ease-in-out infinite; }
   <div class="hat" id="mhHat" aria-hidden="true"></div>
   <!-- 1/3 trên: hai cột nhật ký chạy chữ -->
   <div class="mh-tren" id="mhTren">
-    <div class="cot" id="cotTrai"></div>
-    <div class="cot" id="cotPhai"></div>
+    <!-- các cột do JS dựng theo DATA.cot -->
   </div>
   <!-- 2/3 dưới: chữ ASCII in ra rồi hoá thành hiện vật -->
   <div class="mh-duoi" id="mhDuoi">
@@ -629,34 +613,76 @@ const DATA = {
      3. NHẬT KÝ HAI CỘT — chạy ở một phần ba trên của Main Section
      Dòng nào bắt đầu bằng $ sẽ được tô sáng. Thêm bớt thoải mái.
      --------------------------------------------------------------------- */
-  nhatKy: {
-    /* Dòng nào là chuỗi thì chỉ hiển thị.
-       Dòng "@tangvat" tự nở ra thành danh sách tang vật lấy từ CUMVAT,
-       mỗi dòng bấm được để phóng to hiện vật tương ứng.                  */
-    trai: [
-      "$ finding-tuan --open case/004",
-      "> subject   : Tran Nhon Tuan",
-      "> alias     : Tom",
-      "> born      : 02-06-2006",
-      "> location  : Thua Thien Hue",
-      "> role      : Content Creator",
-      "> target    : Creative Strategist",
+  /* ---------------------------------------------------------------------
+     NHẬT KÝ SÁU CỘT — chạy ở một phần ba trên của Main Section.
+     Mỗi dòng có thể là:
+       "chuỗi"                      → chỉ hiển thị
+       { chu:"...", vat:"a4" }      → bấm vào mở hiện vật đó
+       { chu:"...", url:"https:.." }→ bấm vào mở đường dẫn
+       "@khoa"                      → tự nở thành danh sách hiện vật đang khoá
+     Dòng bắt đầu bằng $ được tô sáng.
+     --------------------------------------------------------------------- */
+  cot: [
+    { dong: [
+      "$ whoami",
+      "> Trần Nhơn Tuân",
+      "> alias ..... Tom",
+      "> giới tính . Nam",
+      "> tuổi ...... 20",
+      "> nghề ...... Content Creator",
+      "> nơi ở ..... Huế",
+      "> ngành ..... TT Đa Phương Tiện",
+      "> khoá ...... 2024 - 2028"
+    ]},
+    { dong: [
+      "$ cat skills.txt",
+      "> tổ chức · quản lý thời gian",
+      "> giao tiếp · phối hợp nhóm",
+      "> thích nghi tình huống",
+      "> tư duy phản biện",
+      "> quản lý dự án",
       "",
-      "$ scan --skills --verbose",
-      "> writing ........... ok",
-      "> photography ....... ok",
-      "> video ............. ok",
-      "> operations ........ ok",
-      "> brand strategy .... ok"
-    ],
-    phai: [
-      "$ ls /evidence --detail",
-      "@tangvat",
+      { chu:"> EV-001 a4-portfolio [open]", vat:"a4" }
+    ]},
+    { dong: [
+      "$ ls /software",
+      "> DaVinci Resolve",
+      "> Affinity",
+      "> Canva",
+      "> Claude",
       "",
-      "$ hint",
-      "> bấm vào một dòng để mở tang vật"
-    ]
-  },
+      { chu:"> EV-002 evidence-bag [open]", vat:"bag" }
+    ]},
+    { dong: [
+      "$ log --history",
+      "> 2024 Content Creator",
+      "    Shaymin Ahh · YouTube",
+      "> 2025 Photographer",
+      "    Đặc Sản Kinh Đô",
+      "> 2025 Quản lý",
+      "    Town Gaming Huế",
+      "> 2026 Videographer"
+    ]},
+    { dong: [
+      "$ ls --locked",
+      "@khoa",
+      "",
+      "> yêu cầu giải mật"
+    ]},
+    { dong: [
+      "$ contact --open",
+      { chu:"> email ......... [→]",
+        url:"mailto:trannhontuan.02.06.2006@gmail.com" },
+      { chu:"> facebook ...... [→]",
+        url:"https://facebook.com/finding.tuan.vn" },
+      { chu:"> instagram ..... [→]",
+        url:"https://instagram.com/finding_tuan" },
+      { chu:"> tiktok ........ [→]",
+        url:"https://tiktok.com/@finding.tuan" }
+    ]}
+  ],
+
+
 
 
 
@@ -816,10 +842,14 @@ const MAIN = {
   bong_lech:    22,       /* bóng dạt tối đa bao nhiêu px                     */
   bong_cao:     16,       /* bóng nằm thấp hơn vật bao nhiêu px               */
   bong_nhoe:    26,       /* độ nhoè của bóng                                 */
-  den:          0.60,     /* độ sáng của quầng đèn pin (0 = tắt)              */
-  den_ban_kinh: 45,       /* bán kính quầng, tính theo % cạnh hiện vật        */
-  den_loi:      0.34,     /* lõi sáng gắt chiếm bao nhiêu phần bán kính        */
-  den_toi:      0.14,     /* ảnh tối đi bao nhiêu khi bị rọi (tăng tương phản) */
+  /* LỘ MÃ CODE: rê con trỏ lên hiện vật thì lớp ảnh bị khoét theo vệt tay,
+     để lộ đúng đoạn ASCII đã dựng nên chỗ đó.                             */
+  lo_bat:       true,
+  lo_diem:      7,        /* số điểm của vệt (đuôi dài ngắn)                 */
+  lo_ban_kinh:  74,       /* bán kính lỗ ở đầu vệt (px) — desktop            */
+  lo_ban_kinh_m:52,       /* — mobile                                        */
+  lo_mem:       0.55,     /* mép lỗ mềm bao nhiêu (0 → 1)                    */
+  lo_tan:       520,      /* mỗi điểm của vệt tắt hẳn sau bao nhiêu ms       */
   ma_duoi:      5,        /* đuôi ký tự rác chạy trước con trỏ gõ chữ         */
 
   /* Bấm vào hiện vật để phóng to xem chi tiết */
@@ -851,15 +881,14 @@ const CUMVAT = [
     the: {
       loai:  "HỒ SƠ GỐC",
       truong: [
-        ["MÃ HỒ SƠ",  "EV-004"],
-        ["NGÀY LẬP",  "02-06-2026"],
-        ["NƠI LƯU",   "Thừa Thiên Huế"],
-        ["TÌNH TRẠNG","Nguyên vẹn"]
+        ["MÃ HỒ SƠ", "EV-004"],
+        ["LOẠI", "Bì lưu trữ"],
+        ["TÌNH TRẠNG", "Chưa giải mật"]
       ],
       khoi: [
-        { ten:"TÓM TẮT", dong:["Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore."] },
-        { ten:"VAI TRÒ", dong:["Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo."] },
-        { ten:"KẾT QUẢ", dong:["Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla."] }
+        { ten:"TRẠNG THÁI", dong:[
+          "Bì hồ sơ chứa toàn bộ tang vật của vụ 02-06-2006."
+        ] }
       ]
     } },
   { ma:"a4", ma_ho_so:"EV-001", tep:"a4-portfolio", ten:"Portfolio A4",
@@ -869,15 +898,38 @@ const CUMVAT = [
     the: {
       loai:  "TÀI LIỆU",
       truong: [
-        ["MÃ HỒ SƠ",  "EV-001"],
-        ["NGÀY LẬP",  "02-06-2026"],
-        ["NƠI LƯU",   "Thừa Thiên Huế"],
-        ["TÌNH TRẠNG","Nguyên vẹn"]
+        ["MÃ HỒ SƠ", "EV-001"],
+        ["LOẠI", "Portfolio A4"],
+        ["ĐỐI TƯỢNG", "Trần Nhơn Tuân"],
+        ["TÌNH TRẠNG", "Đã giải mật"]
       ],
       khoi: [
-        { ten:"TÓM TẮT", dong:["Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore."] },
-        { ten:"VAI TRÒ", dong:["Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo."] },
-        { ten:"KẾT QUẢ", dong:["Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla."] }
+        { ten:"SUBJECT PROFILE", dong:[
+          "Họ và tên khai sinh: Trần Nhơn Tuân · biệt danh Tom.",
+          "Nam · 20 tuổi · quốc tịch Việt Nam · sống tại Thành phố Huế.",
+          "Nghề nghiệp: Content Creator."
+        ] },
+        { ten:"PSYCHOLOGICAL ASSESSMENT", dong:[
+          "Qua quá trình theo dõi, điều tra viên nhận định đối tượng là một cá nhân bị dẫn dắt bởi khao khát kể chuyện. Đối tượng liên tục thu nạp kiến thức từ mọi nguồn và có xu hướng tối ưu mọi công đoạn để chạm mục tiêu nhanh nhất.",
+          "Điểm nổi bật nhất là nhu cầu tạo dấu ấn: không chấp nhận cho ra đời những sản phẩm mờ nhạt, mà theo đuổi việc khắc hoạ những &#39;cái tôi&#39; trần trụi nhất qua từng thước phim, tấm hình.",
+          "Các nguồn tin nội bộ xác nhận đối tượng khá lành: thân thiện, dễ hợp tác, sẵn sàng ngồi lại lắng nghe. Đáng tin cậy, còn nhiều tiềm năng chưa khai phá.",
+          "⚠ Cảnh báo: đối tượng rất hay rủ người đối diện đi cafe đánh cờ."
+        ] },
+        { ten:"EDUCATION RECORD", dong:[
+          "Sinh viên năm 3 · khoá 2024 - 2028.",
+          "Chuyên ngành Truyền Thông Đa Phương Tiện.",
+          "Khoa Quốc Tế - Đại Học Huế."
+        ] },
+        { ten:"OPERATIONAL HISTORY", dong:[
+          "2024 · Content Creator (tự do / YouTube) — nghiên cứu thị hiếu, viết kịch bản, quay và dựng. Toàn bộ quy trình sản xuất cho kênh &#39;Shaymin Ahh&#39;.",
+          "2025 · Photographer (Đặc Sản Kinh Đô) — chụp ảnh trải nghiệm cho khách trên tuyến tàu di sản Huế - Đà Nẵng.",
+          "2025 · Quản lý (Town Gaming Huế) — vận hành quán, tư vấn khách, hướng dẫn nhân viên mới, xử lý sự cố kỹ thuật.",
+          "2026 · Videographer — ghi hình tiền kỳ tới hậu kỳ, hỗ trợ chiến lược cùng đội ngũ nội dung."
+        ] },
+        { ten:"OBJECTIVE", dong:[
+          "Học hỏi qua việc nhìn, nghe, chạm vào những câu chuyện của người đi trước.",
+          "Trên hành trình trở thành Creative Director, đối tượng đang truy tìm những &#39;đồng phạm&#39; đồng hành để cùng tiến bộ."
+        ] }
       ]
     } },
   { ma:"bag", ma_ho_so:"EV-002", tep:"evidence-bag", ten:"Máy ảnh",
@@ -887,15 +939,27 @@ const CUMVAT = [
     the: {
       loai:  "TANG VẬT",
       truong: [
-        ["MÃ HỒ SƠ",  "EV-002"],
-        ["NGÀY LẬP",  "02-06-2026"],
-        ["NƠI LƯU",   "Thừa Thiên Huế"],
-        ["TÌNH TRẠNG","Nguyên vẹn"]
+        ["MÃ HỒ SƠ", "EV-002"],
+        ["LOẠI", "Túi tang vật"],
+        ["THU GIỮ BỞI", "Trần Nhơn Tuân"],
+        ["NGÀY", "2026-07-26"]
       ],
       khoi: [
-        { ten:"TÓM TẮT", dong:["Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore."] },
-        { ten:"VAI TRÒ", dong:["Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo."] },
-        { ten:"KẾT QUẢ", dong:["Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla."] }
+        { ten:"SOFTWARE", dong:[
+          "DaVinci Resolve · dựng phim và chỉnh màu.",
+          "Affinity · thiết kế và xử lý ảnh.",
+          "Canva · dàn trang nhanh, ấn phẩm mạng xã hội.",
+          "Claude · hỗ trợ viết, dựng web và xử lý dữ liệu."
+        ] },
+        { ten:"SPECIAL SKILLS", dong:[
+          "✔ Tổ chức và quản lý thời gian",
+          "✔ Giao tiếp và phối hợp nhóm",
+          "✔ Thích nghi với tình huống đột xuất",
+          "✔ Tư duy phản biện và quản lý dự án"
+        ] },
+        { ten:"GHI CHÚ", dong:[
+          "Bốn phần mềm được sử dụng thường xuyên nhất trong toàn bộ quá trình tác nghiệp của đối tượng."
+        ] }
       ]
     } },
   { ma:"key", ma_ho_so:"EV-003", tep:"keychain", ten:"Móc khoá",
@@ -905,15 +969,14 @@ const CUMVAT = [
     the: {
       loai:  "TANG VẬT",
       truong: [
-        ["MÃ HỒ SƠ",  "EV-003"],
-        ["NGÀY LẬP",  "02-06-2026"],
-        ["NƠI LƯU",   "Thừa Thiên Huế"],
-        ["TÌNH TRẠNG","Nguyên vẹn"]
+        ["MÃ HỒ SƠ", "EV-003"],
+        ["LOẠI", "Móc khoá PVC"],
+        ["TÌNH TRẠNG", "Chưa giải mật"]
       ],
       khoi: [
-        { ten:"TÓM TẮT", dong:["Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore."] },
-        { ten:"VAI TRÒ", dong:["Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo."] },
-        { ten:"KẾT QUẢ", dong:["Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla."] }
+        { ten:"TRẠNG THÁI", dong:[
+          "Hiện vật chưa được giải mật. Nội dung sẽ được bổ sung sau."
+        ] }
       ]
     } },
   { ma:"sound", ma_ho_so:"EV-005", tep:"sounds", ten:"Âm thanh",
@@ -923,15 +986,14 @@ const CUMVAT = [
     the: {
       loai:  "BĂNG GHI",
       truong: [
-        ["MÃ HỒ SƠ",  "EV-005"],
-        ["NGÀY LẬP",  "02-06-2026"],
-        ["NƠI LƯU",   "Thừa Thiên Huế"],
-        ["TÌNH TRẠNG","Nguyên vẹn"]
+        ["MÃ HỒ SƠ", "EV-005"],
+        ["LOẠI", "Băng cassette"],
+        ["TÌNH TRẠNG", "Chưa giải mật"]
       ],
       khoi: [
-        { ten:"TÓM TẮT", dong:["Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore."] },
-        { ten:"VAI TRÒ", dong:["Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo."] },
-        { ten:"KẾT QUẢ", dong:["Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla."] }
+        { ten:"TRẠNG THÁI", dong:[
+          "Hiện vật chưa được giải mật. Nội dung sẽ được bổ sung sau."
+        ] }
       ]
     } }
 ];
@@ -961,8 +1023,6 @@ const HEROBI = {
   bong_lech:  26,   /* bóng dạt tối đa bao nhiêu px                   */
   bong_cao:   24,   /* bóng nằm thấp hơn vật bao nhiêu px             */
   bong_nhoe:  40,   /* độ nhoè của bóng                               */
-  den:        0.6,  /* độ sáng quầng đèn pin (0 = tắt)                */
-  den_ban_kinh: 42, /* bán kính quầng, % cạnh tấm bì                   */
   keo_lac:    10,   /* lắc bao nhiêu độ theo hướng bị kéo               */
   keo_nghieng: 9    /* và ngả thêm bao nhiêu độ theo trục 3D            */
 };
@@ -1274,13 +1334,11 @@ var dangKeoBi = false;          /* để thao tác vuốt không mở nhầm Mai
 var biQuay = null;
 
 function veHeroBi(){
-  var e = el('heroBi'), a = el('heroBiAnh'), lo = el('heroBiLoe');
+  var e = el('heroBi'), a = el('heroBiAnh');
   if(!e || !a) return;
   if(!a.src){
     a.addEventListener('load', function(){ veHeroBi(); }, { once:true });
     a.src = ANH.heroBi;
-    if(lo){ lo.style.webkitMaskImage = 'url(' + ANH.heroBi + ')';
-            lo.style.maskImage = 'url(' + ANH.heroBi + ')'; }
   }
   var nho = window.innerWidth < 768;
   var W = window.innerWidth, H = window.innerHeight;
@@ -1325,16 +1383,7 @@ function datBi(ngay){
   e.style.filter = 'drop-shadow(' + bx.toFixed(1) + 'px ' + by.toFixed(1) + 'px ' +
                    nhoe.toFixed(0) + 'px rgba(18,48,57,' + (0.28 + nhac * 0.1).toFixed(2) + '))';
 
-  /* ĐÈN PIN bám theo con trỏ */
-  var lo = el('heroBiLoe');
-  if(lo){
-    lo.style.setProperty('--den-x', (50 + biTT.mx * 50).toFixed(1) + '%');
-    lo.style.setProperty('--den-y', (50 + biTT.my * 50).toFixed(1) + '%');
-    var Rb = Math.min(biTam.w, biTam.h) * (HEROBI.den_ban_kinh || 42) / 100;
-    lo.style.setProperty('--den-r',   Rb.toFixed(1) + 'px');
-    lo.style.setProperty('--den-loi', (Rb * 0.34).toFixed(1) + 'px');
-    lo.style.opacity = (biTT.manh * (HEROBI.den == null ? 0.6 : HEROBI.den)).toFixed(3);
-  }
+
 }
 
 function biChay(){
@@ -1730,7 +1779,7 @@ function batManHinh(){
   if(!MAIN.bat) return null;
 
   var boc   = el('manHinh');
-  var oTren = el('mhTren'), cotT = el('cotTrai'), cotP = el('cotPhai');
+  var oTren = el('mhTren'), oCot = [];
   var oDuoi = el('mhDuoi'), oCum = el('mhCum');
   var oNen  = el('xemNen'), oXem = el('xemChu');
   var cv    = el('mhAscii'), ctx  = cv.getContext('2d');
@@ -1805,8 +1854,7 @@ function batManHinh(){
       n.className = 'cum-vat';
       n.setAttribute('data-i', i);
       if(v.def.xem !== false) n.className += ' xem-duoc';
-      n.innerHTML = '<img draggable="false" alt="' + thoat(v.def.ten) + '" src="' + v.im.src + '">' +
-                    '<span class="loe"></span>';
+      n.innerHTML = '<img draggable="false" alt="' + thoat(v.def.ten) + '" src="' + v.im.src + '">';
       n.style.left   = (v.cx - v.w / 2) + 'px';
       n.style.top    = (v.cy - v.h / 2) + 'px';
       n.style.width  = v.w + 'px';
@@ -1814,10 +1862,6 @@ function batManHinh(){
       n.style.zIndex = String(v.def.lop || 1);
       oCum.appendChild(n);
       v.nut = n; v.tam = n.querySelector('img'); v.i = i;
-      v.loe = n.querySelector('.loe');
-
-      v.loe.style.webkitMaskImage = 'url(' + v.im.src + ')';
-      v.loe.style.maskImage = 'url(' + v.im.src + ')';
       v.dx = 0; v.dy = 0; v.ox = 0; v.oy = 0; v.mx = 0; v.my = 0;
       v.vx = 0; v.vy = 0; v._px = null; v._py = null;
       v.manh = 0; v.zoom = 0; v.dichZoom = 0;
@@ -2056,18 +2100,10 @@ function batManHinh(){
     var nhoe = (MAIN.bong_nhoe || 26) + nhac * 16;
     if(v.tam) v.tam.style.filter =
       'drop-shadow(' + bx.toFixed(1) + 'px ' + by.toFixed(1) + 'px ' + nhoe.toFixed(0) +
-      'px rgba(0,0,0,' + (0.38 + nhac * 0.12).toFixed(2) + ')) ' +
-      'brightness(' + (1 - (MAIN.den_toi || 0.14) * (v.manh || 0)).toFixed(3) + ')';
+      'px rgba(0,0,0,' + (0.38 + nhac * 0.12).toFixed(2) + '))';
 
     /* ĐÈN PIN bám theo con trỏ */
-    if(v.loe){
-      v.loe.style.setProperty('--den-x', (50 + (v.mx || 0) * 50).toFixed(1) + '%');
-      v.loe.style.setProperty('--den-y', (50 + (v.my || 0) * 50).toFixed(1) + '%');
-      var Rq = Math.min(wq, hq) * (MAIN.den_ban_kinh || 45) / 100;
-      v.loe.style.setProperty('--den-r',   Rq.toFixed(1) + 'px');
-      v.loe.style.setProperty('--den-loi', (Rq * (MAIN.den_loi || 0.34)).toFixed(1) + 'px');
-      v.loe.style.opacity = ((v.manh || 0) * (MAIN.den || 0.6)).toFixed(3);
-    }
+
 
     var khac = phongVat >= 0 && phongVat !== v.i;
     n.style.opacity = khac ? '0.10' : '1';
@@ -2090,6 +2126,52 @@ function batManHinh(){
 
   /* Thẻ tên bám đỉnh hiện vật đang được rê. Chỉ đặt left/top, không transform
      gì khác, nên nó hoàn toàn miễn nhiễm với nghiêng 3D và lắc khi kéo.  */
+  /* ---------------------------------------------------------------------
+     LỘ MÃ CODE — rê tay lên hiện vật thì lớp ảnh bị khoét theo vệt, để lộ
+     đúng đoạn ASCII đã dựng nên chỗ đó. Mặt nạ đặt trên cả cụm ảnh nên
+     dùng chung một hệ toạ độ với canvas ASCII, hai lớp khít tuyệt đối.
+     --------------------------------------------------------------------- */
+  var vetTay = [];
+  function ghiVetTay(px, py){
+    if(!MAIN.lo_bat || pha !== 'xong') return;
+    var x = px, y = py - caoThanh - CH * MAIN.phan_tren;
+    var n = vetTay.length;
+    if(n && Math.abs(vetTay[n-1].x - x) + Math.abs(vetTay[n-1].y - y) < 4) return;
+    vetTay.push({ x:x, y:y, t:performance.now() });
+    while(vetTay.length > Math.max(2, MAIN.lo_diem || 7)) vetTay.shift();
+  }
+  function datLoCode(){
+    if(!MAIN.lo_bat) return;
+    var mo = (reVat >= 0 && phongVat < 0 && pha === 'xong');
+    if(!mo || !vetTay.length){
+      if(oCum.style.maskImage){
+        oCum.style.maskImage = oCum.style.webkitMaskImage = '';
+        oCum.style.maskComposite = oCum.style.webkitMaskComposite = '';
+      }
+      if(cv.style.opacity !== '0') cv.style.opacity = '0';
+      return;
+    }
+    var R0  = (nhoMH() ? MAIN.lo_ban_kinh_m : MAIN.lo_ban_kinh) || 70;
+    var mem = Math.round(Math.max(0, Math.min(0.9, MAIN.lo_mem == null ? 0.55 : MAIN.lo_mem)) * 100);
+    var tan = MAIN.lo_tan || 520, T = performance.now(), g = [];
+    for(var i = vetTay.length - 1; i >= 0; i--){
+      var d = vetTay[i];
+      var a = Math.max(0, 1 - (T - d.t) / tan);
+      if(a < 0.06) continue;
+      var r = R0 * (0.34 + 0.66 * a);          /* đầu vệt to, đuôi thon lại */
+      g.push('radial-gradient(circle ' + r.toFixed(1) + 'px at ' +
+             d.x.toFixed(1) + 'px ' + d.y.toFixed(1) + 'px, ' +
+             'rgba(0,0,0,0) 0%, rgba(0,0,0,0) ' + mem + '%, #000 100%)');
+    }
+    if(!g.length){ cv.style.opacity = '0'; return; }
+    var m = g.join(', ');
+    oCum.style.maskImage = oCum.style.webkitMaskImage = m;
+    oCum.style.maskComposite = 'intersect';
+    oCum.style.webkitMaskComposite = 'source-in';
+    oCum.style.maskRepeat = oCum.style.webkitMaskRepeat = 'no-repeat';
+    cv.style.opacity = '1';
+  }
+
   function datThe(){
     var e = el('vatTen'); if(!e) return;
     if(reVat < 0 || phongVat >= 0 || pha !== 'xong'){ e.classList.remove('hien'); return; }
@@ -2098,8 +2180,11 @@ function batManHinh(){
       e._i = reVat;
       e.innerHTML = '<b>' + thoat(v.def.ma_ho_so) + '</b>' + thoat(v.def.ten);
     }
+    /* Chỉ nhận độ nghiêng CỐ ĐỊNH của hiện vật trong bản vẽ. Nghiêng 3D và
+       lắc khi kéo đều không chạm tới đây.                                */
     e.style.left = (v.cx + (v.dx || 0)) + 'px';
     e.style.top  = (v.cy + (v.dy || 0) - v.h / 2 - 12) + 'px';
+    e.style.transform = 'translate(-50%,-100%) rotate(' + (v.def.goc || 0).toFixed(2) + 'deg)';
     e.classList.add('hien');
   }
 
@@ -2123,6 +2208,8 @@ function batManHinh(){
       datVatTF(v);
     }
     datThe();
+    datLoCode();
+    if(vetTay.length) yen = false;      /* vệt còn đang tắt dần thì cứ vẽ tiếp */
     if(yen){ quay = null; return; }
     quay = requestAnimationFrame(chay);
   }
@@ -2237,6 +2324,7 @@ function batManHinh(){
       }
     });
     addEventListener('pointermove', function(e){
+      ghiVetTay(e.clientX, e.clientY);
       if(reVat >= 0 && keoVat < 0){
         var v = vat[reVat], X = hopXem(v), z = v.zoom || 0;
         /* tâm và nửa kích thước HIỆN TẠI, kể cả khi đang phóng to */
@@ -2288,8 +2376,14 @@ function batManHinh(){
     oTren.addEventListener('click', function(e){
       if(pha !== 'xong') return;
       var t = e.target;
-      while(t && t !== oTren && !(t.classList && t.classList.contains('co-vat'))) t = t.parentNode;
+      while(t && t !== oTren && !(t.classList &&
+            (t.classList.contains('co-vat') || t.classList.contains('co-link')))) t = t.parentNode;
       if(!t || t === oTren) return;
+      if(t.classList.contains('co-link')){
+        var u = t.getAttribute('data-url');
+        if(u) window.open(u, u.indexOf('mailto:') === 0 ? '_self' : '_blank', 'noopener');
+        return;
+      }
       var i = parseInt(t.getAttribute('data-vat'), 10);
       if(isNaN(i) || i < 0 || i >= vat.length) return;
       if(vat[i].def.xem === false){
@@ -2367,19 +2461,46 @@ function batManHinh(){
 
   /* Nở "@tangvat" thành danh sách lấy thẳng từ CUMVAT, nên thêm bớt hiện vật
      là danh sách tự cập nhật theo.                                        */
+  function chiSoVat(ma){
+    for(var k = 0; k < CUMVAT.length; k++) if(CUMVAT[k].ma === ma) return k;
+    return -1;
+  }
   function noDanhSach(ds){
     var ra = [], i, k;
     for(i = 0; i < ds.length; i++){
-      if(ds[i] !== '@tangvat'){ ra.push(ds[i]); continue; }
-      for(k = 0; k < CUMVAT.length; k++){
-        var c = CUMVAT[k];
-        var ten = (c.ma_ho_so + '  ' + (c.tep || c.ma) + ' ');
-        while(ten.length < 30) ten += '.';
-        ra.push({ chu: '> ' + ten + ' [' + (c.xem === false ? 'lock' : 'open') + ']',
-                  vat: k, mo: c.xem !== false });
+      var m = ds[i];
+      if(m === '@tangvat' || m === '@khoa' || m === '@mo'){
+        for(k = 0; k < CUMVAT.length; k++){
+          var c = CUMVAT[k], khoa = (c.xem === false);
+          if(m === '@khoa' && !khoa) continue;
+          if(m === '@mo'   &&  khoa) continue;
+          var ten = (c.ma_ho_so + ' ' + (c.tep || c.ma) + ' ');
+          while(ten.length < 26) ten += '.';
+          ra.push({ chu:'> ' + ten + ' [' + (khoa ? 'lock' : 'open') + ']',
+                    vat:k, mo:!khoa });
+        }
+        continue;
       }
+      /* cho phép khai báo vat bằng mã chữ ("a4") thay vì chỉ số */
+      if(m && m.vat != null && typeof m.vat === 'string'){
+        var q = chiSoVat(m.vat);
+        ra.push({ chu:m.chu, vat:q, mo:(q >= 0 && CUMVAT[q].xem !== false) });
+        continue;
+      }
+      ra.push(m);
     }
     return ra;
+  }
+
+  /* Dựng đúng số cột theo DATA.cot */
+  function dungCot(){
+    oTren.innerHTML = ''; oCot = [];
+    for(var i = 0; i < DATA.cot.length; i++){
+      var d = document.createElement('div');
+      d.className = 'cot';
+      oTren.appendChild(d);
+      oCot.push(d);
+    }
   }
 
   function goCot(o, ds, tongMs, xong, noiThem){
@@ -2419,9 +2540,12 @@ function batManHinh(){
       var m = ds[i], chu = (m && m.chu != null) ? m.chu : m;
       var d = document.createElement('div');
       d.className = 'dong' + (/^\$/.test(chu) ? ' sang' : '');
-      if(m && m.vat != null){
+      if(m && m.vat != null && m.vat >= 0){
         d.className += ' co-vat' + (m.mo ? '' : ' khoa');
         d.setAttribute('data-vat', m.vat);
+      } else if(m && m.url){
+        d.className += ' co-link';
+        d.setAttribute('data-url', m.url);
       }
       o.appendChild(d);
       i++;
@@ -2446,7 +2570,7 @@ function batManHinh(){
     oCum.classList.remove('song');
     oCum.style.maskImage = oCum.style.webkitMaskImage = '';
     if(cv) cv.style.maskImage = cv.style.webkitMaskImage = '';
-    cotT.innerHTML = ''; cotP.innerHTML = '';
+    oTren.innerHTML = ''; oCot = [];
     if(ctx)  ctx.clearRect(0, 0, cv.width, cv.height);
     if(ctxN) ctxN.clearRect(0, 0, cvN.width, cvN.height);
     for(var i = 0; i < vat.length; i++){
@@ -2455,6 +2579,9 @@ function batManHinh(){
       v.mx = 0; v.my = 0; v.manh = 0; v.zoom = 0; v._net = null;
       v.vx = 0; v.vy = 0; v._px = null; v._py = null;
       var eT = el('vatTen'); if(eT){ eT.classList.remove('hien'); eT._i = null; }
+      vetTay.length = 0;
+      oCum.style.maskComposite = oCum.style.webkitMaskComposite = '';
+      if(cv) cv.style.opacity = '';
       if(v.nut){
         v.nut.style.transform = ''; v.nut.style.opacity = '';
         v.nut.style.zIndex = ''; v.nut.style.pointerEvents = '';
@@ -2463,7 +2590,6 @@ function batManHinh(){
         v.nut.style.top  = (v.cy - v.h / 2) + 'px';
       }
       if(v.tam) v.tam.style.filter = '';
-      if(v.loe) v.loe.style.opacity = '0';
     }
   }
 
@@ -2500,7 +2626,10 @@ function batManHinh(){
       if(q >= 1){
         pha = 'xong';
         oCum.style.maskImage = oCum.style.webkitMaskImage = '';
-        ctx.clearRect(0, 0, cv.width / dpr, cv.height / dpr);
+        /* KHÔNG xoá canvas ASCII nữa — giữ nguyên cả hình để lộ ra khi rê tay.
+           Chỉ ẩn nó đi, ảnh nằm đè lên trên.                              */
+        cv.style.maskImage = cv.style.webkitMaskImage = '';
+        cv.style.opacity = '0';
         ctxN.clearRect(0, 0, cvN.width / dpr, cvN.height / dpr);
         oCum.classList.add('song');
         batTuongTacVat();
@@ -2536,16 +2665,18 @@ function batManHinh(){
         datNa(oCum, 1, false, true); datNa(cv, 1, true, true);
         boc.classList.add('hien');
         pha = 'xong'; oCum.classList.add('song'); batTuongTacVat();
-        goCot(cotT, DATA.nhatKy.trai, itDong ? 0 : MAIN.in_ascii);
-        goCot(cotP, DATA.nhatKy.phai, itDong ? 0 : MAIN.in_ascii);
+        dungCot();
+        for(var c0 = 0; c0 < oCot.length; c0++)
+          goCot(oCot[c0], DATA.cot[c0].dong, itDong ? 0 : MAIN.in_ascii);
         return;
       }
       datNa(oCum, 0, false, true); datNa(cv, 0, true, true);
       boc.classList.add('hien');
       pha = 'in'; batDau = 0;
       requestAnimationFrame(vong);
-      goCot(cotT, DATA.nhatKy.trai, itDong ? 0 : MAIN.in_ascii);
-      goCot(cotP, DATA.nhatKy.phai, itDong ? 0 : MAIN.in_ascii);
+      dungCot();
+      for(var c1 = 0; c1 < oCot.length; c1++)
+        goCot(oCot[c1], DATA.cot[c1].dong, itDong ? 0 : MAIN.in_ascii);
     },
     dong: function(){
       pha = 'nghi';
