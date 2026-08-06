@@ -4,6 +4,11 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>FINDING TUAN — Archival Portfolio v2</title>
+<!-- Icon hiện trên tab trình duyệt. Đường dẫn thật do JS đặt theo FAVICON
+     trong khu vực chỉnh sửa, nên đừng sửa thẻ này. -->
+<link rel="icon" id="bieuTuong" href="data:,">
+<link rel="apple-touch-icon" id="bieuTuongIOS">
+<meta name="theme-color" content="#0A0E0E">
 <meta name="description" content="Portfolio của Trần Nhơn Tuân — Content Creator, trên hành trình trở thành Creative Strategist.">
 
 <style>
@@ -192,9 +197,9 @@ body.da-phu .cuaso, body.da-phu .hero{
   display:grid; align-items:stretch; justify-content:stretch;
   grid-template-columns:repeat(3, minmax(0, 1fr));
   gap:0 clamp(8px,1.4vw,22px);
-  /* Rất nhỏ và rất dày — đây là chất của màn hình BIOS trong ảnh mẫu.
-     Muốn dễ đọc hơn thì nâng số cuối; muốn dày hơn nữa thì hạ xuống.   */
-  font-size:clamp(8px,.78vw,10.5px); line-height:1.34;
+  /* Chất BIOS vẫn dày, nhưng đã nâng lên cỡ đọc được thoải mái.
+     Muốn dễ đọc hơn nữa thì nâng số cuối; muốn dày hơn thì hạ xuống.   */
+  font-size:clamp(9.5px,.9vw,12px); line-height:1.4;
 }
 .bios-luoi .cot{
   overflow:hidden; min-width:0; display:flex; flex-direction:column;
@@ -204,18 +209,27 @@ body.da-phu .cuaso, body.da-phu .hero{
 }
 /* Nhãn chế độ ở góc trên trái, mờ hẳn so với phần thân */
 .cot-nhan{
-  flex:0 0 auto; margin-bottom:.55em;
-  font-size:.82em; line-height:1.5; letter-spacing:.1em;
+  flex:0 0 auto; margin-bottom:.4em;
+  font-size:.82em; line-height:1.35; letter-spacing:.1em;
   text-transform:uppercase; color:rgba(140,199,196,.4);
   white-space:nowrap; overflow:hidden; text-overflow:clip;
 }
-.cot-than{ flex:1 1 auto; min-height:0; overflow:hidden; }
+/* Thân bảng NHOÀ DẦN VỀ ĐÁY — chữ tan vào nền thay vì bị cắt ngang phũ.
+   --mo-tu  = từ % nào của bảng thì bắt đầu nhoà
+   --mo-con = xuống tới đáy thì còn lại bao nhiêu độ rõ (0 = mất hẳn)   */
+.cot-than{
+  flex:1 1 auto; min-height:0; overflow:hidden;
+  -webkit-mask-image:linear-gradient(to bottom,
+    #000 0%, #000 var(--mo-tu,70%), rgba(0,0,0,var(--mo-con,.22)) 100%);
+  mask-image:linear-gradient(to bottom,
+    #000 0%, #000 var(--mo-tu,70%), rgba(0,0,0,var(--mo-con,.22)) 100%);
+}
 
 /* Mỗi dòng mở đầu bằng một tiếng lệnh lặp lại, tạo thành máng dọc bên trái.
    Dòng trống vẫn hiện tiếng lệnh — đúng như một tệp batch thật.          */
 .mh-tren .dong{
   white-space:nowrap; overflow:hidden; text-overflow:ellipsis; opacity:.82;
-  position:relative; padding-left:var(--pre-w, 3.5em); min-height:1.34em;
+  position:relative; padding-left:var(--pre-w, 3.5em); min-height:1.4em;
 }
 .mh-tren .dong::before{
   content:"ECHO";
@@ -449,7 +463,17 @@ body.da-phu .cuaso, body.da-phu .hero{
   font-size:clamp(10px,.95vw,13px); line-height:1.62; color:var(--mint); opacity:.9;
 }
 
-@media (max-width:760px){
+/* --- MÁY TÍNH BẢNG (768–1079px) ---
+   Vẫn hai cột hai bên, nhưng hẹp lại và hiện vật cũng thu nhỏ, nếu không
+   thì ở iPad dựng đứng cột phải sẽ đè lên hiện vật.                     */
+@media (min-width:768px) and (max-width:1079px){
+  .hud-trai{ width:min(23vw, 200px); }
+  .hud-phai{ width:min(27vw, 235px); }
+  .hud-ten{ font-size:clamp(15px,2.2vw,22px); }
+  .hud-o{ padding:7px 9px; }
+}
+
+@media (max-width:767px){
   /* Điện thoại: ba cột xếp NGANG, vuốt sang để đọc — tránh hẳn việc chồng
      lên nhau khi chiều cao vùng trên không đủ, và không tranh vuốt dọc
      với thao tác thoát Main Section.                                      */
@@ -682,9 +706,18 @@ body.khoa .cs-logo{ animation:tho 2.1s ease-in-out infinite; }
 /* =========================================================================
    RESPONSIVE
    ========================================================================= */
-@media (max-width:760px){
-  /* Cửa sổ còn nhỏ trên điện thoại thì bỏ toạ độ đi cho thanh tiêu đề đủ chỗ */
-  .cuaso:not(.phu-kin) .cs-toado{ display:none; }
+@media (max-width:767px){
+  /* THANH TIÊU ĐỀ TRÊN ĐIỆN THOẠI
+     Toạ độ bị bỏ HẲN ở cả hai trạng thái. Trước đây nó chỉ ẩn lúc cửa sổ còn
+     nhỏ, mà chính nó mang margin-left:auto — nên khi phóng to, nó hiện lại và
+     hất hai nút sang phải, trông như nút biến mất rồi nhảy chỗ.
+     Nay hai nút nằm cố định BÊN TRÁI, không đổi vị trí ở bất kỳ trạng thái nào. */
+  .cs-toado{ display:none; }
+  .cs-thanh{ gap:6px; }
+  .cs-thu{   order:-2; }
+  .cs-tieng{ order:-1; }
+  .cs-logo{  order:0; }
+  .cs-ten{   order:1; min-width:0; overflow:hidden; text-overflow:ellipsis; }
   .cum{ max-width:none; }
   .cum-chu{ font-size:12px; }
   .cuaso{ width:min(80vw, 340px); }
@@ -1004,6 +1037,19 @@ const GOTERM = {
   tre:      420    /* chờ bao lâu rồi mới bắt đầu gõ dòng đầu (ms)        */
 };
 
+/* ---- ICON TRANG WEB (favicon) ----
+   Là cái ảnh nhỏ hiện cạnh tên trang trên tab trình duyệt. Không đặt gì thì
+   trình duyệt tự lấy hình quả địa cầu mặc định.
+   · Để nguyên nguon:"" thì icon dùng CHUNG ảnh với LOGO.nguon bên dưới.
+   · Muốn icon khác logo thì ghi đường dẫn riêng vào nguon.
+   · Nên dùng ảnh vuông, tối thiểu 180×180, nền trong suốt hoặc nền tối.
+   · Không tìm thấy ảnh thì trang tự vẽ một icon vòng ngắm dự phòng.      */
+const FAVICON = {
+  bat:      true,
+  nguon:    "",        /* ví dụ: "./anh/favicon.png" — để trống = dùng LOGO */
+  du_phong: true       /* thiếu ảnh thì vẽ tạm icon vòng ngắm mint/đỏ       */
+};
+
 /* ---- LOGO trên thanh tiêu đề cửa sổ ----
    Thay chấm đỏ nhấp nháy cũ. Đặt file ảnh (png/svg/webp nền trong suốt) vào
    thư mục 'anh' cạnh file HTML rồi khai báo đường dẫn ở đây.
@@ -1051,10 +1097,13 @@ const MAHOA = {
 
 const MAIN = {
   bat:          true,
-  phan_tren:    0.34,     /* một phần ba trên dành cho hai cột nhật ký       */
+  phan_tren:    0.38,     /* phần trên dành cho các bảng nhật ký (chữ to hơn */
+                          /* nên cần thêm chỗ; hạ xuống thì bảng bị nhoà sớm)*/
   le_cum:       0.03,     /* cụm hiện vật chừa lề bao nhiêu trong vùng dưới  */
 
   /* Cột nhật ký — bố cục và nhịp gõ kiểu terminal */
+  cot_mo_tu:    70,       /* từ % nào của bảng thì chữ bắt đầu nhoà dần    */
+  cot_mo_con:   0.22,     /* xuống tới đáy còn lại bao nhiêu độ rõ (0 → 1) */
   tieng_lenh:   "ECHO",   /* tiếng lệnh lặp ở đầu MỌI dòng, tạo máng dọc   */
                           /* để trống "" nếu không muốn có máng này        */
   cot_rong:     30,       /* bề ngang mỗi cột, tính bằng SỐ KÝ TỰ           */
@@ -1108,6 +1157,8 @@ const MAIN = {
   xem_cao:      56,       /* hiện vật phóng cao bao nhiêu % màn hình         */
   xem_cao_m:    32,       /* — mobile                                        */
   xem_rong:     30,       /* hiện vật phóng rộng tối đa bao nhiêu % màn hình */
+  xem_rong_tab: 22,       /* — máy tính bảng (768–1079px), hẹp hơn để chừa   */
+                          /*   chỗ cho hai cột dữ liệu hai bên               */
   xem_rong_m:   58,       /* — mobile                                        */
   xem_x:        50,       /* tâm hiện vật khi phóng, % bề ngang — CHÍNH GIỮA */
   xem_x_m:      50,       /* — mobile                                        */
@@ -1866,6 +1917,31 @@ function veManHinh(){
   setTimeout(dongTiep, GOTERM.tre || 420);
 }
 
+/* Đặt icon cho tab trình duyệt. Thử tải ảnh trước, hỏng thì mới dùng icon
+   dự phòng — nhờ vậy không bao giờ rơi về hình quả địa cầu mặc định.    */
+function veBieuTuong(){
+  if(!FAVICON.bat) return;
+  var l  = el('bieuTuong'), l2 = el('bieuTuongIOS');
+  var du = 'data:image/svg+xml,' + encodeURIComponent(
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">' +
+    '<rect width="64" height="64" fill="#123039"/>' +
+    '<path d="M32 6v52M6 32h52" stroke="#8CC7C4" stroke-width="3.5"/>' +
+    '<circle cx="32" cy="32" r="12" fill="none" stroke="#8CC7C4" stroke-width="3.5"/>' +
+    '<circle cx="32" cy="32" r="4.5" fill="#DB1A1A"/></svg>');
+
+  function dat(u){
+    if(l)  l.href  = u;
+    if(l2) l2.href = u;
+  }
+  var u = FAVICON.nguon || (typeof LOGO !== 'undefined' && LOGO.nguon) || '';
+  if(!u){ dat(du); return; }
+
+  var im = new Image();
+  im.onload  = function(){ dat(u); };
+  im.onerror = function(){ if(FAVICON.du_phong) dat(du); };
+  im.src = u;
+}
+
 /* Logo trên thanh tiêu đề — không có ảnh thì tự ẩn, thanh vẫn gọn gàng */
 function veLogo(){
   var g = el('csLogo'); if(!g) return;
@@ -2485,13 +2561,17 @@ function batManHinh(){
   var reVat = -1, keoVat = -1, phongVat = -1, quay = null;
 
   function nhoMH(){ return W < 768; }
+  /* Máy tính bảng: vẫn bố cục ngang nhưng chật hơn máy tính để bàn */
+  function vuaMH(){ return W >= 768 && W < 1080; }
 
   /* Đích khi phóng to — tính trong hệ toạ độ của vùng dưới */
   function hopXem(v){
     var caoTren = CH * MAIN.phan_tren;
     var n = nhoMH();
     var h = CH * (n ? MAIN.xem_cao_m : MAIN.xem_cao) / 100;
-    var r = W  * (n ? MAIN.xem_rong_m : MAIN.xem_rong) / 100;
+    var r = W  * (n ? MAIN.xem_rong_m
+                    : (vuaMH() ? (MAIN.xem_rong_tab == null ? 22 : MAIN.xem_rong_tab)
+                               : MAIN.xem_rong)) / 100;
     /* Vừa khít theo CẢ chiều cao lẫn chiều rộng — nếu không thì hiện vật
        nằm ngang như cuộn băng sẽ phóng ra quá khổ.                        */
     var ti = Math.min(h / Math.max(1, v.h), r / Math.max(1, v.w));
@@ -2747,7 +2827,10 @@ function batManHinh(){
       thoat(v.def.ma_ho_so) + ' · ĐANG TRÍCH XUẤT</b>';
   }
 
-  /* Đường nối chạy từ mép hiện vật sang hai cột dữ liệu */
+  /* Đường nối chạy từ mép hiện vật sang các cột dữ liệu.
+     MÁY TÍNH / TABLET: hai nhánh ngang, toả sang trái và phải.
+     ĐIỆN THOẠI: một nhánh THẲNG ĐỨNG từ mép DƯỚI hiện vật xuống bảng — vì
+     bảng nằm dưới đáy, nhánh ngang cũ chạy xuyên qua giữa hình hiện vật. */
   function veDay(v){
     if(!oDay) return;
     var X = hopXem(v), caoTren = CH * MAIN.phan_tren;
@@ -2763,8 +2846,18 @@ function batManHinh(){
                  : ('M' + tr + ' ' + cy + 'H' + ((x + tr) / 2) + 'V' + y + 'H' + x));
       d.push('CIRCLE' + x + ',' + y);
     }
-    if(!nhoMH()) canh(oTrai, 0);
-    canh(oPhai, 1);
+    function duoi(o){
+      if(!o) return;
+      var b  = o.getBoundingClientRect();
+      var yT = b.top - r.top;
+      var yD = caoTren + X.y + X.h / 2 + 16;   /* ngay dưới khung ngắm */
+      /* Chỉ vẽ khi có đủ khoảng trống, tránh nét cụt dính vào hiện vật */
+      if(yT - yD < 26) return;
+      d.push('M' + X.x.toFixed(1) + ' ' + yD.toFixed(1) + 'V' + (yT - 10).toFixed(1));
+      d.push('CIRCLE' + X.x.toFixed(1) + ',' + (yT - 10).toFixed(1));
+    }
+    if(nhoMH()) duoi(oPhai);
+    else { canh(oTrai, 0); canh(oPhai, 1); }
     var svg = '';
     for(var k = 0; k < d.length; k++){
       if(d[k].indexOf('CIRCLE') === 0){
@@ -3295,6 +3388,11 @@ function batManHinh(){
     tabDang = 0;
 
     /* Tiếng lệnh lặp ở đầu mỗi dòng */
+    oLuoi.style.setProperty('--mo-tu',
+      (MAIN.cot_mo_tu == null ? 70 : MAIN.cot_mo_tu) + '%');
+    oLuoi.style.setProperty('--mo-con',
+      String(MAIN.cot_mo_con == null ? 0.22 : MAIN.cot_mo_con));
+
     var tl = MAIN.tieng_lenh == null ? 'ECHO' : String(MAIN.tieng_lenh).replace(/"/g, '');
     oLuoi.style.setProperty('--pre', '"' + tl + '"');
     /* Máng rộng đúng bằng độ dài tiếng lệnh cộng một khoảng thở. Bỏ tiếng
@@ -3699,6 +3797,7 @@ dungCumChu();
 veLuoi();
 dongBoCum();
 veManHinh();
+veBieuTuong();
 veLogo();
 datNutCuaSo(false);
 veHeroBi();
