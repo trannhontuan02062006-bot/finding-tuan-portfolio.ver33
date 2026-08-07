@@ -23,7 +23,8 @@
   --muc-nhat:  #2C687B;   /* Chữ phụ, mô tả — xanh đậm                        */
   --mint:      #8CC7C4;   /* Đường kẻ, nhãn nhỏ — xanh mint                   */
   --do:        #DB1A1A;   /* Màu nhấn — đỏ (dùng TIẾT CHẾ, chỉ vài chỗ)       */
-  --den:       #0A0A0A;   /* Nền màn hình terminal                            */
+  --den:       #050505;   /* Nền màn hình code — CỐ ĐỊNH ĐEN, bảng màu không
+                             đụng tới. Đổi ở đây nếu muốn sắc đen khác.     */
 
   --vien:      rgba(44,104,123,.22);  /* Đường kẻ mảnh — hiện KHÔNG dùng,     */
                                       /* để sẵn nếu muốn bật lại kẻ phân cách  */
@@ -167,8 +168,79 @@ body.da-phu .cuaso, body.da-phu .hero{
 /* Khung trợ lý: vòng ngắm bên trái, các khối dữ liệu trải sang phải */
 .karen{
   position:relative; width:100%; height:100%;
-  display:flex; align-items:stretch; gap:clamp(12px,2vw,34px);
+  display:flex; flex-direction:column; gap:clamp(6px,1vh,14px);
 }
+/* Cụm khung kính trải ngang, mỗi khung so le độ cao như trong ảnh mẫu */
+.bios-luoi .cot:nth-child(odd){ margin-top:0; margin-bottom:clamp(6px,1.4vh,20px); }
+.bios-luoi .cot:nth-child(even){ margin-top:clamp(6px,1.4vh,20px); margin-bottom:0; }
+
+/* --- ĐƯỜNG NỐI + NÚT VÒNG chạy từ cụm khung xuống thanh đọc số --- */
+.hud-noi{
+  position:absolute; inset:0; width:100%; height:100%;
+  pointer-events:none; overflow:visible; z-index:0;
+}
+.hud-noi path{
+  fill:none; stroke:var(--mint); stroke-width:.9; opacity:0;
+  stroke-dasharray:var(--d,300); stroke-dashoffset:var(--d,300);
+  transition:stroke-dashoffset .6s cubic-bezier(.25,.72,.3,1), opacity .4s ease;
+}
+.hud-noi g.ve path{ opacity:.4; stroke-dashoffset:0; }
+.hud-noi circle{ fill:none; stroke:var(--mint); stroke-width:1;
+  opacity:0; transition:opacity .35s ease .3s; }
+.hud-noi g.ve circle{ opacity:.75; }
+.hud-noi .loi{ fill:var(--do); stroke:none; }
+
+/* --- THANH ĐỌC SỐ: hai ngoặc kẹp, dãy số lớn, chú thích bên trên --- */
+.hud-doc{
+  flex:0 0 auto; display:flex; align-items:center;
+  justify-content:center; gap:clamp(10px,1.6vw,26px);
+  opacity:0; transform:translateY(6px);
+  transition:opacity .4s ease, transform .5s cubic-bezier(.2,.85,.25,1);
+}
+.karen.ra-doc .hud-doc{ opacity:1; transform:none; }
+.doc-khoi{ position:relative; display:flex; align-items:center; gap:.6em; }
+.doc-ngoac{
+  flex:0 0 auto; width:clamp(7px,.8vw,11px); align-self:stretch;
+  border-top:1px solid var(--mint); border-bottom:1px solid var(--mint);
+  position:relative;
+}
+.doc-ngoac::before{ content:''; position:absolute; top:2px; bottom:2px;
+  width:2px; background:var(--mint); }
+.doc-ngoac.t::before{ left:0; }
+.doc-ngoac.p::before{ right:0; }
+.doc-so{
+  font-weight:700; letter-spacing:.1em; color:var(--giay);
+  font-size:clamp(15px,2.2vw,32px); line-height:1.1;
+  font-variant-numeric:tabular-nums; white-space:nowrap;
+}
+.doc-so em{ font-style:normal; color:var(--mint); opacity:.5; }
+.doc-chu{
+  position:absolute; left:50%; top:-1.35em; transform:translateX(-50%);
+  font-size:clamp(6px,.62vw,8.5px); letter-spacing:.3em; text-transform:uppercase;
+  color:var(--mint); opacity:.65; white-space:nowrap;
+}
+/* Danh sách trạng thái hai cột, kiểu DECLINED / COMPLETE */
+.hud-tt{
+  display:grid; grid-template-columns:auto auto; gap:.1em 1.1em;
+  font-size:clamp(7px,.72vw,10px); letter-spacing:.16em; text-transform:uppercase;
+  color:var(--mint); white-space:nowrap;
+}
+.hud-tt b{ font-weight:400; opacity:.7; }
+.hud-tt span{ color:var(--giay); font-variant-numeric:tabular-nums; }
+.hud-tt span.do{ color:var(--do); }
+
+/* --- CHỮ SỐ VÀ KÝ HIỆU RẢI Ở BỐN GÓC --- */
+.hud-goc{
+  position:absolute; inset:0; pointer-events:none; z-index:0;
+  color:var(--mint); opacity:0; transition:opacity .5s ease;
+}
+.karen.ra-vien .hud-goc{ opacity:.55; }
+.hud-goc span{
+  position:absolute; font-size:clamp(8px,.9vw,13px); font-weight:700;
+  letter-spacing:.1em; opacity:.7;
+}
+.hud-goc svg{ position:absolute; width:clamp(11px,1.3vw,18px); height:auto;
+  fill:none; stroke:currentColor; stroke-width:1.2; }
 
 /* =========================================================================
    LỚP KHỞI TẠO — nằm đè lên cả Main Section trong lúc trang tự dựng
@@ -187,8 +259,10 @@ body.da-phu .cuaso, body.da-phu .hero{
              opacity .4s ease;
 }
 .kt-day path.ve{ stroke-dashoffset:0; }
-.kt-day circle{ fill:var(--do); opacity:0; transition:opacity .25s ease; }
-.kt-day circle.ve{ opacity:.95; }
+.kt-day circle{ fill:none; stroke:var(--mint); stroke-width:1;
+  opacity:0; transition:opacity .25s ease; }
+.kt-day circle.loi{ fill:var(--do); stroke:none; }
+.kt-day circle.ve{ opacity:.9; }
 .kt.tat .kt-day path, .kt.tat .kt-day circle{ opacity:0; }
 
 .kt-giua{
@@ -205,63 +279,58 @@ body.da-phu .cuaso, body.da-phu .hero{
 .kt-term .d b{ color:var(--giay); font-weight:400; }
 .kt-term .tro{ color:var(--do); animation:nhay 1s steps(1) infinite; }
 
-/* --- VÒNG NGẮM TRỢ LÝ + NHÃN TRẠNG THÁI --- */
-.k-nhan{
-  flex:0 0 auto; display:flex; flex-direction:column;
-  align-items:center; justify-content:center; gap:.5em;
-  width:clamp(46px, 6vw, 74px); color:var(--mint);
+/* =========================================================================
+   KHUNG KÍNH CẮT GÓC — ngôn ngữ hình dùng chung cho cả Main Section lẫn
+   HUD chi tiết. Ba lớp lồng nhau: lớp ngoài lo hoạt ảnh mở, lớp giữa là
+   nét viền, lớp trong là mảng kính mờ.
+   ========================================================================= */
+.kg{ position:relative; --n:13px; }
+.kg-vien{
+  position:absolute; inset:0;
+  background:linear-gradient(150deg,
+    var(--mint) 0%, rgba(140,199,196,.45) 42%, var(--mint) 100%);
+  clip-path:polygon(
+    var(--n) 0, calc(100% - var(--n)) 0, 100% var(--n),
+    100% calc(100% - var(--n)), calc(100% - var(--n)) 100%,
+    var(--n) 100%, 0 calc(100% - var(--n)), 0 var(--n));
 }
-.k-vong{
-  width:100%; height:auto; display:block; overflow:visible;
-  opacity:0; transform:scale(.55) rotate(-70deg);
-  transition:opacity .5s ease, transform var(--vong-ms,620ms) cubic-bezier(.2,.9,.25,1);
+.kg-nen{
+  position:absolute; inset:1px;
+  background:linear-gradient(160deg,
+    rgba(10,26,32,.86) 0%, rgba(8,20,26,.62) 55%, rgba(10,26,32,.8) 100%);
+  -webkit-backdrop-filter:blur(3px); backdrop-filter:blur(3px);
+  clip-path:polygon(
+    calc(var(--n) - 1px) 0, calc(100% - var(--n) + 1px) 0, 100% calc(var(--n) - 1px),
+    100% calc(100% - var(--n) + 1px), calc(100% - var(--n) + 1px) 100%,
+    calc(var(--n) - 1px) 100%, 0 calc(100% - var(--n) + 1px), 0 calc(var(--n) - 1px));
 }
-.karen.ra-vong .k-vong{ opacity:1; transform:none; }
-.k-vong g, .k-vong circle, .k-vong path, .k-vong polygon{
-  fill:none; stroke:currentColor; stroke-width:1.1; vector-effect:non-scaling-stroke;
-}
-.k-vong .v-ngoai{ transform-origin:50% 50%; animation:kQuay var(--quay-ng,24s) linear infinite; }
-.k-vong .v-giua { transform-origin:50% 50%; animation:kQuay var(--quay-tr,16s) linear infinite reverse; }
-.k-vong .v-loi  { stroke-width:1.4; opacity:.9; }
-.k-vong .v-tam  { fill:var(--do); stroke:none; animation:kTho 2.4s ease-in-out infinite; }
-@keyframes kQuay{ to{ transform:rotate(360deg); } }
-@keyframes kTho{ 0%,100%{ opacity:1; } 50%{ opacity:.35; } }
+.kg-noi{ position:relative; z-index:2; flex:1 1 auto; min-height:0;
+  display:flex; flex-direction:column; }
+/* Bốn mốc sáng ở góc, dấu hiệu quen thuộc của loại khung này */
+.kg-goc{ position:absolute; width:var(--n); height:1px; background:var(--giay);
+  opacity:.9; pointer-events:none; }
+.kg-goc.a{ left:0;  top:var(--n);    transform:rotate(-45deg); transform-origin:left center; }
+.kg-goc.b{ right:0; top:var(--n);    transform:rotate(45deg);  transform-origin:right center; }
+.kg-goc.c{ left:0;  bottom:var(--n); transform:rotate(45deg);  transform-origin:left center; }
+.kg-goc.d{ right:0; bottom:var(--n); transform:rotate(-45deg); transform-origin:right center; }
 
-.k-trangthai{
-  text-align:center; line-height:1.35; white-space:nowrap;
-  font-size:clamp(6.5px,.62vw,8.5px); letter-spacing:.2em; text-transform:uppercase;
-  opacity:0; transition:opacity .4s ease .15s;
+/* Đầu khối: gạch dọc dày bên trái + nhãn hai tầng, y như "VIEW MODE" */
+.kg-dau{
+  display:flex; align-items:flex-start; gap:.6em; margin-bottom:.5em;
+  line-height:1.15; white-space:nowrap;
 }
-.karen.ra-vong .k-trangthai{ opacity:1; }
-.k-trangthai b{ display:block; font-weight:700; color:var(--giay); letter-spacing:.26em; }
-.k-trangthai span{ color:var(--do); }
-
-/* --- KHUNG CUNG BỐN GÓC bao quanh cả vùng --- */
-.k-vien{ position:absolute; inset:0; width:100%; height:100%;
-  pointer-events:none; overflow:visible; color:var(--mint); }
-.k-vien path{
-  fill:none; stroke:currentColor; stroke-width:1; opacity:.5;
-  stroke-dasharray:var(--d,120); stroke-dashoffset:var(--d,120);
-  transition:stroke-dashoffset var(--vien-ms,420ms) cubic-bezier(.25,.7,.3,1);
+.kg-dau i{ flex:0 0 auto; width:2px; align-self:stretch; background:var(--do); }
+.kg-dau span{ min-width:0; }
+.kg-dau b{
+  display:block; font-weight:700; color:var(--giay);
+  font-size:1.15em; letter-spacing:.16em; text-transform:uppercase;
 }
-.karen.ra-vien .k-vien path{ stroke-dashoffset:0; }
-
-/* --- DẢI QUÉT KHỞI ĐỘNG chạy dọc cả vùng một lần --- */
-.k-quet{
-  position:absolute; left:0; right:0; top:0; height:26%;
-  pointer-events:none; opacity:0;
-  background:linear-gradient(to bottom,
-    rgba(var(--k-mint,140,199,196),0) 0%,
-    rgba(var(--k-mint,140,199,196),.16) 62%,
-    rgba(var(--k-mint,140,199,196),.7) 96%,
-    rgba(var(--k-mint,140,199,196),0) 100%);
+.kg-dau s{
+  display:block; text-decoration:none; color:var(--mint); opacity:.72;
+  font-size:.82em; letter-spacing:.24em; text-transform:uppercase;
 }
-.karen.dang-quet .k-quet{ animation:kQuet var(--quet-ms,420ms) cubic-bezier(.3,.6,.4,1) 1; }
-@keyframes kQuet{
-  0%  { opacity:0; transform:translateY(-100%); }
-  14% { opacity:1; }
-  100%{ opacity:0; transform:translateY(400%); }
-}
+.kg-dau u{ margin-left:auto; align-self:center; text-decoration:none;
+  opacity:.45; font-size:.8em; letter-spacing:.14em; }
 
 /* --- LƯỚI CÁC KHỐI DỮ LIỆU --- */
 .bios-luoi{
@@ -274,7 +343,7 @@ body.da-phu .cuaso, body.da-phu .hero{
 }
 .bios-luoi .cot{
   overflow:hidden; min-width:0; display:flex; flex-direction:column;
-  position:relative; padding:0 0 0 .85em;
+  position:relative; padding:0;
   opacity:0; clip-path:inset(49% 48% 49% 48%);
 }
 /* Bảng NỞ TO ra từ giữa: giãn ngang trước, rồi mới giãn dọc — kiểu tấm kính
@@ -286,37 +355,10 @@ body.da-phu .cuaso, body.da-phu .hero{
   48% { clip-path:inset(49% 0 49% 0); }
   100%{ opacity:1; clip-path:inset(0 0 0 0); }
 }
-/* Không dùng khung kín nữa — chỉ một nét dọc mảnh mọc từ trên xuống,
-   đúng ngôn ngữ nét mảnh của giao diện trợ lý.                         */
-.bios-luoi .cot::before{
-  content:''; position:absolute; left:0; top:0; bottom:0; width:1px;
-  background:linear-gradient(to bottom,
-    var(--mint) 0%, var(--mint) 62%, rgba(140,199,196,0) 100%);
-  transform:scaleY(0); transform-origin:top;
-  transition:transform .5s cubic-bezier(.25,.75,.3,1);
-}
-.bios-luoi .cot.ra::before{ transform:scaleY(1); }
-/* Gạch ngang nhỏ ở đầu nét dọc */
-.bios-luoi .cot::after{
-  content:''; position:absolute; left:0; top:0; width:.5em; height:1px;
-  background:var(--do); opacity:0; transition:opacity .3s ease .2s;
-}
-.bios-luoi .cot.ra::after{ opacity:1; }
-/* Đầu khối: nhãn viết hoa · gạch mảnh kéo dài · số hiệu ở mép phải */
-.cot-nhan{
-  flex:0 0 auto; margin-bottom:.5em;
-  display:flex; align-items:center; gap:.55em;
-  font-size:.85em; line-height:1.4; letter-spacing:.2em;
-  text-transform:uppercase; color:var(--mint);
-  white-space:nowrap; overflow:hidden;
-}
-.cot-nhan i{ flex:0 0 auto; width:4px; height:4px; background:var(--do);
-  transform:rotate(45deg); }
-.cot-nhan b{ font-weight:400; color:var(--giay); }
-.cot-nhan u{ flex:1 1 auto; height:1px; background:currentColor;
-  opacity:.34; text-decoration:none; min-width:.8em; }
-.cot-nhan s{ flex:0 0 auto; opacity:.5; text-decoration:none;
-  letter-spacing:.12em; font-size:.9em; }
+/* Nội dung nằm trong lớp .kg-noi của khung kính */
+.bios-luoi .cot .kg-noi{ padding:.6em .85em .7em; }
+/* Đầu khối dùng chung lớp .kg-dau bên trên */
+.cot-nhan{ flex:0 0 auto; }
 /* Thân bảng NHOÀ DẦN VỀ ĐÁY — chữ tan vào nền thay vì bị cắt ngang phũ.
    --mo-tu  = từ % nào của bảng thì bắt đầu nhoà
    --mo-con = xuống tới đáy thì còn lại bao nhiêu độ rõ (0 = mất hẳn)   */
@@ -477,40 +519,63 @@ body.da-phu .cuaso, body.da-phu .hero{
   transition:stroke-dashoffset var(--ve,.68s) cubic-bezier(.25,.7,.3,1);
 }
 .hud.ra .hud-day path{ stroke-dashoffset:0; }
-.hud-day circle{ fill:var(--do); opacity:0; transition:opacity .3s ease .45s; }
-.hud.ra .hud-day circle{ opacity:.9; }
+/* Đầu mút là NÚT VÒNG rỗng có tâm đỏ, giống các nút nối trong ảnh mẫu */
+.hud-day circle{ fill:none; stroke:var(--mint); stroke-width:1;
+  opacity:0; transition:opacity .3s ease .45s; }
+.hud-day circle.loi{ fill:var(--do); stroke:none; }
+.hud.ra .hud-day circle{ opacity:.85; }
 
-/* --- KHUNG NGẮM quanh hiện vật, cùng ngôn ngữ nét cung với vùng trợ lý --- */
+/* --- KHUNG NGẮM quanh hiện vật, theo mẫu HUD02 ---
+   Viền cắt góc 45°, giữa hai cạnh trái phải có khấc chevron thụt vào, kèm
+   nhãn hai tầng ở góc trên trái và hai dòng thông số ở đáy.             */
 .hud-khung{ position:absolute; color:var(--mint); }
-.hud-khung svg{
-  position:absolute; inset:0; width:100%; height:100%; overflow:visible;
+.hud-khung svg{ position:absolute; inset:0; width:100%; height:100%; overflow:visible; }
+.hud-khung svg .vien{
+  fill:none; stroke:currentColor; stroke-width:1.3;
+  stroke-dasharray:var(--d,900); stroke-dashoffset:var(--d,900);
+  transition:stroke-dashoffset .72s cubic-bezier(.25,.7,.3,1);
 }
-.hud-khung svg path{
-  fill:none; stroke:currentColor; stroke-width:1.2;
-  stroke-dasharray:var(--d,140); stroke-dashoffset:var(--d,140); opacity:.85;
-  transition:stroke-dashoffset .5s cubic-bezier(.25,.7,.3,1);
-}
-.hud.ra-khung .hud-khung svg path{ stroke-dashoffset:0; }
-.hud-khung svg .vach{ stroke-width:1; opacity:.4; stroke-dasharray:none;
-  stroke-dashoffset:0; transition:opacity .4s ease .25s; opacity:0; }
+.hud.ra-khung .hud-khung svg .vien{ stroke-dashoffset:0; }
+.hud-khung svg .vach{ stroke:currentColor; stroke-width:1; fill:none;
+  opacity:0; transition:opacity .4s ease .3s; }
 .hud.ra-khung .hud-khung svg .vach{ opacity:.45; }
-/* Vòng quay nhỏ ở góc trên trái — dấu hiệu "đang được soi" */
-.hud-khung .quay{
-  position:absolute; left:-6px; top:-6px;
-  width:clamp(16px,1.8vw,26px); height:clamp(16px,1.8vw,26px);
-  opacity:0; transform:scale(.4); transition:opacity .35s ease, transform .5s cubic-bezier(.2,.9,.25,1);
+.hud-khung svg .sang{ stroke:var(--giay); stroke-width:1.6; fill:none;
+  opacity:0; transition:opacity .4s ease .35s; }
+.hud.ra-khung .hud-khung svg .sang{ opacity:.85; }
+
+/* Nhãn hai tầng ở góc trên trái, kiểu "VIEW MODE / THERMAL OPTICS" */
+.hud-khung .nhan{
+  position:absolute; left:clamp(10px,1.2vw,20px); top:clamp(8px,1vw,16px);
+  display:flex; gap:.6em; opacity:0; transition:opacity .4s ease .25s;
+  pointer-events:none;
 }
-.hud.ra-khung .hud-khung .quay{ opacity:1; transform:none; }
-.hud-khung .quay circle, .hud-khung .quay path{
-  fill:none; stroke:currentColor; stroke-width:1.4; vector-effect:non-scaling-stroke;
+.hud.ra-khung .hud-khung .nhan{ opacity:1; }
+.hud-khung .nhan i{ width:2px; align-self:stretch; background:var(--giay); opacity:.8; }
+.hud-khung .nhan b{
+  display:block; font-weight:700; color:var(--giay);
+  font-size:clamp(10px,1.15vw,17px); letter-spacing:.14em; line-height:1.12;
 }
-.hud-khung .quay g{ transform-origin:50% 50%; animation:kQuay 9s linear infinite; }
-.hud-khung b{
-  position:absolute; left:0; top:-1.9em;
-  font-size:clamp(7px,.7vw,9px); letter-spacing:.24em; font-weight:400;
-  color:var(--do); white-space:nowrap; opacity:0; transition:opacity .3s ease .2s;
+.hud-khung .nhan s{
+  display:block; text-decoration:none; opacity:.72;
+  font-size:clamp(7px,.78vw,11px); letter-spacing:.24em; line-height:1.3;
 }
-.hud.ra-khung .hud-khung b{ opacity:.9; }
+/* Hai dòng thông số nhỏ ở đáy khung, kiểu "125 // 25mm f1.4" */
+.hud-khung u{
+  position:absolute; bottom:clamp(6px,.7vw,12px); text-decoration:none;
+  font-size:clamp(6.5px,.68vw,9px); letter-spacing:.2em; opacity:0;
+  white-space:nowrap; transition:opacity .4s ease .35s;
+}
+.hud.ra-khung .hud-khung u{ opacity:.7; }
+.hud-khung u.t{ left:clamp(10px,1.2vw,20px); }
+.hud-khung u.p{ right:clamp(10px,1.2vw,20px); }
+/* Số nhỏ có đường gióng ở mép trái, như số "29" trong ảnh mẫu */
+.hud-khung .so{
+  position:absolute; left:calc(100% * -0.02); top:50%;
+  transform:translateY(-50%);
+  font-size:clamp(6.5px,.7vw,9px); letter-spacing:.14em; opacity:0;
+  transition:opacity .4s ease .4s;
+}
+.hud.ra-khung .hud-khung .so{ opacity:.75; }
 
 /* --- Hai cột dữ liệu --- */
 .hud-cot{
@@ -524,36 +589,14 @@ body.da-phu .cuaso, body.da-phu .hero{
 .hud-trai{ left:var(--le); }
 .hud-phai{ right:var(--le); width:min(31vw, 430px); }
 
-/* Không còn hộp viền kín. Mỗi khối là một nét dọc mảnh cộng một mảng nền
-   loang dần — cùng ngôn ngữ với các khối ở vùng trợ lý bên ngoài.       */
+/* Khối dữ liệu dùng chung khung kính cắt góc với Main Section */
 .hud-o{
-  position:relative; border:0;
-  padding:clamp(7px,.75vw,11px) clamp(9px,.9vw,14px);
-  padding-left:clamp(11px,1.1vw,17px);
-  color:var(--mint); flex:0 0 auto;
-  -webkit-backdrop-filter:blur(2px); backdrop-filter:blur(2px);
-  background:linear-gradient(to right,
-    rgba(8,14,16,.72) 0%, rgba(8,14,16,.5) 55%, rgba(8,14,16,.12) 100%);
-  opacity:0;
+  position:relative; border:0; background:none; padding:0;
+  color:var(--mint); flex:0 0 auto; opacity:0;
   transition:opacity .3s ease, transform .44s cubic-bezier(.2,.85,.25,1),
              clip-path .48s cubic-bezier(.2,.85,.25,1);
 }
-.hud-phai .hud-o{
-  background:linear-gradient(to left,
-    rgba(8,14,16,.72) 0%, rgba(8,14,16,.5) 55%, rgba(8,14,16,.12) 100%);
-  padding-left:clamp(9px,.9vw,14px); padding-right:clamp(11px,1.1vw,17px);
-}
-.hud-o::before{
-  content:''; position:absolute; left:0; top:0; bottom:0; width:1px;
-  background:linear-gradient(to bottom,
-    var(--mint) 0%, var(--mint) 58%, rgba(140,199,196,0) 100%);
-}
-.hud-phai .hud-o::before{ left:auto; right:0; }
-.hud-o::after{
-  content:''; position:absolute; left:0; top:0; width:.55em; height:1px;
-  background:var(--do);
-}
-.hud-phai .hud-o::after{ left:auto; right:0; }
+.hud-o .kg-noi{ padding:clamp(7px,.75vw,11px) clamp(9px,.95vw,15px); }
 /* HƯỚNG MỌC: khối bắt đầu ở MÉP TRONG — mép quay về phía hiện vật — rồi nở
    dần ra phía ngoài. Cột trái mở từ phải sang trái, cột phải thì ngược lại.
    Nhờ vậy mọi thứ đều toả ra từ giữa màn hình chứ không trượt từ rìa vào. */
@@ -564,12 +607,12 @@ body.da-phu .cuaso, body.da-phu .hero{
 .hud-o .nhan{
   display:flex; align-items:center; gap:.55em;
   font-size:clamp(8px,.72vw,10px); letter-spacing:.22em; text-transform:uppercase;
-  color:var(--mint); margin-bottom:.6em; white-space:nowrap;
+  color:var(--giay); margin-bottom:.6em; white-space:nowrap; font-weight:700;
 }
-.hud-o .nhan::before{ content:''; flex:0 0 auto; width:4px; height:4px;
-  background:var(--do); transform:rotate(45deg); }
+.hud-o .nhan::before{ content:''; flex:0 0 auto; width:2px; height:1em;
+  background:var(--do); }
 .hud-o .nhan::after{ content:''; flex:1 1 auto; height:1px;
-  background:currentColor; opacity:.34; }
+  background:var(--mint); opacity:.3; }
 .hud-ma{ font-size:clamp(9px,.8vw,11px); letter-spacing:.2em; color:var(--do);
   font-weight:700; margin-bottom:.2em; }
 .hud-ten{
@@ -630,9 +673,13 @@ body.da-phu .cuaso, body.da-phu .hero{
      với thao tác thoát Main Section.                                      */
   .mh-tren{ padding:8px var(--le); }
   /* Điện thoại: vòng ngắm nhỏ lại nằm bên trái, khối dữ liệu vuốt ngang */
-  .karen{ gap:10px; }
-  .k-nhan{ width:58px; justify-content:flex-start; padding-top:2px; }
-  .k-trangthai{ font-size:6px; letter-spacing:.12em; }
+  .karen{ gap:6px; }
+  .bios-luoi .cot:nth-child(odd),
+  .bios-luoi .cot:nth-child(even){ margin-top:0; margin-bottom:0; }
+  .hud-doc{ gap:10px; }
+  .doc-so{ font-size:15px; letter-spacing:.06em; }
+  .hud-tt{ font-size:7px; letter-spacing:.1em; }
+  .hud-goc span{ font-size:9px; }
   .bios-luoi{
     display:flex; gap:0;
     overflow-x:auto; overflow-y:hidden;
@@ -655,14 +702,9 @@ body.da-phu .cuaso, body.da-phu .hero{
     top:auto; bottom:2.5%; transform:none; max-height:44svh;
   }
   /* Điện thoại: hiện vật nằm PHÍA TRÊN, nên khối nở từ mép trên xuống */
-  .hud-phai .hud-o{
-    transform:translateY(-18px); clip-path:inset(0 0 100% 0);
-    background:linear-gradient(to right,
-      rgba(8,14,16,.74) 0%, rgba(8,14,16,.5) 70%, rgba(8,14,16,.2) 100%);
-    padding-left:clamp(11px,3vw,17px); padding-right:clamp(9px,2.4vw,14px);
-  }
-  .hud-phai .hud-o::before{ left:0; right:auto; }
-  .hud-phai .hud-o::after{ left:0; right:auto; }
+  .hud-phai .hud-o{ transform:translateY(-18px); clip-path:inset(0 0 100% 0); }
+  .hud-khung .nhan b{ font-size:11px; letter-spacing:.1em; }
+  .hud-khung .nhan s{ font-size:7px; letter-spacing:.16em; }
   .hud-phai .hud-o.ra{ transform:none; clip-path:inset(0 0 0 0); }
   .hud-ten{ font-size:clamp(17px,5.4vw,26px); }
   .hud-khung i{ width:11px; height:11px; }
@@ -1267,27 +1309,27 @@ const BANGMAU = {
   danh_sach: [
     { ten:"THANH LAM",  ma:"08d9d6 252a34 ff2e63 eaeaea",
       giay:"#252A34", muc:"#EAEAEA", muc_nhat:"#98A0AC",
-      mint:"#08D9D6", do:"#FF2E63",  den:"#171A21" },
+      mint:"#08D9D6", do:"#FF2E63" },
 
     { ten:"TỬ ĐINH",    ma:"f4eeff dcd6f7 a6b1e1 424874",
       giay:"#F4EEFF", muc:"#2B2F52", muc_nhat:"#7B84B5",
-      mint:"#A6B1E1", do:"#424874",  den:"#1E2140" },
+      mint:"#A6B1E1", do:"#424874" },
 
     { ten:"HỒNG PHẤN",  ma:"f9f5f6 f8e8ee fdcedf f2bed1",
       giay:"#F9F5F6", muc:"#5C2B3D", muc_nhat:"#9C6377",
-      mint:"#E7A9C0", do:"#D14A78",  den:"#2A1520" },
+      mint:"#E7A9C0", do:"#D14A78" },
 
     { ten:"THIÊN THANH", ma:"e3f2fd 90caf9 2196f3 0d47a1",
       giay:"#E3F2FD", muc:"#0D47A1", muc_nhat:"#3E7CC4",
-      mint:"#90CAF9", do:"#2196F3",  den:"#062243" },
+      mint:"#90CAF9", do:"#2196F3" },
 
     { ten:"LỤC DẠ",     ma:"000000 222222 1dcd9f 169976",
       giay:"#222222", muc:"#DFF5EC", muc_nhat:"#7FB9A6",
-      mint:"#169976", do:"#1DCD9F",  den:"#000000" },
+      mint:"#169976", do:"#1DCD9F" },
 
     { ten:"HẢI ĐĂNG",   ma:"bf092f 132440 16476a 3b9797",
       giay:"#132440", muc:"#DCE9EE", muc_nhat:"#6E93A8",
-      mint:"#3B9797", do:"#BF092F",  den:"#0A1526" }
+      mint:"#3B9797", do:"#BF092F" }
   ]
 };
 
@@ -1368,16 +1410,38 @@ const KHOITAO = {
   tan_xa:     150     /* các ký tự bay xa cỡ nào khi phân tán (px)         */
 };
 
-/* ---- HUY HIỆU TRỢ LÝ ---- (vòng ngắm nhỏ ở mép trái vùng dữ liệu) */
-const KAREN = {
+/* ---- BẢNG HUD CỦA MAIN SECTION ----
+   Cụm khung kính cắt góc trải ngang, bên dưới là thanh đọc số kẹp ngoặc và
+   danh sách trạng thái, hai bên rải vài chữ số và ký hiệu nhỏ.          */
+const HUDMAIN = {
   bat:        true,
-  ten:        "KAREN",
-  trang_thai: "TRỰC TUYẾN",
-  vien_ms:    440,   /* bốn góc cung của khung vẽ ra trong bao lâu     */
-  vien_tre:   160,   /* chờ bao lâu rồi mới vẽ bốn góc                 */
-  vong_ms:    620,   /* huy hiệu bung ra trong bao lâu                 */
-  quay_ngoai: 26,    /* vòng ngoài quay trọn một vòng mất bao nhiêu GIÂY */
-  quay_trong: 17     /* vòng trong quay ngược, mất bao nhiêu giây        */
+  cat_goc:    13,     /* độ cắt góc của khung kính (px)                   */
+  vien_tre:   160,    /* chờ bao lâu rồi mới hiện ký hiệu bốn góc (ms)    */
+  doc_tre:    420,    /* chờ bao lâu rồi mới hiện thanh đọc số (ms)       */
+  noi_tre:    620,    /* chờ bao lâu rồi mới vẽ đường nối xuống thanh số  */
+
+  /* Thanh đọc số ở giữa. Dùng dấu · để chèn khoảng ngắt màu nhạt.       */
+  doc_chu:    "ĐANG KẾT NỐI KHO HỒ SƠ",
+  doc_so:     "02·06·2006",
+
+  /* Danh sách trạng thái hai cột — {} rỗng thì không hiện.
+     Giá trị "@mo" và "@khoa" tự đếm số hiện vật đã / chưa giải mật.    */
+  trang_thai: [
+    ["ĐÃ GIẢI MẬT", "@mo"],
+    ["CÒN KHOÁ",    "@khoa"]
+  ],
+
+  /* Chữ số nhỏ rải ở bốn góc vùng HUD */
+  goc: ["05", "23", "S1", "84"]
+};
+
+/* ---- KHUNG NGẮM khi xem chi tiết (theo mẫu HUD02) ---- */
+const KHUNGNGAM = {
+  nhan:     "CHẾ ĐỘ XEM",   /* dòng lớn ở góc trên trái  */
+  cat_goc:  22,             /* độ cắt góc 45° của khung   */
+  khac:     0.16,           /* độ sâu khấc chevron hai bên, theo phần chiều cao */
+  duoi_t:   "125 // 25mm f1.4",   /* dòng thông số góc dưới trái */
+  duoi_p:   "REC 00:00:29"        /* dòng thông số góc dưới phải */
 };
 
 /* ---- Ô SÓNG ÂM THANH ----
@@ -2289,7 +2353,8 @@ function datBangMau(i, veLaiHet){
   r.setProperty('--muc-nhat', b.muc_nhat);
   r.setProperty('--mint',     b.mint);
   r.setProperty('--do',       b.do);
-  r.setProperty('--den',      b.den);
+  /* --den KHÔNG đổi theo bảng màu: màn hình code của cửa sổ phần mềm luôn
+     giữ nền đen để chữ terminal lúc nào cũng đọc được.                   */
   r.setProperty('--vien', 'rgba(' + hexRGB(b.muc_nhat) + ', .22)');
 
   /* 2 — những chỗ vẽ bằng canvas, phải ghi đè vào hằng cấu hình */
@@ -3283,42 +3348,55 @@ function batManHinh(){
   function datKhung(v){
     if(!oKhung) return;
     var X = hopXem(v), caoTren = CH * MAIN.phan_tren;
-    var no = nhoMH() ? 12 : 20;
+    var no = nhoMH() ? 14 : 26;
     var w  = X.w + no * 2, h = X.h + no * 2;
     oKhung.style.left   = (X.x - X.w / 2 - no) + 'px';
     oKhung.style.top    = (caoTren + X.y - X.h / 2 - no) + 'px';
     oKhung.style.width  = w + 'px';
     oKhung.style.height = h + 'px';
 
-    /* Bốn góc CUNG, cùng ngôn ngữ nét với khung trợ lý bên ngoài */
-    var r = Math.min(18, h * 0.16, w * 0.16);
-    var t = Math.min(34, w * 0.18), u = Math.min(30, h * 0.2);
-    var g = [
-      'M0 ' + (r + u) + 'V' + r + 'A' + r + ' ' + r + ' 0 0 1 ' + r + ' 0H' + (r + t),
-      'M' + w + ' ' + (r + u) + 'V' + r + 'A' + r + ' ' + r + ' 0 0 0 ' + (w - r) + ' 0H' + (w - r - t),
-      'M0 ' + (h - r - u) + 'V' + (h - r) + 'A' + r + ' ' + r + ' 0 0 0 ' + r + ' ' + h + 'H' + (r + t),
-      'M' + w + ' ' + (h - r - u) + 'V' + (h - r) + 'A' + r + ' ' + r + ' 0 0 1 ' + (w - r) + ' ' + h + 'H' + (w - r - t)
-    ];
-    var dai = Math.round(r * 1.6 + t + u);
+    /* Viền cắt góc 45° ở bốn góc, giữa hai cạnh trái phải có khấc chevron
+       thụt vào — đúng đường nét của khung ngắm trong ảnh mẫu.          */
+    var c = Math.min(KHUNGNGAM.cat_goc || 22, w * 0.16, h * 0.22);
+    var k = Math.min(h * (KHUNGNGAM.khac || 0.16), w * 0.08);
+    var gy = h / 2;
+    var d = 'M' + c + ' 0H' + (w - c) + 'L' + w + ' ' + c +
+            'V' + (gy - k) + 'L' + (w - k) + ' ' + gy + 'L' + w + ' ' + (gy + k) +
+            'V' + (h - c) + 'L' + (w - c) + ' ' + h +
+            'H' + c + 'L0 ' + (h - c) +
+            'V' + (gy + k) + 'L' + k + ' ' + gy + 'L0 ' + (gy - k) +
+            'V' + c + 'Z';
+    var chuVi = Math.round((w + h) * 2.4);
+
     var sv = '<svg viewBox="0 0 ' + w.toFixed(0) + ' ' + h.toFixed(0) +
-             '" preserveAspectRatio="none" aria-hidden="true">';
-    for(var k = 0; k < g.length; k++)
-      sv += '<path d="' + g[k] + '" style="--d:' + dai + '"/>';
-    /* Vạch chia nhỏ dọc mép dưới */
-    var so = Math.max(4, Math.min(16, Math.round(w / 34)));
-    for(k = 1; k < so; k++){
-      var x = (w * k / so).toFixed(1);
-      sv += '<path class="vach" d="M' + x + ' ' + h + 'V' + (h - (k % 4 ? 4 : 8)) + '"/>';
+             '" preserveAspectRatio="none" aria-hidden="true">' +
+             '<path class="vien" d="' + d + '" style="--d:' + chuVi + '"/>';
+    /* Vạch chia ngắn dọc mép trên và mép dưới */
+    var so = Math.max(5, Math.min(22, Math.round(w / 40)));
+    for(var q = 1; q < so; q++){
+      var x = (w * q / so);
+      if(Math.abs(x - w / 2) < w * 0.06) continue;
+      sv += '<path class="vach" d="M' + x.toFixed(1) + ' 0V' + (q % 4 ? 4 : 8) + '"/>' +
+            '<path class="vach" d="M' + x.toFixed(1) + ' ' + h + 'V' +
+              (h - (q % 4 ? 4 : 8)) + '"/>';
     }
+    /* Hai đoạn nét sáng ở giữa cạnh trên và cạnh dưới, làm điểm nhấn */
+    sv += '<path class="sang" d="M' + (w * 0.42).toFixed(1) + ' 0H' +
+            (w * 0.58).toFixed(1) + '"/>' +
+          '<path class="sang" d="M' + (w * 0.42).toFixed(1) + ' ' + h + 'H' +
+            (w * 0.58).toFixed(1) + '"/>';
+    /* Đường gióng ngắn chỉ vào mép trái, đi kèm con số nhỏ */
+    sv += '<path class="vach" d="M' + (-no * 0.6).toFixed(1) + ' ' + gy.toFixed(1) +
+          'H' + (k + 6).toFixed(1) + '"/>';
     sv += '</svg>';
 
-    /* Vòng quay nhỏ ở góc trên trái */
-    sv += '<svg class="quay" viewBox="0 0 24 24" aria-hidden="true"><g>' +
-          '<circle cx="12" cy="12" r="9.5" stroke-dasharray="3 3"/>' +
-          '<path d="M12 4.5V7M12 17v2.5M4.5 12H7M17 12h2.5"/>' +
-          '</g><circle cx="12" cy="12" r="2.4"/></svg>';
-
-    sv += '<b>' + thoat(v.def.ma_ho_so) + ' · ĐANG TRÍCH XUẤT</b>';
+    sv += '<div class="nhan"><i></i><span>' +
+            '<b>' + thoat(KHUNGNGAM.nhan || 'CHẾ ĐỘ XEM') + '</b>' +
+            '<s>' + thoat(v.def.the && v.def.the.loai ? v.def.the.loai : 'TANG VẬT') +
+          '</s></span></div>';
+    sv += '<u class="t">' + thoat(KHUNGNGAM.duoi_t || '') + '</u>';
+    sv += '<u class="p">' + thoat(v.def.ma_ho_so || '') + '</u>';
+    sv += '<span class="so">' + ('0' + (v.i + 1)).slice(-2) + '</span>';
     oKhung.innerHTML = sv;
   }
 
@@ -3697,8 +3775,9 @@ function batManHinh(){
 
     for(k = 0; k < ds.length; k++){
       var o = document.createElement('div');
-      o.className = 'hud-o';
-      o.innerHTML = ds[k].html;
+      o.className = 'hud-o kg';
+      o.style.setProperty('--n', (HUDMAIN.cat_goc || 13) + 'px');
+      o.innerHTML = voKhungKinh(ds[k].html);
       if(ds[k].am) o.setAttribute('data-co-am', '1');
       if(nho){
         /* Điện thoại: dồn về một cột, so le trái–phải cho vẫn thấy "hai bên" */
@@ -4079,19 +4158,6 @@ function batManHinh(){
     oKaren = K;
 
     /* Bốn góc cung + dải quét khởi động */
-    K.innerHTML =
-      '<svg class="k-vien" preserveAspectRatio="none" aria-hidden="true"></svg>' +
-      '<div class="k-quet" aria-hidden="true"></div>';
-
-    /* Cột trái — vòng ngắm trợ lý */
-    if(KAREN.bat){
-      var N = document.createElement('div');
-      N.className = 'k-nhan';
-      N.innerHTML = veVongNgam() +
-        '<div class="k-trangthai"><b>' + thoat(KAREN.ten || '') + '</b>' +
-        '<span>' + thoat(KAREN.trang_thai || '') + '</span></div>';
-      K.appendChild(N);
-    }
 
     /* Lưới các khối dữ liệu */
     var L = document.createElement('div');
@@ -4113,85 +4179,120 @@ function batManHinh(){
       L.style.columnGap = (MAIN.cot_cach || 26) + 'px';
     }
 
+    var cg = (HUDMAIN.cat_goc || 13) + 'px';
     for(i = 0; i < DATA.cot.length; i++){
       c = DATA.cot[i];
       var nhan = c.tab || String(c.ten || ('KHỐI ' + (i + 1))).replace(/\.[^.]*$/, '');
+      var phu  = String(c.ten || '').replace(/\.[^.]*$/, '');
       var sd = noDanhSach(c.dong || []).length;
       var d = document.createElement('div');
-      d.className = 'cot';
-      d.innerHTML =
-        '<div class="cot-nhan"><i></i><b>' + thoat(nhan) + '</b><u></u>' +
-        '<s>' + ('0' + sd).slice(-2) + '</s></div>' +
-        '<div class="cot-than"></div>';
+      d.className = 'cot kg';
+      d.style.setProperty('--n', cg);
+      d.innerHTML = voKhungKinh(
+        '<div class="cot-nhan kg-dau"><i></i><span><b>' + thoat(nhan) + '</b>' +
+          '<s>' + thoat(phu) + '</s></span>' +
+          '<u>' + ('0' + sd).slice(-2) + '</u></div>' +
+        '<div class="cot-than"></div>');
       L.appendChild(d);
       oCot.push(d.querySelector('.cot-than'));
     }
+
+    /* Thanh đọc số + danh sách trạng thái + ký hiệu bốn góc */
+    K.appendChild(veThanhDoc());
+    K.appendChild(veGocHUD());
+    var svNoi = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    svNoi.setAttribute('class', 'hud-noi');
+    svNoi.setAttribute('id', 'hudNoi');
+    K.insertBefore(svNoi, K.firstChild);
     veVienKaren();
   }
 
-  /* Vòng ngắm: ba lớp lồng nhau, hai lớp ngoài quay ngược chiều nhau */
-  function veVongNgam(){
-    var A = [], k;
-    /* Bốn cung ngắn ở vòng ngoài */
-    for(k = 0; k < 4; k++){
-      var g0 = k * 90 + 12, g1 = k * 90 + 78;
-      A.push('<path d="' + cungTron(50, 50, 45, g0, g1) + '"/>');
-    }
-    /* Vạch chia nhỏ quanh vòng ngoài */
-    var V = '';
-    for(k = 0; k < 24; k++){
-      var a = k * 15 * Math.PI / 180;
-      var r1 = k % 6 === 0 ? 36 : 39.5;
-      V += '<path d="M' + (50 + Math.cos(a) * r1).toFixed(2) + ' ' +
-           (50 + Math.sin(a) * r1).toFixed(2) + 'L' +
-           (50 + Math.cos(a) * 42).toFixed(2) + ' ' +
-           (50 + Math.sin(a) * 42).toFixed(2) + '"/>';
-    }
-    /* Lục giác lõi */
-    var P = [];
-    for(k = 0; k < 6; k++){
-      var b = (k * 60 - 90) * Math.PI / 180;
-      P.push((50 + Math.cos(b) * 15).toFixed(2) + ',' + (50 + Math.sin(b) * 15).toFixed(2));
-    }
-    return '<svg class="k-vong" viewBox="0 0 100 100" aria-hidden="true"' +
-      ' style="--quay-ng:' + (KAREN.quay_ngoai || 26) + 's;--quay-tr:' +
-      (KAREN.quay_trong || 17) + 's;--vong-ms:' + (KAREN.vong_ms || 620) + 'ms">' +
-      '<g class="v-ngoai">' + A.join('') + V + '</g>' +
-      '<g class="v-giua">' +
-        '<path d="' + cungTron(50, 50, 30, 200, 340) + '"/>' +
-        '<path d="' + cungTron(50, 50, 30, 20, 160) + '"/>' +
-      '</g>' +
-      '<polygon class="v-loi" points="' + P.join(' ') + '"/>' +
-      '<circle class="v-tam" cx="50" cy="50" r="3.4"/>' +
-      '</svg>';
-  }
-  function cungTron(cx, cy, r, g0, g1){
-    var a0 = g0 * Math.PI / 180, a1 = g1 * Math.PI / 180;
-    var lon = (g1 - g0) > 180 ? 1 : 0;
-    return 'M' + (cx + Math.cos(a0) * r).toFixed(2) + ' ' + (cy + Math.sin(a0) * r).toFixed(2) +
-           'A' + r + ' ' + r + ' 0 ' + lon + ' 1 ' +
-           (cx + Math.cos(a1) * r).toFixed(2) + ' ' + (cy + Math.sin(a1) * r).toFixed(2);
+  /* Bọc nội dung vào ba lớp của khung kính cắt góc */
+  function voKhungKinh(noi){
+    return '<div class="kg-vien"></div><div class="kg-nen"></div>' +
+           '<i class="kg-goc a"></i><i class="kg-goc b"></i>' +
+           '<i class="kg-goc c"></i><i class="kg-goc d"></i>' +
+           '<div class="kg-noi">' + noi + '</div>';
   }
 
-  /* Bốn góc cung ôm lấy cả vùng trợ lý */
-  function veVienKaren(){
-    if(!oKaren) return;
-    var sv = oKaren.querySelector('.k-vien'); if(!sv) return;
-    var w = oKaren.clientWidth  || W;
-    var h = oKaren.clientHeight || (CH * MAIN.phan_tren);
-    var r = Math.min(22, h * 0.22), t = Math.min(46, w * 0.09);
-    sv.setAttribute('viewBox', '0 0 ' + w + ' ' + h);
-    var g = [
-      'M0 ' + (r + 26) + 'V' + r + 'A' + r + ' ' + r + ' 0 0 1 ' + r + ' 0H' + (r + t),
-      'M' + w + ' ' + (r + 26) + 'V' + r + 'A' + r + ' ' + r + ' 0 0 0 ' + (w - r) + ' 0H' + (w - r - t),
-      'M0 ' + (h - r - 26) + 'V' + (h - r) + 'A' + r + ' ' + r + ' 0 0 0 ' + r + ' ' + h + 'H' + (r + t),
-      'M' + w + ' ' + (h - r - 26) + 'V' + (h - r) + 'A' + r + ' ' + r + ' 0 0 1 ' + (w - r) + ' ' + h + 'H' + (w - r - t)
-    ];
-    sv.innerHTML = g.map(function(d){
-      return '<path d="' + d + '" style="--d:' + Math.round(r * 1.6 + t + 26) +
-             ';--vien-ms:' + (KAREN.vien_ms || 440) + 'ms"/>';
-    }).join('');
+  /* Thanh đọc số kẹp hai ngoặc, kèm danh sách trạng thái bên phải */
+  function veThanhDoc(){
+    var o = document.createElement('div');
+    o.className = 'hud-doc';
+    var so = String(HUDMAIN.doc_so || '')
+      .replace(/·/g, '<em>·</em>');
+    var H = '<div class="doc-khoi">' +
+              '<span class="doc-chu">' + thoat(HUDMAIN.doc_chu || '') + '</span>' +
+              '<span class="doc-ngoac t"></span>' +
+              '<span class="doc-so">' + so + '</span>' +
+              '<span class="doc-ngoac p"></span>' +
+            '</div>';
+    var tt = HUDMAIN.trang_thai || [];
+    if(tt.length){
+      var mo = 0, khoa = 0;
+      for(var k = 0; k < CUMVAT.length; k++)
+        if(CUMVAT[k].xem === false) khoa++; else mo++;
+      H += '<div class="hud-tt">';
+      for(k = 0; k < tt.length; k++){
+        var v = String(tt[k][1]);
+        var doo = v === '@khoa';
+        if(v === '@mo')   v = ('0' + mo).slice(-2);
+        if(v === '@khoa') v = ('0' + khoa).slice(-2);
+        H += '<b>' + thoat(tt[k][0]) + '</b><span' + (doo ? ' class="do"' : '') +
+             '>' + thoat(v) + '</span>';
+      }
+      H += '</div>';
+    }
+    o.innerHTML = H;
+    return o;
   }
+
+  /* Vài chữ số và ký hiệu nhỏ rải ở bốn góc vùng HUD */
+  function veGocHUD(){
+    var o = document.createElement('div');
+    o.className = 'hud-goc';
+    var g = HUDMAIN.goc || [];
+    var vt = ['left:0;top:0', 'right:0;top:0', 'left:0;bottom:0', 'right:0;bottom:0'];
+    var H = '';
+    for(var k = 0; k < Math.min(4, g.length); k++)
+      H += '<span style="' + vt[k] + '">' + thoat(g[k]) + '</span>';
+    /* Hai ký hiệu tam giác nhỏ, gợi lại các glyph rải rác trong ảnh mẫu */
+    H += '<svg viewBox="0 0 20 20" style="left:0;top:38%"><path d="M10 3 17 16H3z"/></svg>' +
+         '<svg viewBox="0 0 20 20" style="right:0;top:38%"><path d="M10 17 3 4h14z"/></svg>';
+    o.innerHTML = H;
+    return o;
+  }
+
+  /* Đường nối chạy từ đáy mỗi khung kính xuống thanh đọc số */
+  function veNoiHUD(){
+    var sv = el('hudNoi'), doc = oKaren ? oKaren.querySelector('.hud-doc') : null;
+    var b  = oLuoi ? oLuoi.querySelectorAll('.cot') : [];
+    if(!sv || !doc || !b.length || !oKaren) return;
+    var r = oKaren.getBoundingClientRect();
+    if(!r.width) return;
+    sv.setAttribute('viewBox', '0 0 ' + r.width.toFixed(0) + ' ' + r.height.toFixed(0));
+    var dr = doc.getBoundingClientRect();
+    var dx = dr.left - r.left + dr.width / 2, dy = dr.top - r.top;
+    var H = '';
+    for(var i = 0; i < b.length; i++){
+      var bb = b[i].getBoundingClientRect();
+      if(!bb.width) continue;
+      var x = bb.left - r.left + bb.width / 2, y = bb.bottom - r.top;
+      var my = y + (dy - y) * 0.55;
+      var d = 'M' + x.toFixed(1) + ' ' + y.toFixed(1) +
+              'V' + my.toFixed(1) + 'L' + dx.toFixed(1) + ' ' + dy.toFixed(1);
+      var dai = Math.abs(my - y) + Math.hypot(dx - x, dy - my);
+      H += '<path d="' + d + '" style="--d:' + Math.round(dai) + '"/>' +
+           '<circle cx="' + x.toFixed(1) + '" cy="' + y.toFixed(1) + '" r="3.2"/>' +
+           '<circle class="loi" cx="' + x.toFixed(1) + '" cy="' + y.toFixed(1) + '" r="1.1"/>';
+    }
+    sv.innerHTML = '<g>' + H + '</g>';
+  }
+
+
+  /* Bố cục mới không còn bốn góc cung; hàm giữ tên cũ để mọi nơi gọi vẫn
+     chạy, nay lo việc vẽ lại đường nối khi kích thước đổi.             */
+  function veVienKaren(){ veNoiHUD(); }
 
   /* =====================================================================
      CHUỖI KHỞI TẠO
@@ -4255,9 +4356,12 @@ function batManHinh(){
     ktBoc = el('khoiTao');
     var nhanhGon = function(){
       if(oKaren){
-        oKaren.classList.add('ra-vien', 'ra-vong');
+        oKaren.classList.add('ra-vien', 'ra-doc');
         var b0 = oLuoi ? oLuoi.querySelectorAll('.cot') : [];
         for(var q = 0; q < b0.length; q++) b0[q].classList.add('ra');
+        veNoiHUD();
+        var g0 = el('hudNoi'); if(g0){ var gg0 = g0.querySelector('g');
+          if(gg0) gg0.classList.add('ve'); }
       }
       moiHet();
       if(xong) xong();
@@ -4420,13 +4524,19 @@ function batManHinh(){
         }, n * le + lms + (KHOITAO.bang_ms || 460) + (KHOITAO.chu_tre || 150)));
       })(duong[k], cham[k], b[diem[k]], k);
 
-    /* Khung trợ lý hiện cùng lúc với đường đầu tiên */
+    /* Ký hiệu bốn góc → thanh đọc số → đường nối xuống thanh đọc số */
     hen.push(setTimeout(function(){
       if(oKaren) oKaren.classList.add('ra-vien');
-    }, KAREN.vien_tre || 160));
+    }, HUDMAIN.vien_tre || 160));
     hen.push(setTimeout(function(){
-      if(oKaren) oKaren.classList.add('ra-vong');
-    }, (KAREN.vien_tre || 160) + 260));
+      if(oKaren) oKaren.classList.add('ra-doc');
+    }, HUDMAIN.doc_tre || 420));
+    hen.push(setTimeout(function(){
+      veNoiHUD();
+      var g = el('hudNoi'); if(!g) return;
+      void g.getBoundingClientRect();
+      var gg = g.querySelector('g'); if(gg) gg.classList.add('ve');
+    }, HUDMAIN.noi_tre || 620));
 
     /* Khối ASCII phân tán ngay khi đường bắt đầu bắn */
     ktTan(xong, (duong.length - 1) * le + lms + (KHOITAO.bang_ms || 460));
