@@ -1,0 +1,15 @@
+Đặt bốn tệp video vào ĐÚNG thư mục này, đúng tên:
+
+    idea-1.mp4
+    idea-2.mp4
+    idea-3.mp4
+    idea-4.mp4
+
+Muốn đổi tên hoặc đổi số lượng thì sửa VIDEO.nguon trong file HTML.
+Không có tệp nào thì cửa sổ sẽ báo "[ ! ] không đọc được luồng video"
+và giữ nguyên màn terminal — mở console của trình duyệt để xem
+đường dẫn nó đã thử.
+
+Ghi chú: phải chạy trang qua một máy chủ (GitHub Pages, hoặc lệnh
+python3 -m http.server). Mở thẳng bằng file:// thì nhiều trình duyệt
+chặn video, và hiệu ứng chữ ASCII cũng bị bỏ qua.
