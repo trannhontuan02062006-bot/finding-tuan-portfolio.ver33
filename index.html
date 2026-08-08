@@ -9,7 +9,7 @@
 <link rel="icon" id="bieuTuong" href="data:,">
 <link rel="apple-touch-icon" id="bieuTuongIOS">
 <meta name="theme-color" content="#0A0E0E">
-<meta name="description" content="Portfolio của Trần Nhơn Tuân — Content Creator, trên hành trình trở thành Creative Strategist.">
+<meta name="description" content="Portfolio của Trần Nhơn Tuân.">
 
 <style>
 /* ############################################################################
@@ -31,6 +31,8 @@
   --vien:      rgba(44,104,123,.22);  /* Đường kẻ mảnh — hiện KHÔNG dùng,     */
                                       /* để sẵn nếu muốn bật lại kẻ phân cách  */
   --le:        clamp(20px, 5vw, 56px);/* Lề trái/phải toàn trang              */
+  --may:       ui-monospace, "SF Mono", Menlo, Consolas, "Liberation Mono",
+               monospace;              /* phông chữ máy dùng cho Main Section  */
 }
 /* ##########################  HẾT KHU VỰC MÀU  ############################## */
 
@@ -130,8 +132,7 @@ body.da-phu .hero-bi{ opacity:0; transition-delay:0s; pointer-events:none; }
    Khối này phủ kín màn hình khi cửa sổ phóng to xong. Nội dung mới cứ dựng
    vào trong #manHinh; class "hien" do phần chuyển cảnh tự bật/tắt.
    ========================================================================= */
-/* Khi Main Section đã phủ kín, chặn bôi đen dính vào chữ terminal nằm dưới.
-   Chỉ hai cột nhật ký và bảng chi tiết mới cho chọn chữ.                   */
+/* Khi Main Section đã phủ kín, chặn bôi đen dính vào chữ terminal nằm dưới. */
 body.da-phu .cuaso, body.da-phu .hero{
   user-select:none; -webkit-user-select:none;
 }
@@ -152,50 +153,87 @@ body.da-phu .cuaso, body.da-phu .hero{
 .man-hinh.hien{ opacity:1; visibility:visible;
   transition:opacity .55s ease, visibility 0s linear 0s; }
 
-/* --- Một phần ba trên: BẢNG ĐIỀU KHIỂN KIỂU MÀN HÌNH BIOS ---
-   Ba tầng xếp dọc: dải trạng thái mảnh · thanh tab trong khung viền ·
-   lưới các bảng dữ liệu. Toàn bộ chỉ dùng nét mảnh và chữ máy rất nhỏ,
-   không có thanh tiêu đề giả hay chấm đèn.                              */
-/* Khung trợ lý: vòng ngắm bên trái, các khối dữ liệu trải sang phải */
-/* Cụm khung kính trải ngang, mỗi khung so le độ cao như trong ảnh mẫu */
-
-/* --- ĐƯỜNG NỐI + NÚT VÒNG chạy từ cụm khung xuống thanh đọc số --- */
-
-/* --- THANH ĐỌC SỐ: hai ngoặc kẹp, dãy số lớn, chú thích bên trên --- */
-/* Danh sách trạng thái hai cột, kiểu DECLINED / COMPLETE */
-
-/* --- CHỮ SỐ VÀ KÝ HIỆU RẢI Ở BỐN GÓC --- */
+/* =========================================================================
+   KHỐI DÒNG LỆNH — góc trên bên trái Main Section
+   Tối đa ba dòng. Giai đoạn A gõ ra các lệnh dựng trang, giai đoạn B xoá đi
+   rồi thay bằng các câu chào luân phiên.
+   ========================================================================= */
+.mh-lenh{
+  position:absolute; z-index:6; pointer-events:none;
+  font:500 var(--lenh-co,13px)/1.62 var(--may);
+  letter-spacing:.02em; color:var(--mint);
+  text-shadow:0 0 14px rgba(var(--mint-rgb), .28);
+}
+.mh-lenh .ml-d{ display:block; white-space:pre; overflow:hidden; text-overflow:ellipsis; }
+.mh-lenh .ml-nhac{ color:var(--do); margin-right:.55em; }   /* dấu nhắc ">"  */
+.mh-lenh .ml-ro{ color:var(--mint); }                       /* chữ đã hiện   */
+.mh-lenh .ml-ma{ color:var(--do); opacity:.85; }            /* đuôi ký tự rác*/
+.mh-lenh .ml-ok{ color:var(--giay); }                       /* nhãn [ OK ]   */
+/* Giai đoạn B: câu chào sáng hơn một bậc cho khác hẳn lệnh hệ thống */
+.mh-lenh.chao .ml-ro{ color:var(--giay); }
+.mh-lenh .ml-tro{                                           /* con trỏ nhấp nháy */
+  display:inline-block; width:.58em; height:1.02em; background:var(--do);
+  vertical-align:-.18em; margin-left:.18em; animation:nhay 1.05s steps(1) infinite;
+}
 
 /* =========================================================================
-   LỚP KHỞI TẠO — nằm đè lên cả Main Section trong lúc trang tự dựng
+   CỘT BẢNG NỘI DUNG — một phần ba bên phải
+   Viền vẽ bằng ký tự box-drawing thật, tiêu đề lồng ngay trên nét viền.
+   Số cột ký tự do JS đo rồi đặt vào biến --cot, nên mọi nét luôn khít nhau.
    ========================================================================= */
+.mh-bang{
+  position:absolute; z-index:6; overflow:hidden;
+  font:500 var(--bang-co,12px)/var(--bang-cao,1.5) var(--may);
+  color:var(--muc-nhat); letter-spacing:.01em;
+  -webkit-mask-image:linear-gradient(to bottom,#000 calc(100% - 34px), rgba(0,0,0,0) 100%);
+          mask-image:linear-gradient(to bottom,#000 calc(100% - 34px), rgba(0,0,0,0) 100%);
+}
+.mh-bang::-webkit-scrollbar{ width:0; height:0; }
+.mh-bang.cuon-duoc{ overflow-y:auto; scrollbar-width:none; pointer-events:auto; }
 
-/* =========================================================================
-   KHUNG KÍNH CẮT GÓC — ngôn ngữ hình dùng chung cho cả Main Section lẫn
-   HUD chi tiết. Ba lớp lồng nhau: lớp ngoài lo hoạt ảnh mở, lớp giữa là
-   nét viền, lớp trong là mảng kính mờ.
-   ========================================================================= */
-/* Bốn mốc sáng ở góc, dấu hiệu quen thuộc của loại khung này */
+/* --- Một bảng --- */
+.bnd{ margin:0 0 var(--bang-khe,10px); opacity:0; }
+.bnd.hien{ opacity:1; }
+.bnd-vien{                       /* dòng viền trên và dưới, sinh bằng JS   */
+  display:block; white-space:pre; color:var(--mint); opacity:.62;
+}
+/* Nét viền chạy ra từ trái sang phải đúng một lần, ngay khi bảng được bật.
+   Dùng hoạt ảnh CSS chứ không vẽ từng khung bằng JS, để nét luôn về đích. */
+.bnd.hien .bnd-vien{ animation:vienChay .26s linear both; }
+@keyframes vienChay{
+  from{ clip-path:inset(0 100% 0 0); }
+  to  { clip-path:inset(0 0 0 0); }
+}
+.bnd-vien b{ color:var(--do); font-weight:700; }        /* dấu ngoặc vuông  */
+.bnd-vien i{ color:var(--giay); font-style:normal; font-weight:700; }  /* tên */
 
-/* Đầu khối: gạch dọc dày bên trái + nhãn hai tầng, y như "VIEW MODE" */
+/* --- Một dòng trong bảng --- */
+.bnd-d{ display:flex; align-items:baseline; white-space:pre; }
+.bnd-d > s{ text-decoration:none; color:var(--mint); opacity:.62; }  /* nét │ */
+.bnd-nhan{ color:var(--do); font-weight:700; flex:0 0 auto; }
+.bnd-gt{ color:var(--giay); flex:1 1 auto; min-width:0;
+         overflow:hidden; text-overflow:ellipsis; }
+.bnd-gt.phai{ flex:0 0 auto; margin-left:auto; padding-left:1ch; }
+.bnd-mo{ color:var(--muc-nhat); }                        /* chữ mờ hơn      */
 
-/* --- LƯỚI CÁC KHỐI DỮ LIỆU --- */
-/* Bảng NỞ TO ra từ giữa: giãn ngang trước, rồi mới giãn dọc — kiểu tấm kính
-   dữ liệu bật mở trong HUD.                                             */
-/* Nội dung nằm trong lớp .kg-noi của khung kính */
-/* Đầu khối dùng chung lớp .kg-dau bên trên */
-/* Thân bảng NHOÀ DẦN VỀ ĐÁY — chữ tan vào nền thay vì bị cắt ngang phũ.
-   --mo-tu  = từ % nào của bảng thì bắt đầu nhoà
-   --mo-con = xuống tới đáy thì còn lại bao nhiêu độ rõ (0 = mất hẳn)   */
+/* Thanh mức [██████░░░] — ô đầy và ô rỗng khác màu */
+.bnd-thanh s{ color:var(--mint); opacity:1; }
+.bnd-thanh u{ text-decoration:none; color:var(--mint); opacity:.28; }
 
-/* Mỗi dòng mở đầu bằng một tiếng lệnh lặp lại, tạo thành máng dọc bên trái.
-   Dòng trống vẫn hiện tiếng lệnh — đúng như một tệp batch thật.          */
-/* Dòng trích dẫn tang vật — bấm được */
-/* Đuôi con trỏ "|" nhấp nháy, luôn đứng cuối dòng đang gõ */
+/* Bản đồ ASCII — đứng giữa bảng, dấu chấm đỏ đánh dấu vị trí */
+.bnd-d.bnd-hbd{ line-height:1.02; }   /* dòng bản đồ bó sát cho liền khối */
+.bnd-bando{ display:block; flex:1 1 auto; min-width:0; white-space:pre;
+            color:var(--mint); opacity:.55; }
+.bnd-bando i{ color:var(--do); font-style:normal; opacity:1;
+              text-shadow:0 0 8px var(--do); }
+.bnd-bando b{ color:var(--giay); font-weight:700; opacity:1; }
 
-/* --- Hai phần ba dưới: chữ ASCII rồi hoá thành hiện vật --- */
+/* Dòng bấm được (mở hồ sơ tang vật / đóng hồ sơ) */
+.bnd-bam{ cursor:pointer; pointer-events:auto; }
+.bnd-bam:hover .bnd-gt, .bnd-bam:focus-visible .bnd-gt{ color:var(--do); }
+
+/* --- Vùng cụm hiện vật: hai phần ba bên trái --- */
 .mh-duoi{ position:absolute; left:0; right:0; z-index:2; }
-.man-hinh.dangXem .mh-duoi{ z-index:4; }   /* hiện vật nổi lên trên nền tối */
 .mh-ascii, .mh-nhieu{ position:absolute; left:0; top:0; display:block; }
 .mh-ascii{ z-index:1; }
 .mh-nhieu{ z-index:2; }
@@ -257,61 +295,17 @@ body.da-phu .cuaso, body.da-phu .hero{
 }
 @media (prefers-reduced-motion:reduce){ .cum-vat > i, .hero-bi > i{ display:none; } }
 
-/* --- DÒNG CODE QUÉT BỀ MẶT (dùng khi xem chi tiết) ---
-   Một dải sáng chạy lên chạy xuống trên mặt vật, cắt đúng theo hình vật.
-   Vị trí dải do JS đặt vào biến --qy.                                     */
-.mh-cum.song .cum-vat.xem-duoc{ cursor:zoom-in; }
+.mh-cum.song .cum-vat.xem-duoc{ cursor:pointer; }
 .mh-cum.song .cum-vat.keo{ cursor:grabbing; }
 
-/* --- Lớp xem chi tiết --- */
-/* Trong lúc xem chi tiết, lớp nhiễu được đẩy lên TRÊN hiện vật để vẽ dòng
-   code đang quét trên bề mặt vật.                                          */
-.man-hinh.dangXem .mh-nhieu{ z-index:5; }
-
 /* =========================================================================
-   HUD TRÍCH XUẤT THÔNG TIN
-   Vật nằm giữa màn hình, một dòng code quét lên xuống trên mặt nó, rồi các
-   khối dữ liệu bung dần ra hai bên như đang được rút ra từ chính hiện vật.
+   VỆT CHUỘT — hai kiểu, nằm trên nội dung và dưới lưới crosshair
+     .vet-chuot  = ô vuông chữ t·u·a·n, dùng ở HERO
+     .vet-matran = ma trận điểm kiểu bảng đèn LED, dùng ở MAIN SECTION
    ========================================================================= */
-
-/* Lớp mã lan ra từ hiện vật */
-
-/* --- Đường nối từ hiện vật sang các khối --- */
-/* Đầu mút là NÚT VÒNG rỗng có tâm đỏ, giống các nút nối trong ảnh mẫu */
-
-/* --- KHUNG NGẮM quanh hiện vật, theo mẫu HUD02 ---
-   Viền cắt góc 45°, giữa hai cạnh trái phải có khấc chevron thụt vào, kèm
-   nhãn hai tầng ở góc trên trái và hai dòng thông số ở đáy.             */
-
-/* Nhãn hai tầng ở góc trên trái, kiểu "VIEW MODE / THERMAL OPTICS" */
-/* Hai dòng thông số nhỏ ở đáy khung, kiểu "125 // 25mm f1.4" */
-/* Số nhỏ có đường gióng ở mép trái, như số "29" trong ảnh mẫu */
-
-/* --- Hai cột dữ liệu --- */
-
-/* Khối dữ liệu dùng chung khung kính cắt góc với Main Section */
-/* HƯỚNG MỌC: khối bắt đầu ở MÉP TRONG — mép quay về phía hiện vật — rồi nở
-   dần ra phía ngoài. Cột trái mở từ phải sang trái, cột phải thì ngược lại.
-   Nhờ vậy mọi thứ đều toả ra từ giữa màn hình chứ không trượt từ rìa vào. */
-
-/* --- Ô SÓNG ÂM THANH --- */
-
-/* --- CÁC DÒNG DỮ LIỆU trong khối HUD --- */
-
-@media (max-width:767px){
-  /* Điện thoại: ba cột xếp NGANG, vuốt sang để đọc — tránh hẳn việc chồng
-     lên nhau khi chiều cao vùng trên không đủ, và không tranh vuốt dọc
-     với thao tác thoát Main Section.                                      */
-  /* Điện thoại: vòng ngắm nhỏ lại nằm bên trái, khối dữ liệu vuốt ngang */
-  /* Điện thoại: gộp về MỘT cột dữ liệu nằm dưới, từng khối vẫn bung lần lượt
-     và so le trái–phải nên vẫn giữ cảm giác đang được rút ra hai bên.      */
-  /* Điện thoại: hiện vật nằm PHÍA TRÊN, nên khối nở từ mép trên xuống */
-}
-
-/* =========================================================================
-   VỆT CHUỘT PIXEL — nằm trên nội dung, dưới lưới crosshair
-   ========================================================================= */
-.vet-chuot{ position:fixed; inset:0; z-index:19; pointer-events:none; }
+.vet-chuot, .vet-matran{ position:fixed; inset:0; pointer-events:none; }
+.vet-chuot { z-index:19; }
+.vet-matran{ z-index:19; }
 
 /* =========================================================================
    HERO
@@ -555,6 +549,24 @@ body.khoa .cs-logo{ animation:tho 2.1s ease-in-out infinite; }
   .cum-toado{ font-size:8px; margin-top:5px; }
 }
 
+/* --- MÁY TÍNH BẢNG: cột bảng hẹp lại, chữ nhỏ hơn một bậc --- */
+@media (min-width:768px) and (max-width:1079px){
+  .mh-bang{ --bang-co:11px; --bang-khe:8px; }
+  .mh-lenh{ --lenh-co:11.5px; }
+}
+
+/* --- MÀN HÌNH ĐỨNG rộng hơn điện thoại: chữ vừa phải, khe thoáng hơn --- */
+@media (min-width:768px) and (orientation:portrait){
+  .mh-bang{ --bang-co:12px; --bang-khe:10px; }
+}
+
+/* --- ĐIỆN THOẠI: xếp DỌC — lệnh, rồi cụm hiện vật, rồi bảng nội dung --- */
+@media (max-width:767px){
+  .mh-bang{ --bang-co:11px; --bang-cao:1.55; --bang-khe:9px; }
+  .mh-lenh{ --lenh-co:11px; line-height:1.55; }
+  .bnd-gt.phai{ padding-left:.6ch; }
+}
+
 /* Tôn trọng thiết lập giảm chuyển động của hệ điều hành */
 @media (prefers-reduced-motion:reduce){
   html{ scroll-behavior:auto; }
@@ -617,6 +629,13 @@ body.khoa .cs-logo{ animation:tho 2.1s ease-in-out infinite; }
      class "hien". Nội dung mới cứ đặt vào bên trong. -->
 <div class="man-hinh" id="manHinh" aria-hidden="true">
   <!-- 2/3 dưới: chữ ASCII in ra rồi hoá thành hiện vật -->
+  <!-- Khối dòng lệnh: góc trên bên trái -->
+  <div class="mh-lenh" id="mhLenh" aria-hidden="true"></div>
+
+  <!-- Cột bảng nội dung: một phần ba bên phải -->
+  <div class="mh-bang" id="mhBang"></div>
+
+  <!-- Cụm hiện vật: hai phần ba bên trái -->
   <div class="mh-duoi" id="mhDuoi">
     <canvas class="mh-ascii" id="mhAscii"></canvas>
     <canvas class="mh-nhieu" id="mhNhieu"></canvas>
@@ -670,21 +689,6 @@ const DATA = {
     /* Dòng sáng cuối cùng, có con trỏ nhấp nháy đứng sau */
     dongChinh: "Loading... Idea"
   },
-
-  /* ---------------------------------------------------------------------
-     3. NHẬT KÝ HAI CỘT — chạy ở một phần ba trên của Main Section
-     Dòng nào bắt đầu bằng $ sẽ được tô sáng. Thêm bớt thoải mái.
-     --------------------------------------------------------------------- */
-  /* ---------------------------------------------------------------------
-     NHẬT KÝ SÁU CỘT — chạy ở một phần ba trên của Main Section.
-     Mỗi dòng có thể là:
-       "chuỗi"                      → chỉ hiển thị
-       { chu:"...", vat:"a4" }      → bấm vào mở hiện vật đó
-       { chu:"...", url:"https:.." }→ bấm vào mở đường dẫn
-       "@khoa"                      → tự nở thành danh sách hiện vật đang khoá
-     Dòng bắt đầu bằng $ được tô sáng.
-     --------------------------------------------------------------------- */
-
 
   /* ---------------------------------------------------------------------
      3. BA CỤM CHỮ TRONG HERO (neo theo toạ độ lưới crosshair)
@@ -750,8 +754,9 @@ const CHUYEN = {
   phu_toi_da: 0.58    /* độ tối của lớp phủ đè lên video (0 → 1)              */
 };
 
+/* ---- VỆT CHUỘT Ở HERO: ô vuông mang chữ t · u · a · n ---- */
 const PIXEL = {
-  bat:        true,       /* true = bật vệt chuột, false = tắt hẳn            */
+  bat:        true,       /* true = bật vệt chuột ở Hero, false = tắt hẳn     */
   o:          18,         /* cạnh mỗi ô vuông (px)                            */
   chu:        "tuan",     /* các chữ lần lượt hiện trong ô, lặp vòng          */
   mau_o:      "#123039",  /* màu nền ô                                        */
@@ -759,6 +764,24 @@ const PIXEL = {
   mau_o_cuoi: "#DB1A1A",  /* màu ô của chữ CUỐI ("n") — mỗi lần viết trọn tên */
                           /* thì ô đó đỏ lên. Để giống mau_o nếu không muốn.  */
   toc_do_mo:  0.022       /* tốc độ phai (số càng lớn thì vệt càng ngắn)      */
+};
+
+/* ---- VỆT CHUỘT Ở MAIN SECTION: MA TRẬN ĐIỂM (dot matrix) ----
+   Màn hình được chia thành lưới điểm cố định như một bảng đèn LED. Con trỏ đi
+   tới đâu, các điểm quanh đó sáng lên tới đó rồi lụi dần theo kiểu lân quang.
+   Điểm sáng nhất nằm ngay dưới con trỏ; càng xa vệt càng mờ và nhỏ lại.     */
+const MATRAN = {
+  bat:        true,
+  o:          13,      /* khoảng cách giữa hai điểm liền nhau (px)            */
+  cham:       4.6,     /* đường kính điểm khi sáng nhất (px)                  */
+  ban_kinh:   2.3,     /* bút vẽ rộng bao nhiêu ô lưới                        */
+  nen:        7,       /* bán kính vùng thấy được lưới nền mờ (số ô)          */
+  nen_mo:     0.11,    /* độ sáng của lưới nền mờ (0 → 1)                     */
+  phai:       0.012,   /* mỗi khung điểm tối đi bao nhiêu (lớn = vệt ngắn)    */
+  mau:        "mint",  /* "mint" | "do" | "giay" — lấy thẳng từ bảng màu      */
+  mau_dau:    "do",    /* màu của điểm ngay dưới con trỏ                      */
+  chu:        true,    /* true = điểm sáng nhất đổi thành ký tự ASCII         */
+  thang:      "·:*+=#@" /* thang ký tự theo độ sáng: mờ → tỏ                  */
 };
 
 /* ############################################################################
@@ -910,25 +933,6 @@ const NGHIENGMAY = {
   muot:     0.14   /* độ mượt khi bám theo cảm biến (0 → 1)                */
 };
 
-/* ---- CHUỖI KHỞI TẠO MAIN SECTION ----
-   Khi cửa sổ phần mềm phóng kín màn hình, Main Section tự dựng lấy nó:
-     1. Giữa màn hiện một KHỐI KÝ TỰ ASCII vẽ từ ảnh, cùng vài dòng lệnh
-        đang chạy bên dưới.
-     2. Từ khối đó bắn ra các ĐƯỜNG TRÍCH XUẤT trỏ về bốn phía.
-     3. Cuối mỗi đường, một BẢNG DỮ LIỆU nở to ra rồi chữ nhảy số thành chữ.
-     4. Khối ASCII phân tán dần, đường trích xuất tắt.
-     5. Tới lượt năm hiện vật hoá hình.                                    */
-
-/* ---- BẢNG HUD CỦA MAIN SECTION ----
-   Cụm khung kính cắt góc trải ngang, bên dưới là thanh đọc số kẹp ngoặc và
-   danh sách trạng thái, hai bên rải vài chữ số và ký hiệu nhỏ.          */
-
-/* ---- KHUNG NGẮM khi xem chi tiết (theo mẫu HUD02) ---- */
-
-/* ---- Ô SÓNG ÂM THANH ----
-   Dạng sóng KHÔNG đọc từ mẫu âm thật (đọc mẫu bị chặn khi mở bằng file://)
-   mà được sinh từ chính đường dẫn tệp, nên nó cố định và luôn vẽ được.  */
-
 const MAHOA = {
   bat:        true,
   thoi_gian:  1000,   /* giải hết một cụm chữ mất bao lâu (ms)             */
@@ -936,25 +940,47 @@ const MAHOA = {
   kho:        "\u2593\u2592\u2591#@$%&*+=<>/|{}[]()01ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 };
 
+/* ---- MAIN SECTION ----
+   Bố cục chia làm ba vùng, tất cả đo theo % nên co giãn theo mọi màn hình:
+
+     ┌───────────────────────────────────────────────┐
+     │ > dòng lệnh (tối đa 3 dòng)                   │  ← khoi_lenh
+     │                                               │
+     │   ┌───────────────────┐   ┌────────────────┐  │
+     │   │  cụm hiện vật     │   │ bảng nội dung  │  │
+     │   │  (2/3 bên trái)   │   │ (1/3 bên phải) │  │
+     │   └───────────────────┘   └────────────────┘  │
+     └───────────────────────────────────────────────┘                     */
 const MAIN = {
   bat:          true,
-  phan_tren:    0,        /* KHÔNG còn vùng trên: hiện vật dùng trọn màn hình */
-  _phan_tren_cu: 0.38,     /* phần trên dành cho các bảng nhật ký (chữ to hơn */
-                          /* nên cần thêm chỗ; hạ xuống thì bảng bị nhoà sớm)*/
-  le_cum:       0.03,     /* cụm hiện vật chừa lề bao nhiêu trong vùng dưới  */
 
+  /* --- BỐ CỤC (đơn vị: % của bề ngang / chiều cao Main Section) --- */
+  le_trai:      3.2,      /* lề trái của cả Main Section                     */
+  le_phai:      3.2,      /* lề phải                                         */
+  le_tren:      3.0,      /* lề trên, tính từ dưới thanh tiêu đề xuống       */
+  le_duoi:      3.0,      /* lề dưới                                         */
+  cot_trai:     66,       /* cụm hiện vật chiếm bao nhiêu % bề ngang         */
+  khe_cot:      2.4,      /* khe hở giữa cột hiện vật và cột bảng            */
+  cao_lenh:     10,       /* khối dòng lệnh cao bao nhiêu % chiều cao        */
+  le_cum:       0.02,     /* cụm hiện vật chừa thêm lề trong ô của nó        */
+  cot_toi_da:   76,       /* cột bảng rộng tối đa bao nhiêu KÝ TỰ            */
+  moc_xep_doc:  1.12,     /* cao / rộng vượt mức này thì tự chuyển xếp dọc   */
 
-  /* Thao tác cảm ứng trên điện thoại */
-  cham_giu:     250,      /* giữ bao lâu (ms) thì mới vào chế độ KÉO        */
-  cham_di:      12,       /* ngón tay xê dịch quá bao nhiêu px thì huỷ chạm */
-  cham_toi_thieu: 44,     /* vùng chạm tối thiểu quanh mỗi hiện vật (px)    */
+  /* --- BỐ CỤC TRÊN ĐIỆN THOẠI (xếp dọc: lệnh → hiện vật → bảng) --- */
+  m_cao_lenh:   9,        /* khối dòng lệnh cao bao nhiêu % chiều cao        */
+  m_cao_cum:    44,       /* cụm hiện vật cao bao nhiêu % chiều cao          */
 
-  /* Nhịp (mili-giây) */
+  /* --- Thao tác cảm ứng trên điện thoại --- */
+  cham_giu:     250,      /* giữ bao lâu (ms) thì mới vào chế độ KÉO         */
+  cham_di:      12,       /* ngón tay xê dịch quá bao nhiêu px thì huỷ chạm  */
+  cham_toi_thieu: 44,     /* vùng chạm tối thiểu quanh mỗi hiện vật (px)     */
+
+  /* --- Nhịp khởi chạy (mili-giây) --- */
   in_ascii:     2600,     /* đường quét in hết chữ ASCII của cụm hiện vật    */
   giu:          260,      /* giữ nguyên hình chữ một nhịp                    */
   hoa_anh:      1100,     /* chữ lùi đi, ảnh thật lấp lên                    */
 
-  /* Dáng chữ ASCII */
+  /* --- Dáng chữ ASCII của cụm hiện vật --- */
   co_o:         7,        /* cạnh ô lưới ASCII (px) — desktop                */
   co_o_mobile:  5,        /* cạnh ô lưới ASCII — mobile                      */
   ti_le_o:      0.58,     /* bề ngang ô so với chiều cao ô                   */
@@ -966,176 +992,250 @@ const MAIN = {
   dai_nhieu:    0.05,     /* dải nhiễu dài bao nhiêu phần chiều cao cụm      */
   mem_quet:     4,        /* mép dải quét mềm bao nhiêu phần trăm            */
 
-  /* Nghiêng 3D theo con trỏ + kéo thả cho từng hiện vật */
+  /* --- Nghiêng 3D theo con trỏ + kéo thả cho từng hiện vật --- */
   nghieng:      true,
   goc_3d:       12,       /* góc nghiêng tối đa (độ)                         */
   chieu_sau:    1000,     /* độ mạnh phối cảnh, px. Nhỏ = méo mạnh           */
   phong:        0.05,     /* phóng thêm khi con trỏ đang ở trên              */
   muot:         0.18,     /* độ mượt khi nghiêng đuổi theo tay               */
   keo_tha:      true,
-  le_keo:       10,       /* chừa lại bao nhiêu px ở mép, kể cả thanh tiêu đề */
-  keo_lac:      12,       /* vật lắc bao nhiêu độ theo hướng bị kéo (mặt phẳng) */
-  keo_nghieng:  10,       /* và ngả thêm bao nhiêu độ theo trục 3D             */
+  le_keo:       10,       /* chừa lại bao nhiêu px ở mép khi kéo             */
+  keo_lac:      12,       /* vật lắc bao nhiêu độ theo hướng bị kéo          */
+  keo_nghieng:  10,       /* và ngả thêm bao nhiêu độ theo trục 3D           */
 
-  /* Bóng đổ chạy theo góc nghiêng + vệt sáng lướt trên mặt */
-  bong_lech:    22,       /* bóng dạt tối đa bao nhiêu px                     */
-  bong_cao:     16,       /* bóng nằm thấp hơn vật bao nhiêu px               */
-  bong_nhoe:    26,       /* độ nhoè của bóng                                 */
-  ma_duoi:      5         /* đuôi ký tự rác chạy trước con trỏ gõ chữ         */
-
-        /* các dòng lệch nhau bao nhiêu ms                  */
+  /* --- Bóng đổ chạy theo góc nghiêng --- */
+  bong_lech:    22,       /* bóng dạt tối đa bao nhiêu px                    */
+  bong_cao:     16,       /* bóng nằm thấp hơn vật bao nhiêu px              */
+  bong_nhoe:    26,       /* độ nhoè của bóng                                */
+  ma_duoi:      5         /* đuôi ký tự rác chạy trước con trỏ gõ chữ        */
 };
 
-/* Bố cục cụm hiện vật — trích thẳng từ ma trận trong portfolio-items.svg,
-   đã hiệu chỉnh theo vùng đục thật của từng ảnh.
-   x, y = tâm theo % khung cụm · cao = % chiều cao khung · goc = độ nghiêng */
-const CUMTILE = 1.2149;   /* rộng / cao của khung cụm */
+/* ############################################################################
+   #####     KHU VỰC 5 — SÁU HIỆN VẬT TRONG CỤM  (sửa tự do)             #####
+   ############################################################################
+   Toạ độ, kích thước và góc nghiêng được trích thẳng từ ma trận trong file
+   portfolio-items.svg, đã hiệu chỉnh theo vùng đục thật của từng ảnh.
+
+     x, y  = tâm hiện vật, tính theo % khung cụm (0 → 100)
+     cao   = chiều cao hiện vật, tính theo % chiều cao khung cụm
+     goc   = độ nghiêng cố định (độ, dương = nghiêng phải)
+     lop   = thứ tự trước–sau, số lớn nằm TRƯỚC
+     xem   = true thì chạm nhanh vào sẽ mở hồ sơ ở cột bảng bên phải
+     the   = nội dung hồ sơ hiện ở cột bên phải khi mở
+
+   THÊM MỘT HIỆN VẬT MỚI = chép nguyên một khối { ... } rồi sửa số liệu,
+   nhớ khai báo thêm đường dẫn ảnh tương ứng trong ANH ở bên dưới.        */
+const CUMTILE = 1.0629;   /* rộng / cao của khung cụm */
 
 const CUMVAT = [
-  { ma:"moBi", ma_ho_so:"EV-004", tep:"archival-open", ten:"Hồ sơ lưu trữ",
-    x:49.27, y:51.04, cao:80.63, goc:5.74,
-    lop:1,                    /* thứ tự trước–sau: số lớn nằm TRƯỚC        */
-    xem:false,                 /* true = bấm vào phóng to xem chi tiết       */
-    the: {
-      loai:  "HỒ SƠ GỐC",
-      truong: [
-        ["MÃ HỒ SƠ", "EV-004"],
-        ["LOẠI", "Bì lưu trữ"],
-        ["TÌNH TRẠNG", "Chưa giải mật"]
-      ],
-      khoi: [
-        { ten:"TRẠNG THÁI", dong:[
-          "Bì hồ sơ chứa toàn bộ tang vật của vụ 02-06-2006."
-        ] }
-      ]
-    } },
-  { ma:"a4", ma_ho_so:"EV-001", tep:"a4-portfolio", ten:"Portfolio A4",
-    x:67.14, y:39.93, cao:65.2, goc:14.18,
-    lop:2,                    /* thứ tự trước–sau: số lớn nằm TRƯỚC        */
-    xem:true ,                 /* true = bấm vào phóng to xem chi tiết       */
-    the: {
-      loai:  "TÀI LIỆU",
-      truong: [
-        ["MÃ HỒ SƠ", "EV-001"],
-        ["LOẠI", "Portfolio A4"],
-        ["ĐỐI TƯỢNG", "Trần Nhơn Tuân"],
-        ["TÌNH TRẠNG", "Đã giải mật"]
-      ],
-      khoi: [
+  /* ---------------------------------------------------------------- 1 --- */
+  { ma:"moBi", ma_ho_so:"EV-001", ten:"Bì hồ sơ lưu trữ",
+    x:50.15, y:56.91, cao:81.51, goc:5.74, lop:1, xem:false,
+    the:{ loai:"HỒ SƠ GỐC",
+      truong:[ ["MÃ HỒ SƠ","EV-001"], ["LOẠI","Bì lưu trữ"],
+               ["TÌNH TRẠNG","Đang mở"] ],
+      khoi:[ { ten:"TRẠNG THÁI", dong:[
+        "Bì hồ sơ chứa toàn bộ tang vật của vụ 02-06-2006." ] } ] } },
+
+  /* ---------------------------------------------------------------- 2 --- */
+  { ma:"dia", ma_ho_so:"EV-002", ten:"Đĩa mềm",
+    x:26.64, y:89.62, cao:13.20, goc:-9.94, lop:2, xem:true,
+    the:{ loai:"DỮ LIỆU",
+      truong:[ ["MÃ HỒ SƠ","EV-002"], ["LOẠI","Đĩa mềm 3.5\""],
+               ["DUNG LƯỢNG","1.44 MB"], ["TÌNH TRẠNG","Đọc được"] ],
+      khoi:[
+        /* ↓↓↓ NỘI DUNG TẠM — thay bằng chữ của cậu ↓↓↓ */
+        { ten:"NỘI DUNG ĐĨA", dong:[
+          "Bản lưu các dự án cũ: kịch bản, bảng phân cảnh và tệp dựng thô.",
+          "Nơi cất những thứ chưa đủ chín để đưa vào hồ sơ chính." ] },
+        { ten:"GHI CHÚ", dong:[
+          "Sửa nội dung khối này trong CUMVAT, mục ma:\"dia\"." ] }
+        /* ↑↑↑ NỘI DUNG TẠM ↑↑↑ */
+      ] } },
+
+  /* ---------------------------------------------------------------- 3 --- */
+  { ma:"a4", ma_ho_so:"EV-003", ten:"Portfolio A4",
+    x:70.60, y:45.86, cao:66.37, goc:15.00, lop:3, xem:true,
+    the:{ loai:"TÀI LIỆU",
+      truong:[ ["MÃ HỒ SƠ","EV-003"], ["LOẠI","Portfolio A4"],
+               ["ĐỐI TƯỢNG","Trần Nhơn Tuân"], ["TÌNH TRẠNG","Đã giải mật"] ],
+      khoi:[
         { ten:"SUBJECT PROFILE", dong:[
           "Họ và tên khai sinh: Trần Nhơn Tuân · biệt danh Tom.",
           "Nam · 20 tuổi · quốc tịch Việt Nam · sống tại Thành phố Huế.",
-          "Nghề nghiệp: Content Creator."
-        ] },
+          "Nghề nghiệp: Content Creator." ] },
         { ten:"PSYCHOLOGICAL ASSESSMENT", dong:[
           "Qua quá trình theo dõi, điều tra viên nhận định đối tượng là một cá nhân bị dẫn dắt bởi khao khát kể chuyện. Đối tượng liên tục thu nạp kiến thức từ mọi nguồn và có xu hướng tối ưu mọi công đoạn để chạm mục tiêu nhanh nhất.",
-          "Điểm nổi bật nhất là nhu cầu tạo dấu ấn: không chấp nhận cho ra đời những sản phẩm mờ nhạt, mà theo đuổi việc khắc hoạ những &#39;cái tôi&#39; trần trụi nhất qua từng thước phim, tấm hình.",
+          "Điểm nổi bật nhất là nhu cầu tạo dấu ấn: không chấp nhận cho ra đời những sản phẩm mờ nhạt, mà theo đuổi việc khắc hoạ những \u0026#39;cái tôi\u0026#39; trần trụi nhất qua từng thước phim, tấm hình.",
           "Các nguồn tin nội bộ xác nhận đối tượng khá lành: thân thiện, dễ hợp tác, sẵn sàng ngồi lại lắng nghe. Đáng tin cậy, còn nhiều tiềm năng chưa khai phá.",
-          "⚠ Cảnh báo: đối tượng rất hay rủ người đối diện đi cafe đánh cờ."
-        ] },
+          "⚠ Cảnh báo: đối tượng rất hay rủ người đối diện đi cafe đánh cờ." ] },
         { ten:"EDUCATION RECORD", dong:[
           "Sinh viên năm 3 · khoá 2024 - 2028.",
           "Chuyên ngành Truyền Thông Đa Phương Tiện.",
-          "Khoa Quốc Tế - Đại Học Huế."
-        ] },
+          "Khoa Quốc Tế - Đại Học Huế." ] },
         { ten:"OPERATIONAL HISTORY", dong:[
-          "2024 · Content Creator (tự do / YouTube) — nghiên cứu thị hiếu, viết kịch bản, quay và dựng. Toàn bộ quy trình sản xuất cho kênh &#39;Shaymin Ahh&#39;.",
+          "2024 · Content Creator (tự do / YouTube) — nghiên cứu thị hiếu, viết kịch bản, quay và dựng. Toàn bộ quy trình sản xuất cho kênh \u0026#39;Shaymin Ahh\u0026#39;.",
           "2025 · Photographer (Đặc Sản Kinh Đô) — chụp ảnh trải nghiệm cho khách trên tuyến tàu di sản Huế - Đà Nẵng.",
           "2025 · Quản lý (Town Gaming Huế) — vận hành quán, tư vấn khách, hướng dẫn nhân viên mới, xử lý sự cố kỹ thuật.",
-          "2026 · Videographer — ghi hình tiền kỳ tới hậu kỳ, hỗ trợ chiến lược cùng đội ngũ nội dung."
-        ] },
+          "2026 · Videographer — ghi hình tiền kỳ tới hậu kỳ, hỗ trợ chiến lược cùng đội ngũ nội dung." ] },
         { ten:"OBJECTIVE", dong:[
           "Học hỏi qua việc nhìn, nghe, chạm vào những câu chuyện của người đi trước.",
-          "Trên hành trình trở thành Creative Director, đối tượng đang truy tìm những &#39;đồng phạm&#39; đồng hành để cùng tiến bộ."
-        ] }
-      ]
-    } },
-  { ma:"bag", ma_ho_so:"EV-002", tep:"evidence-bag", ten:"Túi vật chứng",
-    x:22.5, y:35.15, cao:46.21, goc:-16.28,
-    lop:3,                    /* thứ tự trước–sau: số lớn nằm TRƯỚC        */
-    xem:true ,                 /* true = bấm vào phóng to xem chi tiết       */
-    the: {
-      loai:  "TANG VẬT",
-      truong: [
-        ["MÃ HỒ SƠ", "EV-002"],
-        ["LOẠI", "Túi tang vật"],
-        ["THU GIỮ BỞI", "Trần Nhơn Tuân"],
-        ["NGÀY", "2026-07-26"]
-      ],
-      khoi: [
+          "Trên hành trình trở thành Creative Strategist, đối tượng đang truy tìm những \u0026#39;đồng phạm\u0026#39; đồng hành để cùng tiến bộ." ] }
+      ] } },
+
+  /* ---------------------------------------------------------------- 4 --- */
+  { ma:"bag", ma_ho_so:"EV-004", ten:"Túi vật chứng",
+    x:19.51, y:48.05, cao:46.71, goc:-16.28, lop:4, xem:true,
+    the:{ loai:"TANG VẬT",
+      truong:[ ["MÃ HỒ SƠ","EV-004"], ["LOẠI","Túi tang vật"],
+               ["THU GIỮ BỞI","Trần Nhơn Tuân"], ["NGÀY","2026-07-26"] ],
+      khoi:[
         { ten:"SOFTWARE", dong:[
           "DaVinci Resolve · dựng phim và chỉnh màu.",
           "Affinity · thiết kế và xử lý ảnh.",
           "Canva · dàn trang nhanh, ấn phẩm mạng xã hội.",
-          "Claude · hỗ trợ viết, dựng web và xử lý dữ liệu."
-        ] },
+          "Claude · hỗ trợ viết, dựng web và xử lý dữ liệu." ] },
         { ten:"SPECIAL SKILLS", dong:[
           "✔ Tổ chức và quản lý thời gian",
           "✔ Giao tiếp và phối hợp nhóm",
           "✔ Thích nghi với tình huống đột xuất",
-          "✔ Tư duy phản biện và quản lý dự án"
-        ] },
+          "✔ Tư duy phản biện và quản lý dự án" ] },
         { ten:"GHI CHÚ", dong:[
-          "Bốn phần mềm được sử dụng thường xuyên nhất trong toàn bộ quá trình tác nghiệp của đối tượng."
-        ] }
-      ]
-    } },
-  { ma:"key", ma_ho_so:"EV-003", tep:"keychain", ten:"Móc khoá",
-    x:32.9, y:73.74, cao:27.36, goc:3.49,
-    lop:5,                    /* thứ tự trước–sau: số lớn nằm TRƯỚC        */
-    xem:true ,                 /* true = bấm vào phóng to xem chi tiết       */
-    the: {
-      loai:  "TANG VẬT",
-      truong: [
-        ["MÃ HỒ SƠ", "EV-003"],
-        ["LOẠI", "Móc khoá PVC"],
-        ["THU GIỮ BỞI", "Trần Nhơn Tuân"],
-        ["TÌNH TRẠNG", "Đã giải mật"]
-      ],
-      khoi: [
+          "Bốn phần mềm được sử dụng thường xuyên nhất trong toàn bộ quá trình tác nghiệp của đối tượng." ] }
+      ] } },
+
+  /* ---------------------------------------------------------------- 5 --- */
+  { ma:"key", ma_ho_so:"EV-005", ten:"Móc khoá",
+    x:39.96, y:13.83, cao:27.66, goc:0.00, lop:5, xem:true,
+    the:{ loai:"TANG VẬT",
+      truong:[ ["MÃ HỒ SƠ","EV-005"], ["LOẠI","Móc khoá PVC"],
+               ["THU GIỮ BỞI","Trần Nhơn Tuân"], ["TÌNH TRẠNG","Đã giải mật"] ],
+      khoi:[
         /* ↓↓↓ NỘI DUNG TẠM — thay bằng chữ của cậu ↓↓↓ */
         { ten:"MÔ TẢ", dong:[
           "Móc khoá PVC do đối tượng tự thiết kế, đặt sản xuất số lượng nhỏ.",
-          "Dùng làm dấu nhận diện cá nhân, đi kèm các sản phẩm nội dung."
-        ] },
+          "Dùng làm dấu nhận diện cá nhân, đi kèm các sản phẩm nội dung." ] },
         { ten:"GHI CHÚ", dong:[
-          "Sửa nội dung khối này trong CUMVAT, mục ma:\"key\"."
-        ] }
+          "Sửa nội dung khối này trong CUMVAT, mục ma:\"key\"." ] }
         /* ↑↑↑ NỘI DUNG TẠM ↑↑↑ */
-      ]
-    } },
-  { ma:"sound", ma_ho_so:"EV-005", tep:"sounds", ten:"Băng Cassette",
-    x:67.22, y:78.84, cao:21.94, goc:-8.33,
-    lop:4,                    /* thứ tự trước–sau: số lớn nằm TRƯỚC        */
-    xem:true ,                 /* true = bấm vào phóng to xem chi tiết       */
-    /* ĐƯỜNG DẪN ÂM THANH — hiện vật nào có dòng này thì thẻ chi tiết của nó
-       mọc thêm một ô sóng âm có nút phát, nút phát lại và thanh tua.
-       Đặt file vào thư mục 'am-thanh' cạnh file HTML. Chưa có file thì ô
-       vẫn hiện, sóng vẫn vẽ, chỉ báo là chưa tìm thấy tệp.              */
-    am_thanh:  "./am-thanh/bang-cassette.mp3",
-    am_nhan:   "BĂNG GHI ÂM",
-    the: {
-      loai:  "BĂNG GHI",
-      truong: [
-        ["MÃ HỒ SƠ", "EV-005"],
-        ["LOẠI", "Băng cassette"],
-        ["THU GIỮ BỞI", "Trần Nhơn Tuân"],
-        ["TÌNH TRẠNG", "Đã giải mật"]
-      ],
-      khoi: [
+      ] } },
+
+  /* ---------------------------------------------------------------- 6 --- */
+  { ma:"sound", ma_ho_so:"EV-006", ten:"Băng cassette",
+    x:70.89, y:85.00, cao:22.18, goc:-8.33, lop:6, xem:true,
+    the:{ loai:"BĂNG GHI",
+      truong:[ ["MÃ HỒ SƠ","EV-006"], ["LOẠI","Băng cassette"],
+               ["THU GIỮ BỞI","Trần Nhơn Tuân"], ["TÌNH TRẠNG","Đã giải mật"] ],
+      khoi:[
         /* ↓↓↓ NỘI DUNG TẠM — thay bằng chữ của cậu ↓↓↓ */
         { ten:"NỘI DUNG BĂNG", dong:[
-          "Phần âm thanh do đối tượng dựng: nhạc nền, tiếng động hiện trường,",
-          "lời thoại và phần thu ngoài trời cho các sản phẩm video."
-        ] },
+          "Phần âm thanh do đối tượng dựng: nhạc nền, tiếng động hiện trường, lời thoại và phần thu ngoài trời cho các sản phẩm video." ] },
         { ten:"GHI CHÚ", dong:[
-          "Sửa nội dung khối này trong CUMVAT, mục ma:\"sound\"."
-        ] }
+          "Sửa nội dung khối này trong CUMVAT, mục ma:\"sound\"." ] }
         /* ↑↑↑ NỘI DUNG TẠM ↑↑↑ */
-      ]
-    } }
+      ] } }
 ];
 
+/* ############################################################################
+   #####   KHU VỰC 6 — DÒNG LỆNH & BẢNG NỘI DUNG  (sửa tự do)            #####
+   ############################################################################ */
+
+/* ---- KHỐI DÒNG LỆNH góc trên bên trái ----
+   GIAI ĐOẠN A: gõ ra các lệnh "dung" — chạy song song với lúc cụm hiện vật
+                đang hoá hình bằng ASCII và các bảng bên phải đang dựng.
+   GIAI ĐOẠN B: dựng xong thì xoá sạch lệnh, thay bằng các câu trong "chao",
+                mỗi câu đứng một lát rồi tự đổi sang câu kế tiếp.          */
+const LENH = {
+  bat:        true,
+  so_dong:    3,      /* tối đa bao nhiêu dòng hiện cùng lúc (đề bài: 3)    */
+  nhac:       ">",    /* dấu nhắc đứng đầu mỗi dòng                        */
+  toc_do:     20,     /* gõ mỗi ký tự mất bao nhiêu ms                     */
+  nghi:       230,    /* nghỉ giữa hai dòng lệnh (ms)                      */
+
+  /* GIAI ĐOẠN A — các lệnh dựng trang. Thêm bớt thoải mái; nhiều hơn 3 dòng
+     thì dòng cũ tự cuộn lên và biến mất, đúng kiểu cửa sổ dòng lệnh thật. */
+  dung: [
+    "init finding-tuan.sys --case=02-06-2006",
+    "render portfolio-items[6] :: ascii → raster",
+    "mount panels /right --border=box-drawing",
+    "[ OK ] hồ sơ đã sẵn sàng"
+  ],
+
+  /* GIAI ĐOẠN B — các câu chào, hiện lần lượt rồi lặp lại từ đầu */
+  cho_chao:   700,    /* dựng xong bao lâu thì bắt đầu chào (ms)           */
+  giu_chao:   4200,   /* mỗi câu đứng bao lâu rồi đổi (ms)                 */
+  chao: [
+    "Xin chào. Tôi là Tuân — người kể chuyện bằng hình ảnh.",
+    "Rê con trỏ vào một tang vật để soi đèn lên nó.",
+    "Giữ 250ms rồi kéo — tang vật đi được khắp bàn.",
+    "Chạm nhanh vào tang vật để mở hồ sơ ở cột bên phải.",
+    "Cảm ơn cậu đã ghé qua hiện trường."
+  ]
+};
+
+/* ---- BẢNG NỘI DUNG ở cột một phần ba bên phải ----
+   Mỗi bảng là một khối viền ASCII, tên bảng lồng ngay trên nét viền trên.
+   THÊM MỘT BẢNG = chép nguyên một khối { ... } rồi sửa nội dung.
+
+   Các kiểu bảng dùng được:
+     kieu:"dong"   — mỗi dòng gồm nhãn bên trái, giá trị bên phải
+                     { nhan:"...", gt:"...", phai:"..." }  (phai = chữ dồn sát mép)
+     kieu:"thanh"  — nhãn kèm thanh mức [███····] và số phần trăm
+                     { nhan:"...", muc: 0→100 }
+     kieu:"bando"  — hình vẽ ASCII. Trong hình: {..} tô đỏ, [..] tô trắng đậm
+     kieu:"chu"    — đoạn chữ tự do, tự xuống dòng
+     kieu:"vat"    — TỰ SINH danh sách sáu hiện vật, bấm vào mở hồ sơ
+     kieu:"gio"    — số liệu chạy theo thời gian thật; đặt ma: "phien" |
+                     "uptime" | "ngay" | "man_hinh"                        */
+const BANGND = [
+
+  { ten:"SUBJECT", kieu:"dong", dong:[
+      { nhan:"NAME",   gt:"Trần Nhơn Tuân // Tom" },
+      { nhan:"ROLE",   gt:"Content Creator" },
+      { nhan:"TARGET", gt:"Creative Strategist" },
+      { nhan:"BASE",   gt:"Thành phố Huế, Việt Nam" },
+      { nhan:"SCHOOL", gt:"Truyền thông Đa phương tiện" },
+      { nhan:"CLASS",  gt:"Năm 3 · 2024 – 2028" }
+  ]},
+
+  { ten:"VIETNAM MAP", kieu:"bando",
+    ve:[
+      "      ▄▄▄▄▄▄        ",
+      "   ▄▓▓▓▓▓▓▓▓▓▄      ",
+      "  ▓▓▓▓▓▓▓▓▓▓▓▓▀     ",
+      "   ▀▓▓▓▓▓▓▓▓▀       ",
+      "     ▓▓▓▓▓▓         ",
+      "      ▓▓▓▓ {◉}[HUẾ]     ",
+      "      ▓▓▓           ",
+      "       ▓▓           ",
+      "       ▓▓▓          ",
+      "      ▓▓▓▓          ",
+      "     ▓▓▓▓▓          ",
+      "    ▓▓▓▓▓▓          ",
+      "   ▓▓▓▓▓▓           ",
+      "    ▓▓▀             "
+    ],
+    duoi:"16.4637° N · 107.5909° E" },
+
+  { ten:"TOOLKIT", kieu:"thanh", dong:[
+      { nhan:"RESOLVE ", muc:88 },
+      { nhan:"AFFINITY", muc:80 },
+      { nhan:"CANVA   ", muc:74 },
+      { nhan:"CAMERA  ", muc:85 }
+  ]},
+
+  { ten:"EVIDENCE", kieu:"vat", ghi:"chạm vào tang vật để mở hồ sơ" },
+
+  { ten:"SESSION", kieu:"gio", dong:[
+      { nhan:"LOGIN", ma:"phien" }
+  ]},
+
+  { ten:"UPTIME / DATE", kieu:"gio", dong:[
+      { nhan:"UPTIME", ma:"uptime" },
+      { nhan:"DATE  ", ma:"ngay" }
+  ]}
+
+];
 
 /* Tấm bì hồ sơ ở Hero — nằm giữa khung, dưới cửa sổ phần mềm */
 const HEROBI = {
@@ -1165,22 +1265,23 @@ const HEROBI = {
   keo_nghieng: 9    /* và ngả thêm bao nhiêu độ theo trục 3D            */
 };
 
-/* Kho ảnh — ĐỂ NGOÀI dưới dạng file rời, không nhúng base64 nữa.
-   Đặt thư mục 'anh' cạnh file HTML này. Nhờ vậy file HTML chỉ còn ~130 KB,
-   ảnh tải song song ở nền và trình duyệt cache lại giữa các lần vào.
+/* Kho ảnh — ĐỂ NGOÀI dưới dạng file rời, không nhúng base64.
+   Giải nén thư mục 'anh' rồi đặt cạnh file HTML này.
 
-   LƯU Ý QUAN TRỌNG: hiệu ứng ASCII phải ĐỌC ĐIỂM ẢNH của từng tấm, mà
-   trình duyệt cấm đọc điểm ảnh của file mở trực tiếp bằng file://.
-   → Chạy bằng một máy chủ (GitHub Pages, hoặc `python3 -m http.server`).
+   LƯU Ý QUAN TRỌNG: hiệu ứng ASCII phải ĐỌC ĐIỂM ẢNH của từng tấm, mà trình
+   duyệt cấm đọc điểm ảnh của file mở trực tiếp bằng file://.
+   → Chạy trang qua một máy chủ (GitHub Pages, hoặc `python3 -m http.server`).
    Nếu mở trực tiếp thì trang vẫn chạy, chỉ bỏ qua bước chữ ASCII.        */
 const ANH = {
-  heroBi: "./anh/archival.webp",
-  moBi:   "./anh/archival-open.webp",
-  a4:     "./anh/a4-portfolio.webp",
-  bag:    "./anh/evidence-bag.webp",
-  key:    "./anh/keychain.webp",
-  sound:  "./anh/sounds.webp"
+  heroBi: "./anh/archival.webp",          /* tấm bì ĐÓNG ở Hero            */
+  moBi:   "./anh/archival-open.webp",     /* bì hồ sơ đã mở  · EV-001      */
+  dia:    "./anh/floppy-disk.webp",       /* đĩa mềm         · EV-002      */
+  a4:     "./anh/a4-portfolio.webp",      /* portfolio A4    · EV-003      */
+  bag:    "./anh/evidence-bag.webp",      /* túi vật chứng   · EV-004      */
+  key:    "./anh/keychain.webp",          /* móc khoá        · EV-005      */
+  sound:  "./anh/cassette.webp"           /* băng cassette   · EV-006      */
 };
+
 
 
 /* ############################################################################
@@ -2145,8 +2246,7 @@ function batChuyenCanh(){
   addEventListener('touchmove', function(e){
     if(khoaVuot()) return;      /* đang kéo, hoặc đang xem chi tiết → bỏ qua */
     if(trangThai !== 'hero') return;
-    if(e.target && e.target.closest &&
-       (e.target.closest('.hud') || e.target.closest('.mh-tren'))) return;
+    if(e.target && e.target.closest && e.target.closest('.mh-bang')) return;
     var dy = chamY - e.touches[0].clientY;          /* dương = vuốt lên = cuộn xuống */
     if(dy > 10) noRa();
   }, { passive:true });
@@ -2181,15 +2281,11 @@ function batTuongTac(){
 }
 
 /* =========================================================================
-   MÀN HÌNH MAIN
-   Các dòng chữ kiểu terminal chạy dần ra, bị cắt theo đúng bóng của tấm bì
-   hồ sơ nên hình từ từ hiện lên. Chạy xong thì đổi sang ẢNH THẬT, giữ 2 giây,
-   rồi ảnh thu nhỏ dạt sang trái và chữ gõ ra bên phải.
-   ========================================================================= */
-/* =========================================================================
    MAIN SECTION
-   Một phần ba trên: hai cột nhật ký chạy chữ.
-   Hai phần ba dưới: cụm vật phẩm được in ra bằng ASCII rồi hoá thành ảnh.
+   Bố cục ba vùng:
+     · góc trên bên trái     — khối dòng lệnh (tối đa 3 dòng)
+     · hai phần ba bên trái  — cụm sáu hiện vật, in bằng ASCII rồi hoá ảnh
+     · một phần ba bên phải  — các bảng nội dung viền ASCII
    Không dùng WebGL — toàn bộ chữ ASCII vẽ bằng canvas 2D, và vì hình đứng
    yên nên chỉ cần vẽ THÊM phần mới mỗi khung, rất nhẹ.
    ========================================================================= */
@@ -2207,6 +2303,13 @@ function batManHinh(){
   var pha = 'nghi';          /* nghi | in | hoa | xong */
   var batDau = 0, hen = [];
 
+  /* Ba vùng của Main Section, toạ độ tính từ góc trên bên trái của #manHinh */
+  var vungLenh = { x:0, y:0, w:0, h:0 };   /* khối dòng lệnh   — trên, trái  */
+  var vungCum  = { x:0, y:0, w:0, h:0 };   /* cụm hiện vật     — 2/3 bên trái*/
+  var vungBang = { x:0, y:0, w:0, h:0 };   /* bảng nội dung    — 1/3 bên phải*/
+  var oLenh = el('mhLenh'), oBang = el('mhBang');
+  var hoSoDang = -1;         /* hiện vật đang mở hồ sơ ở cột phải, -1 = không */
+
   /* ---------------------------------------------------------------------
      Tải ảnh
      --------------------------------------------------------------------- */
@@ -2219,31 +2322,76 @@ function batManHinh(){
   }
   for(var _k = 0; _k < CUMVAT.length; _k++) tai(CUMVAT[_k].ma, ANH[CUMVAT[_k].ma]);
 
+  function nhoMH(){ return W < 768; }
+  /* Máy tính bảng: vẫn bố cục ngang nhưng chật hơn máy tính để bàn */
+  function vuaMH(){ return W >= 768 && W < 1080; }
+  /* XẾP DỌC khi màn hình hẹp, HOẶC khi màn hình đứng (cao hơn rộng nhiều).
+     Màn hình đứng mà vẫn chia hai cột thì cụm hiện vật bị bó theo bề ngang,
+     để thừa một mảng trống rất lớn ở trên và dưới.                        */
+  function xepDoc(){
+    return W < 768 || (CH / Math.max(1, W)) > (MAIN.moc_xep_doc || 1.12);
+  }
+
   /* ---------------------------------------------------------------------
-     Bố cục: cụm vật phẩm nằm gọn trong hai phần ba dưới
+     BỐ CỤC BA VÙNG
+       Máy tính / máy tính bảng — nằm ngang:
+         khối lệnh vắt ngang phía trên, bên dưới là cụm hiện vật (2/3 trái)
+         và cột bảng nội dung (1/3 phải).
+       Điện thoại — xếp dọc:
+         khối lệnh · cụm hiện vật · cột bảng nội dung.
      --------------------------------------------------------------------- */
   function tinhBoCuc(){
     W = window.innerWidth;
     caoThanh = Math.round(el('csThanh').getBoundingClientRect().height) || 0;
     CH = Math.max(1, window.innerHeight - caoThanh);
+    boc.style.top = caoThanh + 'px';        /* chừa trọn thanh tiêu đề */
 
-    /* Không còn vùng trên: cụm hiện vật dùng trọn chiều cao màn hình */
-    var caoTren = CH * (MAIN.phan_tren || 0);
-    boc.style.top      = caoThanh + 'px';   /* chừa trọn thanh tiêu đề */
-    oDuoi.style.top    = caoTren + 'px';
-    oDuoi.style.height = (CH - caoTren) + 'px';
+    var lT = W * MAIN.le_trai  / 100, lP = W * MAIN.le_phai / 100;
+    var lU = CH * MAIN.le_tren / 100, lD = CH * MAIN.le_duoi / 100;
+    var oW = Math.max(1, W - lT - lP);      /* bề ngang dùng được */
+    var oH = Math.max(1, CH - lU - lD);     /* chiều cao dùng được */
 
-    /* Khung của cụm: co vừa vặn trong vùng dưới, giữ đúng tỉ lệ của bản vẽ */
-    var vW = W, vH = CH - caoTren;
+    if(xepDoc()){
+      /* --- MÀN HÌNH HẸP HOẶC ĐỨNG: ba tầng xếp dọc --- */
+      var hL = CH * MAIN.m_cao_lenh / 100;
+      var hC = CH * MAIN.m_cao_cum  / 100;
+      vungLenh = { x:lT, y:lU,           w:oW, h:hL };
+      vungCum  = { x:lT, y:lU + hL,      w:oW, h:hC };
+      vungBang = { x:lT, y:lU + hL + hC, w:oW, h:Math.max(60, oH - hL - hC) };
+    } else {
+      /* --- MÁY TÍNH / MÁY TÍNH BẢNG: lệnh trên, hai cột dưới --- */
+      var hLenh = CH * MAIN.cao_lenh / 100;
+      var khe   = oW * MAIN.khe_cot / 100;
+      var wTrai = (oW - khe) * MAIN.cot_trai / 100;
+      var wPhai = Math.max(120, oW - khe - wTrai);
+      var yDuoi = lU + hLenh, hDuoi = Math.max(1, oH - hLenh);
+      vungLenh = { x:lT, y:lU,    w:oW,    h:hLenh };
+      vungCum  = { x:lT, y:yDuoi, w:wTrai, h:hDuoi };
+      vungBang = { x:lT + wTrai + khe, y:yDuoi, w:wPhai, h:hDuoi };
+    }
+
+    /* Đặt khối lệnh */
+    oLenh.style.left = vungLenh.x + 'px'; oLenh.style.top    = vungLenh.y + 'px';
+    oLenh.style.width= vungLenh.w + 'px'; oLenh.style.height = vungLenh.h + 'px';
+
+    /* Đặt cột bảng — bề ngang sẽ được doCotBang() nắn cho khít số cột ký tự */
+    oBang.style.left = vungBang.x + 'px'; oBang.style.top    = vungBang.y + 'px';
+    oBang.style.width= vungBang.w + 'px'; oBang.style.height = vungBang.h + 'px';
+
+    /* Đặt vùng cụm hiện vật */
+    oDuoi.style.left = vungCum.x + 'px';  oDuoi.style.top    = vungCum.y + 'px';
+    oDuoi.style.width= vungCum.w + 'px';  oDuoi.style.height = vungCum.h + 'px';
+
+    /* Khung của cụm: co vừa vặn trong vùng của nó, giữ đúng tỉ lệ bản vẽ */
     var le = MAIN.le_cum;
-    var k = Math.min((vW * (1 - le * 2)) / CUMTILE, (vH * (1 - le * 2)));
+    var k = Math.min((vungCum.w * (1 - le * 2)) / CUMTILE, (vungCum.h * (1 - le * 2)));
     var cw = k * CUMTILE, chh = k;
-    hopCum = { x:(vW - cw) / 2, y:(vH - chh) / 2, w:cw, h:chh };
+    hopCum = { x:(vungCum.w - cw) / 2, y:(vungCum.h - chh) / 2, w:cw, h:chh };
 
     [cv, cvN].forEach(function(c){
-      c.width  = Math.round(vW * dpr);
-      c.height = Math.round(vH * dpr);
-      c.style.width = vW + 'px'; c.style.height = vH + 'px';
+      c.width  = Math.round(vungCum.w * dpr);
+      c.height = Math.round(vungCum.h * dpr);
+      c.style.width = vungCum.w + 'px'; c.style.height = vungCum.h + 'px';
     });
 
     vat = [];
@@ -2270,8 +2418,7 @@ function batManHinh(){
       n.setAttribute('data-i', i);
       if(v.def.xem !== false) n.className += ' xem-duoc';
       n.innerHTML = '<img draggable="false" alt="' + thoat(v.def.ten) + '" src="' + v.im.src + '">' +
-        (LOE.bat ? '<i class="vat-loe"></i>' + (LOE.quet ? '<i class="vat-quet"></i>' : '') : '') +
-        '<i class="vat-scan"></i>';
+        (LOE.bat ? '<i class="vat-loe"></i>' + (LOE.quet ? '<i class="vat-quet"></i>' : '') : '');
       n.style.left   = (v.cx - v.w / 2) + 'px';
       n.style.top    = (v.cy - v.h / 2) + 'px';
       n.style.width  = v.w + 'px';
@@ -2294,8 +2441,6 @@ function batManHinh(){
         v.quet.style.webkitMaskImage = v.quet.style.maskImage = naAnh;
         v.quet.style.setProperty('--quet-ms', (LOE.quet_ms || 560) + 'ms');
       }
-      v.scan = n.querySelector('.vat-scan');
-      if(v.scan) v.scan.style.webkitMaskImage = v.scan.style.maskImage = naAnh;
 
       /* VÙNG CHẠM: hiện vật nhỏ hơn 44px thì nới thêm một viền vô hình quanh
          nó cho vừa đầu ngón tay. Chỉ làm trên thiết bị cảm ứng.           */
@@ -2306,7 +2451,7 @@ function batManHinh(){
       }
       v.dx = 0; v.dy = 0; v.ox = 0; v.oy = 0; v.mx = 0; v.my = 0;
       v.vx = 0; v.vy = 0; v._px = null; v._py = null;
-      v.manh = 0; v.zoom = 0; v.dichZoom = 0;
+      v.manh = 0;
       datVatTF(v);
     }
   }
@@ -2472,37 +2617,14 @@ function batManHinh(){
      TƯƠNG TÁC VỚI TỪNG HIỆN VẬT
      Nghiêng 3D theo toạ độ con trỏ · kéo thả · bấm để phóng to xem chi tiết
      ===================================================================== */
-  var reVat = -1, keoVat = -1, phongVat = -1, quay = null;
-
-  function nhoMH(){ return W < 768; }
-  /* Máy tính bảng: vẫn bố cục ngang nhưng chật hơn máy tính để bàn */
-  function vuaMH(){ return W >= 768 && W < 1080; }
-
-  /* Đích khi phóng to — tính trong hệ toạ độ của vùng dưới */
-  function hopXem(v){
-    var caoTren = CH * MAIN.phan_tren;
-    var n = nhoMH();
-    var h = CH * (n ? MAIN.xem_cao_m : MAIN.xem_cao) / 100;
-    var r = W  * (n ? MAIN.xem_rong_m
-                    : (vuaMH() ? (MAIN.xem_rong_tab == null ? 22 : MAIN.xem_rong_tab)
-                               : MAIN.xem_rong)) / 100;
-    /* Vừa khít theo CẢ chiều cao lẫn chiều rộng — nếu không thì hiện vật
-       nằm ngang như cuộn băng sẽ phóng ra quá khổ.                        */
-    var ti = Math.min(h / Math.max(1, v.h), r / Math.max(1, v.w));
-    return { x: W * (n ? MAIN.xem_x_m : MAIN.xem_x) / 100,
-             y: (n ? CH * MAIN.xem_y_m / 100 : CH / 2) - caoTren,
-             ti: ti, w: v.w * ti, h: v.h * ti };
-  }
+  var reVat = -1, keoVat = -1, quay = null;
 
   /* Ghép chuỗi transform cho một hiện vật.
-     Thứ tự: dịch (kéo + phóng) → phối cảnh → nghiêng 3D → nghiêng cố định
-     → tỉ lệ. Khi đang phóng to thì độ nghiêng cố định và nghiêng 3D tan dần. */
+     Thứ tự: dịch (kéo) → phối cảnh → nghiêng 3D → nghiêng cố định → tỉ lệ. */
   function datVatTF(v){
     var n = v.nut; if(!n) return;
-    var z = v.zoom || 0, X = hopXem(v);
-    var cx = v.cx + (v.dx || 0) * (1 - z) + (X.x - v.cx) * z;
-    var cy = v.cy + (v.dy || 0) * (1 - z) + (X.y - v.cy) * z;
-    var ti = (1 + (MAIN.phong || 0) * (v.manh || 0) * (1 - z)) * (1 + (X.ti - 1) * z);
+    var cx = v.cx + (v.dx || 0), cy = v.cy + (v.dy || 0);
+    var ti = 1 + (MAIN.phong || 0) * (v.manh || 0);
     /* Nghiêng theo con trỏ (máy tính) CỘNG nghiêng theo cảm biến (điện thoại) */
     var gB =  ((v.mx || 0) * (v.manh || 0) + MAY.x) * (MAIN.goc_3d || 0);
     var gA = -((v.my || 0) * (v.manh || 0) + MAY.y) * (MAIN.goc_3d || 0);
@@ -2510,35 +2632,19 @@ function batManHinh(){
        đồng thời ngả thêm theo trục 3D cùng chiều với tay.                 */
     var gh = Math.max(-1, Math.min(1, (v.vx || 0) / 26));
     var gv = Math.max(-1, Math.min(1, (v.vy || 0) / 26));
-    var lac = -gh * (MAIN.keo_lac || 12) * (1 - z);
-    gB +=  gh * (MAIN.keo_nghieng || 10) * (1 - z);
-    gA += -gv * (MAIN.keo_nghieng || 10) * (1 - z);
-    var gc = v.def.goc * (1 - z) + lac;
+    var lac = -gh * (MAIN.keo_lac || 12);
+    gB +=  gh * (MAIN.keo_nghieng || 10);
+    gA += -gv * (MAIN.keo_nghieng || 10);
+    var gc = v.def.goc + lac;
 
-    /* CHỐNG VỠ ẢNH: khi đang đứng yên ở mức phóng to, đặt kích thước THẬT cho
-       thẻ và bỏ scale đi, để trình duyệt vẽ lại tấm ảnh ở đúng cỡ đó. Nếu cứ
-       để transform:scale thì lớp đã được vẽ sẵn ở cỡ nhỏ rồi kéo giãn ra —
-       chính là chỗ ảnh bị vỡ.                                              */
-    var net = z > 0.995;
-    var wq = net ? v.w * ti : v.w, hq = net ? v.h * ti : v.h;
-    var sc = net ? 1 : ti;
-    if(v._net !== net || net){
-      n.style.width  = wq + 'px';  n.style.height = hq + 'px';
-      n.style.left   = (cx - wq / 2) + 'px';
-      n.style.top    = (cy - hq / 2) + 'px';
-      v._net = net;
-    }
-    var tx = net ? 0 : cx - v.cx, ty = net ? 0 : cy - v.cy;
-    if(!net){
-      n.style.left = (v.cx - v.w / 2) + 'px';
-      n.style.top  = (v.cy - v.h / 2) + 'px';
-    }
+    n.style.left = (v.cx - v.w / 2) + 'px';
+    n.style.top  = (v.cy - v.h / 2) + 'px';
     n.style.transform =
-      'translate(' + tx.toFixed(1) + 'px,' + ty.toFixed(1) + 'px) ' +
+      'translate(' + (v.dx || 0).toFixed(1) + 'px,' + (v.dy || 0).toFixed(1) + 'px) ' +
       'perspective(' + (MAIN.chieu_sau || 1000) + 'px) ' +
       'rotateX(' + gA.toFixed(2) + 'deg) rotateY(' + gB.toFixed(2) + 'deg) ' +
-      'rotate(' + gc.toFixed(2) + 'deg) scale(' + sc.toFixed(4) + ')';
-    n.style.zIndex = z > 0.01 ? '60' : (keoVat === v.i ? '50' : String(v.def.lop || 1));
+      'rotate(' + gc.toFixed(2) + 'deg) scale(' + ti.toFixed(4) + ')';
+    n.style.zIndex = (keoVat === v.i ? '50' : String(v.def.lop || 1));
 
     /* BÓNG ĐỔ chạy ngược chiều nghiêng */
     var nhac = (keoVat === v.i) ? 1 : (v.manh || 0);
@@ -2565,34 +2671,30 @@ function batManHinh(){
       v.loe.style.setProperty('--sy', (50 + (v.my || 0) * 45).toFixed(1) + '%');
     }
 
-    /* Ghi lại trạng thái khung này để hàm vẽ dòng code quét dùng lại */
-    v._cx = cx; v._cy = cy; v._ti = ti; v._gc = gc;
-
-    var khac = phongVat >= 0 && phongVat !== v.i;
-    n.style.opacity = khac ? '0.10' : '1';
-    n.style.pointerEvents = khac ? 'none' : 'auto';
+    /* Hiện vật đang mở hồ sơ thì sáng hẳn lên, các vật khác mờ bớt */
+    var khac = hoSoDang >= 0 && hoSoDang !== v.i;
+    n.style.opacity = khac ? '0.42' : '1';
   }
 
+  /* Hiện vật chỉ đi lại trong đúng ô của nó, không lấn sang cột bảng */
   function chanTrongVung(v){
-    /* Hiện vật đi được khắp Main Section. Mốc y = 0 của vùng dưới nằm ở
-       'caoTren', nên y = -caoTren chính là mép dưới thanh tiêu đề IDEA.EXE.
-       Chừa thêm le px nữa để không bao giờ chạm vào thanh đó.             */
-    var caoTren = CH * MAIN.phan_tren;
-    var caoDuoi = CH - caoTren, le = MAIN.le_keo == null ? 10 : MAIN.le_keo;
+    var le = MAIN.le_keo == null ? 10 : MAIN.le_keo;
     var nuaW = v.w / 2, nuaH = v.h / 2;
-    var xMin = le + nuaW - v.cx,  xMax = W - le - nuaW - v.cx;
-    var yMin = (-caoTren + le) + nuaH - v.cy;
-    var yMax = (caoDuoi - le) - nuaH - v.cy;
+    var xMin = le + nuaW - v.cx, xMax = vungCum.w - le - nuaW - v.cx;
+    var yMin = le + nuaH - v.cy, yMax = vungCum.h - le - nuaH - v.cy;
     v.dx = xMax >= xMin ? Math.max(xMin, Math.min(xMax, v.dx)) : 0;
     v.dy = yMax >= yMin ? Math.max(yMin, Math.min(yMax, v.dy)) : 0;
   }
 
+  /* Đổi toạ độ con trỏ trên màn hình sang toạ độ trong vùng cụm hiện vật */
+  function cucBoX(px){ return px - vungCum.x; }
+  function cucBoY(py){ return py - caoThanh - vungCum.y; }
+
   /* Chạm: đặt luôn toạ độ nghiêng theo điểm chạm, khỏi chờ rê chuột */
   function vaoVatCham(i, px, py){
     var v = vat[i];
-    var my = py - caoThanh - CH * MAIN.phan_tren;
-    v.ox = Math.max(-1, Math.min(1, (px - v.cx - (v.dx || 0)) / (v.w / 2)));
-    v.oy = Math.max(-1, Math.min(1, (my - v.cy - (v.dy || 0)) / (v.h / 2)));
+    v.ox = Math.max(-1, Math.min(1, (cucBoX(px) - v.cx - (v.dx || 0)) / (v.w / 2)));
+    v.oy = Math.max(-1, Math.min(1, (cucBoY(py) - v.cy - (v.dy || 0)) / (v.h / 2)));
   }
 
   var mayCu = { x:0, y:0 };
@@ -2603,11 +2705,9 @@ function batManHinh(){
     mayCu.x = MAY.x; mayCu.y = MAY.y;
     for(i = 0; i < vat.length; i++){
       var v = vat[i];
-      var dRe = (reVat === i) ? 1 : 0;   /* rê được cả khi đang phóng to */
-      var dZ  = (phongVat === i) ? 1 : 0;
-      var kz  = 1 - Math.pow(0.001, 16 / Math.max(60, MAIN.xem_nhip));
+      var dRe = (reVat === i) ? 1 : 0;
       if(Math.abs(v.mx - v.ox) > 0.002 || Math.abs(v.my - v.oy) > 0.002 ||
-         Math.abs(v.manh - dRe) > 0.002 || Math.abs(v.zoom - dZ) > 0.002) yen = false;
+         Math.abs(v.manh - dRe) > 0.002) yen = false;
       v.mx += (v.ox - v.mx) * k;
       v.my += (v.oy - v.my) * k;
       v.manh += (dRe - v.manh) * k;
@@ -2615,7 +2715,6 @@ function batManHinh(){
         if(Math.abs(v.vx) < 0.02) v.vx = 0;
         if(Math.abs(v.vy) < 0.02) v.vy = 0; }
       if(Math.abs(v.vx) > 0.02 || Math.abs(v.vy) > 0.02) yen = false;
-      v.zoom += (dZ - v.zoom) * kz;
       datVatTF(v);
     }
     if(yen){ quay = null; return; }
@@ -2623,51 +2722,6 @@ function batManHinh(){
   }
   function day(){ if(!quay) quay = requestAnimationFrame(chay); }
 
-
-  /* Tâm hiện vật khi đang phóng, tính theo hệ toạ độ của .man-hinh */
-
-  /* =====================================================================
-     SÓNG MÃ LAN RA
-     Một vòng ký tự nở ra từ tâm hiện vật. Chạm tới đâu, khối dữ liệu ở đó
-     hoá hình tới đó — nên chữ trông như được chính hiện vật đẩy ra.
-     ===================================================================== */
-
-  /* =====================================================================
-     KHUNG NGẮM bốn góc + nhãn, ôm quanh hiện vật đang phóng
-     ===================================================================== */
-
-  /* Đường nối chạy từ mép hiện vật sang các cột dữ liệu.
-     MÁY TÍNH / TABLET: hai nhánh ngang, toả sang trái và phải.
-     ĐIỆN THOẠI: một nhánh THẲNG ĐỨNG từ mép DƯỚI hiện vật xuống bảng — vì
-     bảng nằm dưới đáy, nhánh ngang cũ chạy xuyên qua giữa hình hiện vật. */
-
-  /* =====================================================================
-     DÒNG CODE QUÉT TRÊN BỀ MẶT HIỆN VẬT
-     Dải sáng chạy lên chạy xuống, và các ký tự code được vẽ đúng vào lưới
-     ASCII đã tính sẵn của chính hiện vật đó — nên chữ bám theo đúng hình.
-     ===================================================================== */
-  /* Thanh ngắm chạy hết bề ngang màn hình, cắt ngang qua hiện vật — kèm
-     vạch chia, hai đoạn nét đứt và hai cụm số hex nhảy ở hai đầu.       */
-
-
-  /* =====================================================================
-     Ô SÓNG ÂM THANH
-     Dạng sóng được sinh từ chính đường dẫn tệp nên lần nào vẽ cũng y hệt
-     nhau — không phải đọc mẫu âm, nhờ vậy chạy được cả khi mở bằng file://
-     Phần đã phát được tô sáng; đang phát thì các cột quanh đầu kim rung nhẹ.
-     ===================================================================== */
-
-
-  /* Nối dây cho ô âm thanh sau khi khối đã nằm trong trang */
-
-  /* =====================================================================
-     CÁC KHỐI DỮ LIỆU bung ra hai bên
-     ===================================================================== */
-
-  /* Mỗi khối chờ đúng lúc SÓNG MÃ chạm tới mép trong của nó rồi mới hoá hình.
-     Nhờ vậy khối gần hiện vật hiện trước, khối xa hiện sau — đúng nhịp lan. */
-
-  /* Giải mã tại chỗ nội dung chữ của một phần tử */
 
   function batTuongTacVat(){
     if(batTuongTacVat.roi) return; batTuongTacVat.roi = true;
@@ -2698,7 +2752,6 @@ function batManHinh(){
       if(pha !== 'xong' || keoVat >= 0) return;
       if(e.pointerType === 'touch') return;      /* cảm ứng lo ở pointerdown */
       var i = chiSo(e); if(i < 0 || !MAIN.nghieng) return;
-      if(phongVat >= 0 && i !== phongVat) return;
       reVat = i; loeQuet(i); day();
     });
     oCum.addEventListener('pointerout', function(e){
@@ -2712,18 +2765,14 @@ function batManHinh(){
     });
     addEventListener('pointermove', function(e){
       if(reVat >= 0 && keoVat < 0){
-        var v = vat[reVat], X = hopXem(v), z = v.zoom || 0;
-        /* tâm và nửa kích thước HIỆN TẠI, kể cả khi đang phóng to */
-        var tx = v.cx + (v.dx || 0) * (1 - z) + (X.x - v.cx) * z;
-        var ty0 = v.cy + (v.dy || 0) * (1 - z) + (X.y - v.cy) * z;
-        var ti = 1 + (X.ti - 1) * z;
-        var my = e.clientY - caoThanh - CH * MAIN.phan_tren;
-        v.ox = Math.max(-1, Math.min(1, (e.clientX - tx) / (v.w * ti / 2)));
-        v.oy = Math.max(-1, Math.min(1, (my - ty0) / (v.h * ti / 2)));
+        var v = vat[reVat];
+        var tx = v.cx + (v.dx || 0), ty = v.cy + (v.dy || 0);
+        v.ox = Math.max(-1, Math.min(1, (cucBoX(e.clientX) - tx) / (v.w / 2)));
+        v.oy = Math.max(-1, Math.min(1, (cucBoY(e.clientY) - ty) / (v.h / 2)));
         day();
       }
       /* Đang trong 250ms chờ giữ: ngón tay xê dịch quá ngưỡng thì huỷ, để
-         không nhầm một cú vuốt thành cú chạm mở chi tiết.                 */
+         không nhầm một cú vuốt thành cú chạm mở hồ sơ.                    */
       if(keoVat < 0 && henGiu && laCham &&
          Math.abs(e.clientX - x0) + Math.abs(e.clientY - y0) > (MAIN.cham_di || 12)){
         huyGiu(); daDi = true;
@@ -2743,7 +2792,7 @@ function batManHinh(){
     }, { passive:true });
 
     oCum.addEventListener('pointerdown', function(e){
-      if(pha !== 'xong') return;      /* code còn đang hoá thành tệp */
+      if(pha !== 'xong') return;      /* code còn đang hoá thành hiện vật */
       var i = chiSo(e); if(i < 0) return;
       laCham = (e.pointerType === 'touch');
       vatDang = i; daDi = false;
@@ -2766,134 +2815,450 @@ function batManHinh(){
           day();
         }, MAIN.cham_giu == null ? 250 : MAIN.cham_giu);
       } else {
-        /* MÁY TÍNH — giữ nguyên nếp cũ: bấm giữ là kéo, bấm nhả là mở */
+        /* MÁY TÍNH — bấm giữ rồi rê là kéo, bấm nhả tại chỗ là mở hồ sơ */
         keoVat = i;
         if(MAIN.keo_tha && nutKeo.classList) nutKeo.classList.add('keo');
         e.preventDefault();
       }
     });
+
     function nha(){
       huyGiu();
+      var i = vatDang;
       if(keoVat < 0){
-        /* Chưa kịp vào chế độ kéo → chỉ là một cú chạm, không mở gì cả */
+        /* Chưa kịp vào chế độ kéo → đây là một CÚ CHẠM NHANH: mở hồ sơ */
         vatDang = -1;
         if(laCham){ reVat = -1; day(); }
+        if(i >= 0 && !daDi) moHoSo(i);
         return;
       }
       if(nutKeo && nutKeo.classList) nutKeo.classList.remove('keo');
-      var i = keoVat; keoVat = -1; nutKeo = null; vatDang = -1;
-      vat[i]._px = null; vat[i]._py = null;
+      var j = keoVat; keoVat = -1; nutKeo = null; vatDang = -1;
+      vat[j]._px = null; vat[j]._py = null;
       if(laCham) reVat = -1;
+      /* Máy tính: bấm xuống rồi nhả ra ngay tại chỗ cũng là một cú chạm */
+      if(!laCham && !daDi) moHoSo(j);
       day();
     }
     oCum.addEventListener('pointerup', nha);
     oCum.addEventListener('pointercancel', nha);
 
+    /* Bấm phím Esc để đóng hồ sơ đang mở */
+    addEventListener('keydown', function(e){
+      if(e.key === 'Escape' && hoSoDang >= 0){ e.stopPropagation(); dongHoSo(); }
+    }, true);
   }
 
-  /* ---------------------------------------------------------------------
-     Hai cột nhật ký ở một phần ba trên
-     --------------------------------------------------------------------- */
-  /* Gõ MỘT DÒNG kèm mã hoá: phần đã gõ là chữ thật, ngay trước con trỏ có
-     một đuôi ký tự rác màu đỏ chạy theo — đọc ra giống code đang được sinh. */
-  function goDongMa(o, chu, buoc, xong){
-    var a = document.createElement('span'); a.className = 'mh-ro';
-    var b = document.createElement('span'); b.className = 'mh-ma';
-    o.appendChild(a); o.appendChild(b);
+  /* =====================================================================
+     KHỐI DÒNG LỆNH — góc trên bên trái
+     GIAI ĐOẠN A: gõ lần lượt các lệnh trong LENH.dung, mỗi ký tự kéo theo
+     một đuôi ký tự rác màu đỏ nên đọc ra giống code đang được sinh.
+     GIAI ĐOẠN B: xoá sạch rồi cho các câu chào trong LENH.chao chạy vòng.
+     Lúc nào cũng chỉ giữ tối đa LENH.so_dong dòng; dòng cũ tự trôi đi.
+     ===================================================================== */
+  var lenhChao = null;          /* id của hẹn giờ đang chạy vòng câu chào */
+
+  function xoaLenh(){
+    if(lenhChao){ clearTimeout(lenhChao); lenhChao = null; }
+    oLenh.innerHTML = ''; oLenh.classList.remove('chao');
+  }
+
+  /* Thêm một dòng mới, đẩy dòng cũ nhất ra ngoài nếu đã quá số dòng cho phép */
+  function themDongLenh(){
+    var d = document.createElement('span'); d.className = 'ml-d';
+    d.innerHTML = '<span class="ml-nhac">' + thoat(LENH.nhac || '>') + '</span>';
+    oLenh.appendChild(d);
+    var toi = Math.max(1, LENH.so_dong || 3);
+    while(oLenh.children.length > toi) oLenh.removeChild(oLenh.firstChild);
+    return d;
+  }
+
+  /* Gõ một dòng, kèm đuôi ký tự rác chạy trước con trỏ */
+  function goDongLenh(o, chu, buoc, xong){
+    var a = document.createElement('span'); a.className = 'ml-ro';
+    var b = document.createElement('span'); b.className = 'ml-ma';
+    var c = document.createElement('i');    c.className = 'ml-tro';
+    o.appendChild(a); o.appendChild(b); o.appendChild(c);
     var i = 0, duoi = MAIN.ma_duoi == null ? 5 : MAIN.ma_duoi;
     var K = String(MAIN.kho || '#');
-    if(buoc <= 0){ a.textContent = chu; if(xong) xong(); return; }
+    if(buoc <= 0 || itDong){
+      a.textContent = chu; b.textContent = ''; c.remove();
+      if(xong) xong(); return;
+    }
     (function b1(){
       a.textContent = chu.slice(0, i);
       if(i < chu.length){
         var n = Math.min(duoi, chu.length - i), t = '';
         for(var k = 0; k < n; k++){
-          var c = chu.charAt(i + k);
-          t += (c === ' ') ? ' ' : K.charAt((Math.random() * K.length) | 0);
+          var ch = chu.charAt(i + k);
+          t += (ch === ' ') ? ' ' : K.charAt((Math.random() * K.length) | 0);
         }
-        b.textContent = t;
-        i++;
+        b.textContent = t; i++;
         hen.push(setTimeout(b1, buoc));
-      } else { b.textContent = ''; if(xong) xong(); }
+      } else {
+        b.textContent = ''; c.remove();
+        if(xong) xong();
+      }
     })();
   }
 
-  /* Cả dòng hiện NGAY dưới dạng mã, rồi giải dần từ trái sang phải.
-     Nhanh hơn gõ từng ký tự rất nhiều mà vẫn giữ nguyên cảm giác Scramble. */
-  function giaiDongMa(o, chu, thoiGian){
-    var a = document.createElement('span'); a.className = 'mh-ro';
-    var b = document.createElement('span'); b.className = 'mh-ma';
-    o.appendChild(a); o.appendChild(b);
-    var K = String(MAIN.kho || '#'), bd = -1, khung = 0;
-    if(thoiGian <= 0){ a.textContent = chu; return; }
-    function ngau(mau){
+  /* GIAI ĐOẠN A — gõ hết danh sách lệnh dựng trang */
+  function chayLenhDung(xong){
+    if(!LENH.bat){ if(xong) xong(); return; }
+    var ds = LENH.dung || [], k = 0;
+    (function tiep(){
+      if(k >= ds.length){ if(xong) xong(); return; }
+      var chu = String(ds[k++]);
+      var d = themDongLenh();
+      /* Dòng đóng khung [ OK ] được tô sáng khác hẳn lệnh thường */
+      if(/^\[\s*OK\s*\]/i.test(chu)){
+        var a = document.createElement('span'); a.className = 'ml-ok';
+        d.appendChild(a);
+        var i = 0;
+        (function go(){
+          a.textContent = chu.slice(0, i);
+          if(i++ < chu.length) hen.push(setTimeout(go, LENH.toc_do || 20));
+          else hen.push(setTimeout(tiep, LENH.nghi || 230));
+        })();
+        return;
+      }
+      goDongLenh(d, chu, LENH.toc_do || 20, function(){
+        hen.push(setTimeout(tiep, LENH.nghi || 230));
+      });
+    })();
+  }
+
+  /* GIAI ĐOẠN B — xoá lệnh rồi cho các câu chào chạy vòng */
+  function chayLenhChao(){
+    if(!LENH.bat) return;
+    var ds = LENH.chao || []; if(!ds.length) return;
+    xoaLenh(); oLenh.classList.add('chao');
+    var k = 0;
+    (function tiep(){
+      var d = themDongLenh();
+      goDongLenh(d, String(ds[k % ds.length]), LENH.toc_do || 20, function(){
+        k++;
+        lenhChao = setTimeout(tiep, LENH.giu_chao || 4200);
+      });
+    })();
+  }
+
+  /* =====================================================================
+     CỘT BẢNG NỘI DUNG — một phần ba bên phải
+     Viền vẽ bằng ký tự box-drawing thật. Muốn mọi nét thẳng hàng thì bề
+     ngang cột phải là bội số nguyên của bề ngang MỘT ký tự, nên ở đây đo
+     chữ trước rồi mới nắn lại bề ngang cột.
+     ===================================================================== */
+  var chuW = 8, cotB = 34, gioHen = null, bdMo = performance.now();
+
+  /* Đo bề ngang một ký tự của phông chữ máy đang dùng cho cột bảng */
+  function doChuMay(){
+    var t = document.createElement('span');
+    t.style.cssText = 'position:absolute;visibility:hidden;white-space:pre;' +
+                      'left:-9999px;top:0;font:inherit';
+    var mau = new Array(101).join('M');
+    t.textContent = mau; oBang.appendChild(t);
+    var w = t.getBoundingClientRect().width / 100;
+    oBang.removeChild(t);
+    return w > 0 ? w : 8;
+  }
+
+  function doCotBang(){
+    chuW = doChuMay();
+    cotB = Math.max(22, Math.min(MAIN.cot_toi_da || 76,
+                                 Math.floor(vungBang.w / chuW)));
+    oBang.style.width = (cotB * chuW).toFixed(2) + 'px';
+  }
+
+  function lap(ch, n){ return n > 0 ? new Array(n + 1).join(ch) : ''; }
+
+  /* Cắt chuỗi cho vừa n ký tự, dài quá thì thêm dấu … */
+  function cat(chu, n){
+    chu = String(chu == null ? '' : chu);
+    return chu.length <= n ? chu : (n > 1 ? chu.slice(0, n - 1) + '…' : chu.slice(0, n));
+  }
+
+  /* Ngắt dòng theo TỪ cho vừa n ký tự — nhờ vậy mỗi dòng là một hàng cố
+     định, viền hai bên luôn thẳng hàng dù chữ dài bao nhiêu.            */
+  function ngatDong(chu, n){
+    var tu = String(chu).split(/\s+/), ra = [], d = '';
+    for(var i = 0; i < tu.length; i++){
+      var t = tu[i];
+      while(t.length > n){ if(d){ ra.push(d); d = ''; } ra.push(t.slice(0, n)); t = t.slice(n); }
+      if(!d) d = t;
+      else if((d + ' ' + t).length <= n) d += ' ' + t;
+      else { ra.push(d); d = t; }
+    }
+    if(d) ra.push(d);
+    return ra.length ? ra : [''];
+  }
+
+  /* ---- Các mảnh HTML dựng nên một bảng ---- */
+
+  /* Viền trên có tiêu đề lồng vào:  ┌─── [ TÊN ] ──────────┐ */
+  function vienTren(ten){
+    ten = String(ten);
+    var dung = 11 + ten.length;                  /* phần cố định + tên */
+    var day  = Math.max(1, cotB - dung);
+    return '<span class="bnd-vien" data-vien="1">┌───' +
+           ' <b>[</b> <i>' + thoat(ten) + '</i> <b>]</b> ' +
+           lap('─', day) + '┐</span>';
+  }
+  function vienDuoi(){
+    return '<span class="bnd-vien" data-vien="1">└' + lap('─', cotB - 2) + '┘</span>';
+  }
+
+  /* Một hàng thường: │ <nội dung> │ — phần giữa rộng đúng cotB-4 ký tự */
+  function hang(giua, lop){
+    return '<div class="bnd-d ' + (lop || '') + '"><s>│ </s>' + giua + '<s> │</s></div>';
+  }
+
+  /* Dựng phần ruột của MỘT bảng, trả về chuỗi HTML */
+  function ruotBang(b){
+    var trong = cotB - 4;                        /* số ký tự dùng được */
+    var r = '', i, d;
+
+    if(b.kieu === 'bando'){
+      var ve = b.ve || [];
+      for(i = 0; i < ve.length; i++){
+        var l = thoat(String(ve[i]))
+                  .replace(/\{([^}]*)\}/g, '<i>$1</i>')
+                  .replace(/\[([^\]]*)\]/g, '<b>$1</b>');
+        r += hang('<span class="bnd-bando">' + l + '</span>', 'bnd-hbd');
+      }
+      if(b.duoi) r += hang('<span class="bnd-gt bnd-mo" data-chu="1">' +
+                           thoat(cat(b.duoi, trong)) + '</span>');
+      return r;
+    }
+
+    if(b.kieu === 'chu'){
+      var ds = b.dong || [];
+      for(i = 0; i < ds.length; i++){
+        var dg = ngatDong(String(ds[i]), trong);
+        for(var k = 0; k < dg.length; k++)
+          r += hang('<span class="bnd-gt" data-chu="1">' + thoat(dg[k]) + '</span>');
+        if(i < ds.length - 1) r += hang('<span class="bnd-gt"> </span>');
+      }
+      return r;
+    }
+
+    if(b.kieu === 'thanh'){
+      var dt = b.dong || [], wn = 0;
+      for(i = 0; i < dt.length; i++) wn = Math.max(wn, String(dt[i].nhan).length);
+      /* nhãn + 1 khoảng + [ + ô + ] + 1 khoảng + 4 ký tự phần trăm */
+      var soO = Math.max(4, trong - wn - 1 - 2 - 1 - 4);
+      for(i = 0; i < dt.length; i++){
+        d = dt[i];
+        var muc = Math.max(0, Math.min(100, +d.muc || 0));
+        var day = Math.round(soO * muc / 100);
+        r += hang('<span class="bnd-nhan">' +
+                  thoat(d.nhan + lap(' ', wn - String(d.nhan).length)) + ' </span>' +
+                  '<span class="bnd-gt bnd-thanh" data-chu="1">[<s>' + lap('█', day) +
+                  '</s><u>' + lap('·', soO - day) + '</u>]</span>' +
+                  '<span class="bnd-gt phai" data-chu="1">' +
+                  lap(' ', 4 - (muc + '%').length) + muc + '%</span>');
+      }
+      return r;
+    }
+
+    if(b.kieu === 'vat'){
+      for(i = 0; i < CUMVAT.length; i++){
+        var v = CUMVAT[i];
+        var moDuoc = v.xem !== false;
+        r += '<div class="bnd-d' + (moDuoc ? ' bnd-bam' : '') + '"' +
+             (moDuoc ? ' data-vat="' + i + '" role="button" tabindex="0"' : '') +
+             '><s>│ </s><span class="bnd-nhan">' + thoat(v.ma_ho_so) + ' </span>' +
+             '<span class="bnd-gt" data-chu="1">' +
+             thoat(cat(v.ten, trong - String(v.ma_ho_so).length - 1)) +
+             '</span><s> │</s></div>';
+      }
+      if(b.ghi) r += hang('<span class="bnd-gt bnd-mo" data-chu="1">' +
+                          thoat(cat(b.ghi, trong)) + '</span>');
+      return r;
+    }
+
+    /* kieu:"dong" và kieu:"gio" — nhãn bên trái, giá trị bên phải */
+    var dd = b.dong || [], wn2 = 0;
+    for(i = 0; i < dd.length; i++) wn2 = Math.max(wn2, String(dd[i].nhan).length);
+    for(i = 0; i < dd.length; i++){
+      d = dd[i];
+      var gt = b.kieu === 'gio' ? soLieuGio(d.ma) : d.gt;
+      r += hang('<span class="bnd-nhan">' +
+                thoat(d.nhan + lap(' ', wn2 - String(d.nhan).length)) + ' </span>' +
+                '<span class="bnd-gt" data-chu="1"' +
+                (b.kieu === 'gio' ? ' data-gio="' + thoat(d.ma) + '"' : '') + '>' +
+                thoat(cat(gt, trong - wn2 - 1)) + '</span>');
+    }
+    return r;
+  }
+
+  /* Số liệu chạy theo thời gian thật cho các bảng kiểu "gio" */
+  function haiSo(n){ return (n < 10 ? '0' : '') + n; }
+  function soLieuGio(ma){
+    var t = new Date();
+    var ngay = t.getFullYear() + '-' + haiSo(t.getMonth() + 1) + '-' + haiSo(t.getDate());
+    var gio  = haiSo(t.getHours()) + ':' + haiSo(t.getMinutes()) + ':' + haiSo(t.getSeconds());
+    if(ma === 'ngay')   return ngay + ' ' + gio;
+    if(ma === 'phien')  return (DATA.caNhan.bietDanh || 'Tuan') + ' // ' + ngay + ' ' + gio;
+    if(ma === 'man_hinh') return window.innerWidth + ' × ' + window.innerHeight;
+    if(ma === 'uptime'){
+      var g = Math.floor((performance.now() - bdMo) / 1000);
+      var p = Math.floor(g / 60), gi = Math.floor(p / 60);
+      return gi > 0 ? (gi + ' giờ, ' + (p % 60) + ' phút')
+                    : (p > 0 ? (p + ' phút, ' + (g % 60) + ' giây') : (g + ' giây'));
+    }
+    return '';
+  }
+  function capNhatGio(){
+    var ds = oBang.querySelectorAll('[data-gio]');
+    for(var i = 0; i < ds.length; i++){
+      var e = ds[i];
+      if(e.getAttribute('data-cho') === '1') continue;   /* còn đang giải mã */
+      e.textContent = cat(soLieuGio(e.getAttribute('data-gio')), cotB - 4);
+    }
+  }
+
+  /* Dựng toàn bộ cột bảng từ danh sách truyền vào */
+  function dungCotBang(ds){
+    doCotBang();
+    var h = '';
+    for(var i = 0; i < ds.length; i++){
+      h += '<section class="bnd" data-b="' + i + '">' +
+           vienTren(ds[i].ten) + ruotBang(ds[i]) + vienDuoi() + '</section>';
+    }
+    oBang.innerHTML = h;
+    /* Nội dung dài hơn cột thì cho cuộn, kèm lớp mờ dần ở đáy */
+    requestAnimationFrame(function(){
+      oBang.classList.toggle('cuon-duoc', oBang.scrollHeight > oBang.clientHeight + 2);
+    });
+    noiDayBang();
+  }
+
+  /* Nối dây cho các dòng bấm được trong cột bảng */
+  function noiDayBang(){
+    var ds = oBang.querySelectorAll('[data-vat]');
+    for(var i = 0; i < ds.length; i++){
+      ds[i].addEventListener('click', function(){
+        moHoSo(parseInt(this.getAttribute('data-vat'), 10));
+      });
+      ds[i].addEventListener('keydown', function(e){
+        if(e.key === 'Enter' || e.key === ' '){
+          e.preventDefault(); moHoSo(parseInt(this.getAttribute('data-vat'), 10));
+        }
+      });
+    }
+    var d = oBang.querySelector('[data-dong-ho-so]');
+    if(d) d.addEventListener('click', dongHoSo);
+  }
+
+  /* Hiện dần từng bảng: viền chạy ra trước, rồi chữ giải mã từ trái sang.
+     tre = chờ bao lâu rồi mới bắt đầu · dai = tổng thời gian cho cả cột.  */
+  function hienCotBang(tre, dai){
+    var bang = oBang.querySelectorAll('.bnd');
+    if(!bang.length) return;
+    var buoc = Math.max(60, dai / bang.length);
+    for(var i = 0; i < bang.length; i++)
+      (function(b, t){ hen.push(setTimeout(function(){ hienMotBang(b, buoc); }, t)); })
+      (bang[i], tre + i * buoc);
+  }
+
+  function hienMotBang(b, dai){
+    b.classList.add('hien');
+    /* Nét viền tự chạy ra nhờ hoạt ảnh CSS gắn với lớp "hien" ở trên.
+       Chữ thì giải mã tại chỗ, so le theo từng dòng. */
+    var chu = b.querySelectorAll('[data-chu]');
+    for(var k = 0; k < chu.length; k++)
+      (function(e, t){ hen.push(setTimeout(function(){ giaiTaiCho(e); }, t)); })
+      (chu[k], dai * 0.3 + k * Math.max(18, dai * 0.5 / Math.max(1, chu.length)));
+  }
+
+  /* Giải mã chữ tại chỗ: cả dòng hiện ngay dưới dạng ký tự rác rồi tan dần
+     thành chữ thật từ trái sang phải.                                    */
+  function giaiTaiCho(e){
+    if(!e || itDong) return;
+    if(e.querySelector('*')) return;              /* có thẻ con thì bỏ qua */
+    var chu = e.textContent, K = String(MAHOA.kho || MAIN.kho || '#');
+    if(!chu) return;
+    e.setAttribute('data-cho', '1');
+    var bd = -1, khung = 0, ms = MAHOA.thoi_gian ? MAHOA.thoi_gian * 0.45 : 420;
+    function ngau(m){
       var t = '';
-      for(var k = 0; k < mau.length; k++){
-        var c = mau.charAt(k);
+      for(var i = 0; i < m.length; i++){
+        var c = m.charAt(i);
         t += (c === ' ') ? ' ' : K.charAt((Math.random() * K.length) | 0);
       }
       return t;
     }
-    b.textContent = ngau(chu);
-    (function buoc(t){
+    requestAnimationFrame(function b(t){
       if(bd < 0) bd = t;
-      var p = Math.min(1, (t - bd) / thoiGian);
+      var p = Math.min(1, (t - bd) / ms);
       var n = Math.round(p * chu.length);
-      a.textContent = chu.slice(0, n);
-      if(n < chu.length){
-        if((++khung % 2) === 0) b.textContent = ngau(chu.slice(n));
-        requestAnimationFrame(buoc);
-      } else b.textContent = '';
-    })(performance.now());
+      e.textContent = chu.slice(0, n) + ((++khung % 2) ? ngau(chu.slice(n)) : chu.slice(n).replace(/\S/g, '·'));
+      if(p < 1) requestAnimationFrame(b);
+      else { e.textContent = chu; e.removeAttribute('data-cho'); }
+    });
   }
 
-  /* Nở "@tangvat" thành danh sách lấy thẳng từ CUMVAT, nên thêm bớt hiện vật
-     là danh sách tự cập nhật theo.                                        */
-  function chiSoVat(ma){
-    for(var k = 0; k < CUMVAT.length; k++) if(CUMVAT[k].ma === ma) return k;
-    return -1;
+  /* ---- MỞ / ĐÓNG HỒ SƠ MỘT HIỆN VẬT ở cột bên phải ---- */
+
+  /* Đổi khối "the" của một hiện vật thành danh sách bảng để dựng cột */
+  function bangHoSo(v){
+    var ds = [];
+    if(v.the && v.the.truong && v.the.truong.length){
+      ds.push({ ten:(v.ma_ho_so || 'HỒ SƠ') + ' · ' + (v.the.loai || ''),
+                kieu:'dong',
+                dong:v.the.truong.map(function(t){ return { nhan:t[0], gt:t[1] }; }) });
+    }
+    var kh = (v.the && v.the.khoi) || [];
+    for(var i = 0; i < kh.length; i++)
+      ds.push({ ten:kh[i].ten, kieu:'chu', dong:kh[i].dong });
+    ds.push({ ten:'ĐÓNG', kieu:'chu', dong:['[ ESC ] hoặc chạm dòng này để quay lại'] });
+    return ds;
   }
 
+  function moHoSo(i){
+    var v = CUMVAT[i]; if(!v || v.xem === false || !v.the) return;
+    hoSoDang = i;
+    if(gioHen){ clearInterval(gioHen); gioHen = null; }
+    dungCotBang(bangHoSo(v));
+    /* Dòng cuối của bảng ĐÓNG chính là nút quay lại */
+    var het = oBang.querySelectorAll('.bnd');
+    if(het.length){
+      var cuoi = het[het.length - 1].querySelector('.bnd-d');
+      if(cuoi){ cuoi.classList.add('bnd-bam'); cuoi.setAttribute('data-dong-ho-so', '1');
+                cuoi.setAttribute('role', 'button'); cuoi.setAttribute('tabindex', '0');
+                cuoi.addEventListener('click', dongHoSo); }
+    }
+    oBang.scrollTop = 0;
+    hienCotBang(0, 520);
+    day();
+  }
 
-  /* Bọc nội dung vào ba lớp của khung kính cắt góc */
+  function dongHoSo(){
+    hoSoDang = -1;
+    dungCotBang(BANGND);
+    batGioChay();
+    oBang.scrollTop = 0;
+    hienCotBang(0, 460);
+    day();
+  }
 
-  /* Thanh đọc số kẹp hai ngoặc, kèm danh sách trạng thái bên phải */
-
-  /* Vài chữ số và ký hiệu nhỏ rải ở bốn góc vùng HUD */
-
-  /* Đường nối chạy từ đáy mỗi khung kính xuống thanh đọc số */
-
-
-  /* Bố cục mới không còn bốn góc cung; hàm giữ tên cũ để mọi nơi gọi vẫn
-     chạy, nay lo việc vẽ lại đường nối khi kích thước đổi.             */
-
-  /* =====================================================================
-     CHUỖI KHỞI TẠO
-     Giữa màn hiện khối ASCII vẽ từ ảnh cùng vài dòng lệnh; xong thì bắn các
-     đường trích xuất ra bốn phía, cuối mỗi đường một bảng dữ liệu nở to rồi
-     chữ nhảy số thành chữ; đồng thời khối ASCII phân tán và đường tắt dần.
-     ===================================================================== */
-
-
-  /* Đọc ảnh thành lưới ký tự. Trả null nếu trình duyệt chặn đọc điểm ảnh. */
-
-
-  /* Vẽ khối: p = phần đã hiện (0→1) · t = phần đã phân tán (0→1) */
-
-  /* Các dòng lệnh gõ ra bên dưới khối ASCII */
-
-  /* Bắn các đường trích xuất từ khối ASCII tới từng bảng dữ liệu */
-
-  /* Khối ASCII phân tán rồi lớp khởi tạo tắt hẳn */
-
+  function batGioChay(){
+    if(gioHen) clearInterval(gioHen);
+    gioHen = setInterval(capNhatGio, 1000);
+  }
 
   /* Trả mọi thứ về trạng thái sạch. Gọi sau khi Main Section đã mờ hẳn,
      hoặc gọi ngay trước khi mở lại.                                       */
   var henDon = null;
   function donDep(){
     if(henDon){ clearTimeout(henDon); henDon = null; }
-    phongVat = -1; reVat = -1; keoVat = -1;
+    reVat = -1; keoVat = -1; hoSoDang = -1;
     if(quay){ cancelAnimationFrame(quay); quay = null; }
+    if(gioHen){ clearInterval(gioHen); gioHen = null; }
+    hen.forEach(clearTimeout); hen = [];
+    xoaLenh();
+    oBang.innerHTML = ''; oBang.classList.remove('cuon-duoc');
     oCum.classList.remove('song');
     oCum.style.maskImage = oCum.style.webkitMaskImage = '';
     if(cv) cv.style.maskImage = cv.style.webkitMaskImage = '';
@@ -2902,14 +3267,13 @@ function batManHinh(){
     for(var i = 0; i < vat.length; i++){
       var v = vat[i];
       v.p = 0; v.dx = 0; v.dy = 0; v.ox = 0; v.oy = 0;
-      v.mx = 0; v.my = 0; v.manh = 0; v.zoom = 0; v._net = null;
+      v.mx = 0; v.my = 0; v.manh = 0;
       v.vx = 0; v.vy = 0; v._px = null; v._py = null;
       if(v.loe)  v.loe.style.opacity  = '0';
-      if(v.scan) v.scan.style.opacity = '0';
       if(v.nut){
         v.nut.classList.remove('loe-quet', 'keo');
         v.nut.style.transform = ''; v.nut.style.opacity = '';
-        v.nut.style.zIndex = ''; v.nut.style.pointerEvents = '';
+        v.nut.style.zIndex = '';
         v.nut.style.width = v.w + 'px'; v.nut.style.height = v.h + 'px';
         v.nut.style.left = (v.cx - v.w / 2) + 'px';
         v.nut.style.top  = (v.cy - v.h / 2) + 'px';
@@ -2919,7 +3283,11 @@ function batManHinh(){
   }
 
   /* ---------------------------------------------------------------------
-     Vòng lặp
+     VÒNG LẶP KHỞI CHẠY — GIAI ĐOẠN A
+     Đường quét chạy TỪ TRÊN XUỐNG in cụm hiện vật ra bằng chữ ASCII, rồi
+     chạy NGƯỢC TỪ DƯỚI LÊN để chữ lùi đi và ảnh thật dâng lên thế chỗ.
+     Cùng lúc đó khối dòng lệnh đang gõ và cột bảng đang tự dựng, nên cả ba
+     phần cùng thành hình một lượt.
      --------------------------------------------------------------------- */
   function vong(luc){
     if(pha === 'nghi') return;
@@ -2941,30 +3309,43 @@ function batManHinh(){
     } else {
       var q = T3 > T2 ? Math.min(1, (t - T2) / (T3 - T2)) : 1;
       inTiep(mocY(1));
-      /* Lần quét thứ hai chạy TỪ DƯỚI LÊN: ảnh thật dâng lên lấp chỗ chữ */
-      var caoDuoi = CH - CH * MAIN.phan_tren;
-      var fLen = mocY(1 - q);                       /* mép ảnh, toạ độ màn  */
+      var fLen = mocY(1 - q);                        /* mép ảnh, toạ độ vùng */
       veNhieuLen(fLen);
-      var pq = Math.max(0, Math.min(1, (caoDuoi - fLen) / Math.max(1, caoDuoi)));
+      var pq = Math.max(0, Math.min(1, (vungCum.h - fLen) / Math.max(1, vungCum.h)));
       datNa(oCum, pq, false, true);
       datNa(cv,   pq, true,  true);
-      if(q >= 1){
-        pha = 'xong';
-        oCum.style.maskImage = oCum.style.webkitMaskImage = '';
-        cv.style.maskImage = cv.style.webkitMaskImage = '';
-        ctx.clearRect(0, 0, cv.width / dpr, cv.height / dpr);
-        ctxN.clearRect(0, 0, cvN.width / dpr, cvN.height / dpr);
-        oCum.classList.add('song');
-        batTuongTacVat();
-        return;
-      }
+      if(q >= 1){ xongGiaiDoanA(); return; }
     }
     requestAnimationFrame(vong);
   }
 
+  /* --- GIAI ĐOẠN B: dựng xong thì lệnh tự xoá, thay bằng các câu chào --- */
+  function xongGiaiDoanA(){
+    pha = 'xong';
+    oCum.style.maskImage = oCum.style.webkitMaskImage = '';
+    cv.style.maskImage = cv.style.webkitMaskImage = '';
+    ctx.clearRect(0, 0, cv.width / dpr, cv.height / dpr);
+    ctxN.clearRect(0, 0, cvN.width / dpr, cvN.height / dpr);
+    oCum.classList.add('song');
+    batTuongTacVat();
+    day();
+    hen.push(setTimeout(chayLenhChao, LENH.cho_chao == null ? 700 : LENH.cho_chao));
+  }
+
+  /* Dựng lại toàn bộ khi đổi cỡ màn hình hoặc xoay máy */
   addEventListener('resize', function(){
     if(pha === 'nghi') return;
-    if(tinhBoCuc()){ dungLuoi(); dungAnh();
+    if(tinhBoCuc()){
+      dungLuoi(); dungAnh();
+      dungCotBang(hoSoDang >= 0 ? bangHoSo(CUMVAT[hoSoDang]) : BANGND);
+      var b = oBang.querySelectorAll('.bnd');
+      for(var i = 0; i < b.length; i++) b[i].classList.add('hien');
+      if(hoSoDang >= 0){
+        var het = b[b.length - 1];
+        var cuoi = het && het.querySelector('.bnd-d');
+        if(cuoi){ cuoi.classList.add('bnd-bam'); cuoi.setAttribute('data-dong-ho-so','1');
+                  cuoi.addEventListener('click', dongHoSo); }
+      } else batGioChay();
       if(pha === 'xong'){
         oCum.style.maskImage = oCum.style.webkitMaskImage = '';
         ctx.clearRect(0, 0, cv.width / dpr, cv.height / dpr);
@@ -2980,6 +3361,17 @@ function batManHinh(){
       if(!tinhBoCuc()) return;
       var soO = dungLuoi();
       dungAnh();
+      bdMo = performance.now();
+
+      /* --- GIAI ĐOẠN A --- ba phần cùng dựng một lượt:
+         1. khối dòng lệnh gõ các lệnh dựng trang
+         2. cụm hiện vật hoá hình bằng ASCII rồi thành ảnh thật
+         3. cột bảng nội dung hiện dần theo                              */
+      dungCotBang(BANGND);
+      batGioChay();
+      hienCotBang(120, itDong ? 0 : (MAIN.in_ascii || 2600) * 0.85);
+      chayLenhDung();
+
       if(khongDocDuoc || !soO){
         /* Không đọc được điểm ảnh (mở bằng file://) → bỏ qua bước ASCII,
            cho hiện vật hiện thẳng ra rồi bật tương tác.                  */
@@ -2987,7 +3379,7 @@ function batManHinh(){
                      'Hãy chạy trang qua một máy chủ (GitHub Pages hoặc python3 -m http.server).');
         datNa(oCum, 1, false, true); datNa(cv, 1, true, true);
         boc.classList.add('hien');
-        pha = 'xong'; oCum.classList.add('song'); batTuongTacVat();
+        hen.push(setTimeout(xongGiaiDoanA, itDong ? 0 : 900));
         return;
       }
       datNa(oCum, 0, false, true); datNa(cv, 0, true, true);
@@ -2996,15 +3388,17 @@ function batManHinh(){
       requestAnimationFrame(vong);
     },
     /* Báo cho phần chuyển cảnh biết lúc nào KHÔNG được hiểu cú vuốt là
-       lệnh thoát: đang xem chi tiết, đang kéo hiện vật, hoặc đang cuộn thẻ. */
-    khoa: function(){ return phongVat >= 0 || keoVat >= 0; },
+       lệnh thoát: đang kéo hiện vật, hoặc đang cuộn cột bảng.            */
+    khoa: function(){ return keoVat >= 0; },
     /* Cho phần cảm biến nghiêng gọi vào để vẽ lại khi máy đổi hướng */
     day: function(){ if(pha === 'xong') day(); },
     dong: function(){
       pha = 'nghi';
       hen.forEach(clearTimeout); hen = [];
+      if(lenhChao){ clearTimeout(lenhChao); lenhChao = null; }
+      if(gioHen){ clearInterval(gioHen); gioHen = null; }
       if(quay){ cancelAnimationFrame(quay); quay = null; }
-      phongVat = -1; reVat = -1; keoVat = -1;
+      reVat = -1; keoVat = -1;
       /* CHỈ tắt hiển thị — mọi thứ đứng nguyên tại chỗ rồi mờ đi cùng nhau.
          Việc dọn dẹp để SAU khi đã mờ hẳn, nếu không thì các hiện vật sẽ
          nhảy về chỗ cũ ngay trước mắt người xem.                          */
@@ -3126,6 +3520,158 @@ function batVetChuot(){
   }
 }
 
+
+/* =========================================================================
+   VỆT CHUỘT MA TRẬN ĐIỂM — dùng trong MAIN SECTION
+   Màn hình được chia thành một lưới điểm cố định như bảng đèn LED. Con trỏ
+   quét tới đâu, các điểm quanh đó bừng sáng tới đó rồi lụi dần kiểu lân
+   quang. Quanh con trỏ luôn thấy lờ mờ chính cái lưới ấy, nên vệt đọc ra là
+   "đồ hoạ ma trận điểm" chứ không phải một vệt sáng trơn.
+   Bỏ qua trên thiết bị cảm ứng và khi hệ điều hành đang giảm chuyển động.
+   ========================================================================= */
+function batVetMaTran(){
+  if(!MATRAN.bat || itDong) return;
+  if(!matchMedia('(pointer: fine)').matches) return;
+
+  var cv = document.createElement('canvas');
+  cv.className = 'vet-matran';
+  cv.setAttribute('aria-hidden', 'true');
+  document.body.appendChild(cv);
+  var ctx = cv.getContext('2d');
+
+  var W = 0, H = 0, cot = 0, dong = 0;
+  var muc = null;                       /* độ sáng từng điểm, 0 → 1        */
+  var cx = -1, cy = -1;                 /* con trỏ, theo toạ độ ô          */
+  var px = -1, py = -1;                 /* vị trí trước đó, để nối nét      */
+  var dangChay = false, coCho = false;  /* coCho = còn điểm nào đang sáng   */
+
+  /* Lấy màu thật từ bảng màu đang dùng, nên đổi bảng màu là vệt đổi theo */
+  function mau(ten){
+    var v = getComputedStyle(document.documentElement)
+              .getPropertyValue('--' + (ten === 'giay' ? 'giay' : ten === 'do' ? 'do' : 'mint'));
+    return (v || '#8CC7C4').trim();
+  }
+  var mauChinh = mau(MATRAN.mau), mauDau = mau(MATRAN.mau_dau);
+  /* Bảng màu đổi thì đọc lại — biến CSS thay đổi không tự báo, nên đọc lại
+     mỗi khi cửa sổ đổi cỡ và mỗi lần người xem bấm một ô bảng màu.        */
+  function docLaiMau(){ mauChinh = mau(MATRAN.mau); mauDau = mau(MATRAN.mau_dau); }
+  document.addEventListener('click', function(e){
+    if(e.target && e.target.closest && e.target.closest('.bang-mau'))
+      setTimeout(docLaiMau, 60);
+  }, true);
+
+  function doLai(){
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    W = window.innerWidth; H = window.innerHeight;
+    cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
+    cv.style.width = W + 'px'; cv.style.height = H + 'px';
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    var o = Math.max(6, MATRAN.o || 13);
+    cot = Math.ceil(W / o) + 1; dong = Math.ceil(H / o) + 1;
+    muc = new Float32Array(cot * dong);
+    docLaiMau();
+  }
+  doLai();
+  addEventListener('resize', doLai, { passive:true });
+
+  /* Thắp sáng các điểm quanh một toạ độ ô, càng gần tâm càng sáng */
+  function thap(ox, oy, manh){
+    var R = MATRAN.ban_kinh || 2.1, r = Math.ceil(R);
+    for(var j = -r; j <= r; j++){
+      for(var i = -r; i <= r; i++){
+        var x = Math.round(ox) + i, y = Math.round(oy) + j;
+        if(x < 0 || y < 0 || x >= cot || y >= dong) continue;
+        var d = Math.sqrt((x - ox) * (x - ox) + (y - oy) * (y - oy));
+        if(d > R) continue;
+        var m = manh * (1 - d / R);
+        var k = y * cot + x;
+        if(m > muc[k]) muc[k] = Math.min(1, m);
+      }
+    }
+  }
+
+  addEventListener('mousemove', function(e){
+    if(!tatVetChuot) return;              /* chỉ vẽ khi đang ở Main Section */
+    var o = Math.max(6, MATRAN.o || 13);
+    var nx = e.clientX / o, ny = e.clientY / o;
+    /* Nối nét giữa hai lần báo toạ độ, để con trỏ đi nhanh vệt vẫn liền */
+    if(px >= 0){
+      var b = Math.ceil(Math.max(Math.abs(nx - px), Math.abs(ny - py)));
+      for(var i = 1; i <= b; i++)
+        thap(px + (nx - px) * i / b, py + (ny - py) * i / b, 1);
+    } else thap(nx, ny, 1);
+    px = nx; py = ny; cx = nx; cy = ny; coCho = true;
+    if(!dangChay){ dangChay = true; requestAnimationFrame(ve); }
+  }, { passive:true });
+
+  addEventListener('mouseout', function(e){
+    if(!e.relatedTarget && !e.toElement){ cx = -1; cy = -1; px = -1; py = -1; }
+  }, { passive:true });
+
+  function ve(){
+    var o = Math.max(6, MATRAN.o || 13);
+    var D = MATRAN.cham || 3.4, phai = MATRAN.phai || 0.055;
+    var thang = String(MATRAN.thang || '·:*+=#@');
+    ctx.clearRect(0, 0, W, H);
+
+    if(!tatVetChuot){                     /* rời khỏi Main Section → tắt hẳn */
+      if(muc) muc.fill(0);
+      dangChay = false; coCho = false; return;
+    }
+
+    /* 1. Lưới nền mờ quanh con trỏ — cho thấy chính cái ma trận điểm */
+    if(cx >= 0 && MATRAN.nen_mo > 0){
+      var Rn = MATRAN.nen || 6;
+      ctx.fillStyle = mauChinh;
+      for(var jn = -Rn; jn <= Rn; jn++){
+        for(var inn = -Rn; inn <= Rn; inn++){
+          var xn = Math.round(cx) + inn, yn = Math.round(cy) + jn;
+          if(xn < 0 || yn < 0 || xn >= cot || yn >= dong) continue;
+          var dn = Math.sqrt(inn * inn + jn * jn);
+          if(dn > Rn) continue;
+          ctx.globalAlpha = MATRAN.nen_mo * (1 - dn / Rn);
+          ctx.fillRect(xn * o - 0.7, yn * o - 0.7, 1.4, 1.4);
+        }
+      }
+    }
+
+    /* 2. Các điểm đang sáng của vệt */
+    var con = false;
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.font = '700 ' + Math.round(o * 0.78) + 'px ' +
+               'ui-monospace, Menlo, Consolas, monospace';
+    for(var y = 0; y < dong; y++){
+      for(var x = 0; x < cot; x++){
+        var k = y * cot + x, m = muc[k];
+        if(m <= 0.004) continue;
+        con = true;
+        var X = x * o, Y = y * o;
+        /* Điểm ngay dưới con trỏ đổi màu nhấn */
+        var gan = cx >= 0 && Math.abs(x - cx) < 1.1 && Math.abs(y - cy) < 1.1;
+        ctx.globalAlpha = m;
+        if(MATRAN.chu && m > 0.5){
+          /* Sáng nhất thì điểm hoá thành một ký tự ASCII */
+          var ic = Math.min(thang.length - 1,
+                            Math.floor((m - 0.5) / 0.5 * thang.length));
+          ctx.fillStyle = gan ? mauDau : mauChinh;
+          ctx.fillText(thang.charAt(ic), X, Y);
+        } else {
+          ctx.fillStyle = gan ? mauDau : mauChinh;
+          ctx.beginPath();
+          ctx.arc(X, Y, Math.max(0.4, D * 0.5 * m), 0, 6.2832);
+          ctx.fill();
+        }
+        muc[k] = m - phai * (0.6 + m);        /* sáng thì lụi nhanh hơn */
+        if(muc[k] < 0) muc[k] = 0;
+      }
+    }
+    ctx.globalAlpha = 1;
+    coCho = con;
+    if(con || cx >= 0) requestAnimationFrame(ve);
+    else { dangChay = false; ctx.clearRect(0, 0, W, H); }
+  }
+}
+
 /* =========================================================================
    6. KHỞI ĐỘNG
    ========================================================================= */
@@ -3163,6 +3709,7 @@ doKichThuocGoc();
 document.body.classList.add('khoa');   /* Hero đứng yên cho tới khi người xem cuộn */
 batTuongTac();
 batVetChuot();
+batVetMaTran();
 batChuyenCanh();
 batHeroBi();
 batGanCuaSo();
